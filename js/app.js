@@ -142,7 +142,7 @@ function updatePrayerTimes(lat, lng) {
     }
     
     // تحديث واجهة المستخدم
-    updatePrayerTimesDisplay();
+   
 }
 
 // دالة مساعدة لعرض الإشعارات
@@ -216,3 +216,4 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 
 });
+
