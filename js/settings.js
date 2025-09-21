@@ -374,3 +374,34 @@ document.getElementById('settings-modal').addEventListener('shown.bs.modal', fun
   initSoundEvents();
   initAppearanceEvents();
 });
+// إغلاق نافذة الإعدادات تلقائياً بعد 5 ثوانٍ من عدم النشاط
+let settingsInactivityTimer;
+
+function resetSettingsInactivityTimer() {
+  clearTimeout(settingsInactivityTimer);
+  settingsInactivityTimer = setTimeout(() => {
+    const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settings-modal'));
+    if (settingsModal) {
+      settingsModal.hide();
+    }
+  }, 5000); // 5 ثواني
+}
+
+// إضافة مستمعي الأحداث لنشاط المستخدم
+function initSettingsAutoClose() {
+  const settingsModal = document.getElementById('settings-modal');
+  if (settingsModal) {
+    settingsModal.addEventListener('mousemove', resetSettingsInactivityTimer);
+    settingsModal.addEventListener('click', resetSettingsInactivityTimer);
+    settingsModal.addEventListener('keypress', resetSettingsInactivityTimer);
+    
+    // بدء المؤقت عند فتح النافذة
+    settingsModal.addEventListener('shown.bs.modal', resetSettingsInactivityTimer);
+  }
+}
+
+// استدعاء الدالة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+  initSettingsAutoClose();
+});
+
