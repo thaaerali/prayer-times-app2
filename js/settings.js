@@ -374,16 +374,4 @@ document.getElementById('settings-modal').addEventListener('shown.bs.modal', fun
   initSoundEvents();
   initAppearanceEvents();
 });
-// إغلاق نافذة الإعدادات تلقائياً بعد 5 ثوانٍ من عدم النشاط
-let settingsInactivityTimer;
-
-function resetSettingsInactivityTimer() {
-  clearTimeout(settingsInactivityTimer);
-  settingsInactivityTimer = setTimeout(() => {
-    const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settings-modal'));
-    if (settingsModal) {
-      settingsModal.hide();
-    }
-  }, 5000); // 5 ثواني
-}
 
