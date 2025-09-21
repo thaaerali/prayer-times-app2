@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -195,21 +194,44 @@
 
                 <!-- تبويب الأصوات -->
                 <div class="tab-pane fade" id="v-pills-sound" role="tabpanel" aria-labelledby="v-pills-sound-tab">
-                  <!-- قائمة المؤذنين المنسدلة مع زر الاختبار -->
                   <div class="mb-4">
-                    <h6 class="fw-bold mb-3">اختيار المؤذن</h6>
-                    <div class="muezzin-select-group">
-                      <button id="test-adhan-btn" class="btn btn-primary test-sound-btn" title="اختبار صوت الأذان">
-                        <i class="bi bi-play-fill"></i>
-                      </button>
-                      <select id="muezzin-select" class="form-select muezzin-select">
-                        <option value="abdul-basit">أبا ذر الحلواجي</option>
-                        <option value="mishary-rashid">الشيخ شبر معله</option>
-                        <option value="saud-al-shuraim">الحاج مصطفى الصراف</option>
-                        <option value="yasser-al-dosari">محمد التوخى</option>
-                      </select>
+                    <h6 class="fw-bold mb-3">صوت الأذان</h6>
+                    <div class="list-group" id="adhan-sounds-list">
+                      <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="abdul-basit">
+                        <div>
+                          <span class="fw-medium">أبا ذر الحلواجي</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary play-btn">
+                          <i class="bi bi-play-fill"></i>
+                        </button>
+                      </div>
+                      <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="mishary-rashid">
+                        <div>
+                          <span class="fw-medium">الشيخ شبر معله</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary play-btn">
+                          <i class="bi bi-play-fill"></i>
+                        </button>
+                      </div>
+                      <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="saud-al-shuraim">
+                        <div>
+                          <span class="fw-medium">الحاج مصطفى الصراف</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary play-btn">
+                          <i class="bi bi-play-fill"></i>
+                        </button>
+                      </div>
+                      <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="yasser-al-dosari">
+                        <div>
+                          <span class="fw-medium">محمد التوخى</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary play-btn">
+                          <i class="bi bi-play-fill"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
+
                   <div class="mb-4">
                     <h6 class="fw-bold mb-3">تشغيل الأذان تلقائياً</h6>
                     <div class="form-check form-switch mb-2">
@@ -278,6 +300,9 @@
             </div>
           </div>
         </div>
+        <div class="modal-footer">
+          <button id="cancel-settings" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button id="save-settings" class="btn btn-primary">حفظ</button>
         </div>
       </div>
     </div>
