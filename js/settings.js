@@ -374,4 +374,3 @@ document.getElementById('settings-modal').addEventListener('shown.bs.modal', fun
   initSoundEvents();
   initAppearanceEvents();
 });
-
