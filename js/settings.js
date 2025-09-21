@@ -387,21 +387,3 @@ function resetSettingsInactivityTimer() {
   }, 5000); // 5 ثواني
 }
 
-// إضافة مستمعي الأحداث لنشاط المستخدم
-function initSettingsAutoClose() {
-  const settingsModal = document.getElementById('settings-modal');
-  if (settingsModal) {
-    settingsModal.addEventListener('mousemove', resetSettingsInactivityTimer);
-    settingsModal.addEventListener('click', resetSettingsInactivityTimer);
-    settingsModal.addEventListener('keypress', resetSettingsInactivityTimer);
-    
-    // بدء المؤقت عند فتح النافذة
-    settingsModal.addEventListener('shown.bs.modal', resetSettingsInactivityTimer);
-  }
-}
-
-// استدعاء الدالة عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-  initSettingsAutoClose();
-});
-
