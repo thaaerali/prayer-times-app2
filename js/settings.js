@@ -374,3 +374,17 @@ document.getElementById('settings-modal').addEventListener('shown.bs.modal', fun
   initSoundEvents();
   initAppearanceEvents();
 });
+// حفظ الإعدادات عند إغلاق نافذة الإعدادات
+document.getElementById('settings-modal').addEventListener('hidden.bs.modal', function() {
+  // التأكد من حفظ أي إعدادات أخيرة قبل إغلاق النافذة
+  autoSaveSettings();
+  
+  // إعادة حساب أوقات الصلاة بعد إغلاق النافذة
+  calculateAndDisplayPrayerTimes();
+  
+  // إعادة تشغيل مراقبة الإشعارات
+  if (typeof startNotificationChecker === 'function') {
+    startNotificationChecker();
+  }
+});
+
