@@ -259,5 +259,47 @@ function initAppearanceEvents() {
     });
   }
 }
+// دالة لترحيل الإعدادات من النسخة القديمة إلى الجديدة
+function migrateOldSettings() {
+  const oldSettings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+  
+  if (oldSettings.selectedSound || oldSettings.appearance) {
+    // فصل إعدادات الصوت
+    const soundSettings = {
+      selectedSound: oldSettings.selectedSound || 'abdul-basit',
+      playFajrAdhan: oldSettings.playFajrAdhan !== undefined ? oldSettings.playFajrAdhan : true,
+      playDhuhrAdhan: oldSettings.playDhuhrAdhan !== undefined ? oldSettings.playDhuhrAdhan : true,
+      playAsrAdhan: oldSettings.playAsrAdhan !== undefined ? oldSettings.playAsrAdhan : true,
+      playMaghribAdhan: oldSettings.playMaghribAdhan !== undefined ? oldSettings.playMaghribAdhan : true,
+      playIshaAdhan: oldSettings.playIshaAdhan !== undefined ? oldSettings.playIshaAdhan : true,
+      volumeLevel: oldSettings.volumeLevel !== undefined ? oldSettings.volumeLevel : 80
+    };
+    
+    // فصل إعدادات المظهر
+    const appearanceSettings = {
+      appearance: oldSettings.appearance || 'auto'
+    };
+    
+    // حفظ الإعدادات الجديدة
+    localStorage.setItem('soundSettings', JSON.stringify(soundSettings));
+    localStorage.setItem('appearanceSettings', JSON.stringify(appearanceSettings));
+    
+    // إزالة الخصائص القديمة من كائن الإعدادات
+    delete oldSettings.selectedSound;
+    delete oldSettings.playFajrAdhan;
+    delete oldSettings.playDhuhrAdhan;
+    delete oldSettings.playAsrAdhan;
+    delete oldSettings.playMaghribAdhan;
+    delete oldSettings.playIshaAdhan;
+    delete oldSettings.volumeLevel;
+    delete oldSettings.appearance;
+    
+    // حفظ إعدادات الصلاة المتبقية
+    localStorage.setItem('prayerSettings', JSON.stringify(oldSettings));
+  }
+}
+
+// استدعاء دالة الترحيل عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', migrateOldSettings);
 
 
