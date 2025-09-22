@@ -53,3 +53,44 @@ async function checkFileExists(url) {
     return false;
   }
 }
+// دالة تطبيق المظهر
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('bg-light');
+    } else if (theme === 'light') {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('bg-light');
+    } else {
+        // التلقائي - نتحقق من تفضيلات النظام
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+            document.body.classList.remove('bg-light');
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.body.classList.add('bg-light');
+        }
+    }
+    
+    // حفظ التفضيل في localStorage
+    localStorage.setItem('theme', theme);
+}
+
+// تحميل التفضيل المحفوظ عند بدء التحميل
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+    return savedTheme;
+}
+
+// للاستماع لتغير تفضيلات النظام عند اختيار "تلقائي"
+function watchSystemTheme() {
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'auto') {
+                applyTheme('auto');
+            }
+        });
+    }
+}
