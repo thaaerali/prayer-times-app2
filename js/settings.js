@@ -135,3 +135,40 @@ function loadSettings() {
     
     return settings;
 }
+
+// تهيئة أحداث المظهر
+function initAppearanceEvents() {
+    const appearanceItems = document.querySelectorAll('#appearance-list .sound-item');
+    
+    appearanceItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // إزالة النشاط من جميع العناصر
+            appearanceItems.forEach(el => el.classList.remove('active'));
+            
+            // إضافة النشاط للعنصر المحدد
+            this.classList.add('active');
+            
+            // تطبيق المظهر
+            const theme = this.getAttribute('data-appearance');
+            applyTheme(theme);
+            
+            // حفظ الإعدادات
+            saveSettings();
+        });
+    });
+}
+
+// وفي دالة تحميل الإعدادات، تأكد من تفعيل الخيار الصحيح
+function loadAppearanceSettings() {
+    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+    const savedTheme = settings.appearance || 'light';
+    
+    // تفعيل الخيار المناسب
+    const activeItem = document.querySelector(`#appearance-list .sound-item[data-appearance="${savedTheme}"]`);
+    if (activeItem) {
+        document.querySelectorAll('#appearance-list .sound-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        activeItem.classList.add('active');
+    }
+}
