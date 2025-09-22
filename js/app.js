@@ -185,7 +185,7 @@ function initApp() {
   setInterval(calculateAndDisplayPrayerTimes, 3600000);
 
   // تمكين التشغيل التلقائي والتحقق من الأذونات
-  enableAutoPlay();
+//  enableAutoPlay();
   
   // بدء مراقبة الإشعارات
   startNotificationChecker();
@@ -216,4 +216,5 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 
 });
+
 
