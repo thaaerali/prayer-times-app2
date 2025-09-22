@@ -22,6 +22,9 @@ function initAppearanceSettings() {
             saveSettings();
         });
     });
+    // في نهاية js/settings.js
+console.log('تم تحميل ملف settings.js');
+
     
     // تحميل الإعدادات المحفوظة وتحديد الخيار النشط
     loadAppearanceSettings();
@@ -172,3 +175,4 @@ function loadAppearanceSettings() {
         activeItem.classList.add('active');
     }
 }
+
