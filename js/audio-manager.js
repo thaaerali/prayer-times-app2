@@ -29,36 +29,31 @@ async function playAdhanSound(soundId) {
   adhanPlayer.volume = volumeLevel.value / 100;
 
   try {
-    // محاولة التشغيل مع التعامل مع قيود المتصفح
     const promise = adhanPlayer.play();
 
     if (promise !== undefined) {
       promise.then(() => {
         showNotification('جاري تشغيل الأذان');
       }).catch(error => {
-        // إذا فشل التشغيل، نعرض رسالة للمستخدم
-        showError('تعذر تشغيل الأذان. يرجى النقر على الصفحة أولاً ثم المحاولة مرة أخرى.');
+        showError('تعذر تشغيل الأذان.');
         console.error('Error playing adhan:', error);
       });
     }
   } catch (error) {
     console.error('Error playing adhan:', error);
-    showNotification('تعذر تشغيل صوت الأذان. يرجى تفعيل الصوت في المتصفح.');
+    showNotification('تعذر تشغيل صوت الأذان. يرجى تفعيل الصوت.');
   }
 }
 
-// دالة للتحقق من أذونات الصوت
+// دالة للتحقق من أذونات الصوت (ممكن تتركها أو تحذفها)
 function checkAudioPermissions() {
   try {
-    // محاولة تشغيل صوت صامت للتحقق من الصلاحيات
     const testAudio = new Audio();
     testAudio.src = 'data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAAC';
 
     testAudio.play().then(() => {
       console.log('إذن الصوت مُمنوح');
       testAudio.pause();
-
-      // حفظ حالة الإذن
       localStorage.setItem('audioPermission', 'granted');
     }).catch(error => {
       console.log('لم يتم منح إذن الصوت:', error);
@@ -94,7 +89,6 @@ function checkPrayerTimes() {
 
 // دالة مساعدة للتحقق إذا حان وقت الصلاة
 function isPrayerTime(prayerTime, currentTime) {
-  // تحويل الوقت إلى دقائق للمقارنة
   const [prayerHours, prayerMinutes] = prayerTime.split(':').map(Number);
   const [currentHours, currentMinutes] = currentTime.split(':').map(Number);
 
@@ -113,35 +107,8 @@ function shouldPlayAdhan(prayer, settings) {
   }
 }
 
-// دالة لتمكين التشغيل التلقائي بعد تفاعل المستخدم
-function enableAutoPlay() {
-  let userInteracted = false;
-  const interactionAlert = document.getElementById('interaction-alert');
-
-  document.addEventListener('click', function() {
-    if (!userInteracted) {
-      userInteracted = true;
-      localStorage.setItem('userInteracted', 'true');
-      checkAudioPermissions();
-      interactionAlert.style.display = 'none';
-
-      // بدء مراقبة أوقات الصلاة بعد التفاعل
-      setInterval(checkPrayerTimes, 60000);
-      setTimeout(checkPrayerTimes, 2000);
-    }
-  });
-
-  // التحقق من التفاعل السابق
-  if (localStorage.getItem('userInteracted') === 'true') {
-    userInteracted = true;
-  }
-
-  // إظهار تنبيه إذا لم يتفاعل المستخدم بعد
-  setTimeout(() => {
-    if (!userInteracted) {
-      interactionAlert.style.display = 'block';
-    }
-  }, 3000);
-
-  return userInteracted;
-}
+// ✅ بدء المراقبة مباشرة بدون enableAutoPlay ولا interaction-alert
+document.addEventListener("DOMContentLoaded", () => {
+  setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
+  setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
+});
