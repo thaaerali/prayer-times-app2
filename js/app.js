@@ -165,6 +165,11 @@ function initApp() {
 
   // تحميل الإعدادات المحفوظة
   loadSettings();
+   // تحميل وتطبيق المظهر
+    loadTheme();
+    watchSystemTheme();
+  // تهيئة إعدادات المظهر
+    initAppearanceSettings();
 
   // عرض التاريخ الحالي
   displayDate();
@@ -216,5 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 
 });
+
 
 
