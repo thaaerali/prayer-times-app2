@@ -388,3 +388,24 @@ document.getElementById('settings-modal').addEventListener('hidden.bs.modal', fu
   }
 });
 
+// إعدادات المظهر
+function initAppearanceSettings() {
+    const appearanceOptions = document.querySelectorAll('.appearance-option');
+    
+    appearanceOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            appearanceOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            const theme = this.getAttribute('data-theme');
+            applyTheme(theme);
+            
+            // حفظ الإعدادات كاملة
+            saveSettings();
+        });
+    });
+    
+    // تحميل الإعدادات المحفوظة
+    const savedTheme = loadTheme();
+    document.querySelector(`.appearance-option[data-theme="${savedTheme}"]`)?.classList.add('active');
+}
