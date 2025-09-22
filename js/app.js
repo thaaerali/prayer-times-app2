@@ -221,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 
 });
-// في بداية js/app.js
-console.log('بدء تحميل app.js');
+
+
 
 
 
