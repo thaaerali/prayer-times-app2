@@ -223,3 +223,7 @@ async function checkInternetConnection() {
 }
 
 console.log('تم تحميل utils.js بنجاح');
+// في نهاية js/utils.js
+console.log('تم تحميل ملف utils.js');
+
+
