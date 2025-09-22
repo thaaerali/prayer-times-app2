@@ -1,3 +1,19 @@
+.dark-mode .form-control,
+.dark-mode .form-select {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.dark-mode .form-control:focus,
+.dark-mode .form-select:focus {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--bg-primary);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* أضف المزيد من القواعد حسب الحاجة */
 /* أنماط الوضع الليلي */
 body.dark-mode {
   background-color: #1a1a1a;
@@ -146,3 +162,4 @@ body.dark-mode .form-range::-webkit-slider-thumb {
 body.dark-mode .form-range::-moz-range-thumb {
   background-color: #6ea8fe;
 }
+
