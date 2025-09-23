@@ -52,10 +52,53 @@
     </div>
   </header>
 
-  <!-- أوقات الصلاة -->
-  <div id="prayer-times" class="container my-3">
-    <div class="text-center py-4">جاري تحميل أوقات الصلاة...</div>
+ <!-- أوقات الصلاة - RecyclerView Style -->
+<div id="prayer-times" class="container my-3">
+  <div class="prayer-recyclerview">
+    <div class="prayer-item" data-prayer="fajr">
+      <div class="prayer-name">
+        <i class="bi bi-sun prayer-icon"></i>
+        <span>الفجر</span>
+      </div>
+      <div class="prayer-time" id="fajr-time">--:--</div>
+    </div>
+    <div class="prayer-item" data-prayer="sunrise">
+      <div class="prayer-name">
+        <i class="bi bi-brightness-high prayer-icon"></i>
+        <span>الشروق</span>
+      </div>
+      <div class="prayer-time" id="sunrise-time">--:--</div>
+    </div>
+    <div class="prayer-item" data-prayer="dhuhr">
+      <div class="prayer-name">
+        <i class="bi bi-brightness-high-fill prayer-icon"></i>
+        <span>الظهر</span>
+      </div>
+      <div class="prayer-time" id="dhuhr-time">--:--</div>
+    </div>
+    <div class="prayer-item" data-prayer="asr">
+      <div class="prayer-name">
+        <i class="bi bi-cloud-sun prayer-icon"></i>
+        <span>العصر</span>
+      </div>
+      <div class="prayer-time" id="asr-time">--:--</div>
+    </div>
+    <div class="prayer-item" data-prayer="maghrib">
+      <div class="prayer-name">
+        <i class="bi bi-sunset prayer-icon"></i>
+        <span>المغرب</span>
+      </div>
+      <div class="prayer-time" id="maghrib-time">--:--</div>
+    </div>
+    <div class="prayer-item" data-prayer="isha">
+      <div class="prayer-name">
+        <i class="bi bi-moon-stars prayer-icon"></i>
+        <span>العشاء</span>
+      </div>
+      <div class="prayer-time" id="isha-time">--:--</div>
+    </div>
   </div>
+</div>
 
   <!-- نافذة الإعدادات -->
   <div class="modal fade" id="settings-modal" tabindex="-1">
@@ -377,6 +420,7 @@
  
 </body>
 </html>
+
 
 
 
