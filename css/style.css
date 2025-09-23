@@ -31,7 +31,30 @@ body {
 .bg-primary {
     background-color: var(--bg-primary) !important;
 }
-
+  /* إخفاء خطوط الطول والعرض */
+    #coordinates {
+      display: none;
+    }
+    
+    /* تعديل تنسيق البدي لاستيعاب اسم المدينة */
+    #prayer-times {
+      position: relative;
+    }
+    
+    .city-name-container {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .city-name-container h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #333;
+    }
 /* أضف المزيد من القواعد حسب الحاجة */
 .vertical-tabs .nav-link {
   text-align: right;
@@ -218,6 +241,7 @@ header .d-flex .location-marker {
 .prayer-notification .btn-close {
   filter: invert(1);
 }
+
 
 
 
