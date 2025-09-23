@@ -27,22 +27,79 @@ function updateLocationStatus(message, isError = false) {
   locationStatus.className = isError ? 'mt-2 small text-danger' : 'mt-2 small text-success';
 }
 
+// دالة لتنسيق الوقت مع التقريب - نسخة محسنة
 function formatTime(time, format) {
-  let [hours, minutes] = time.split(':').map(Number);
-  if (format === '24h') return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
-  const period = hours >= 12 ? 'م' : 'ص';
-  hours = hours % 12 || 12;
-  if (format === '12h') return `${hours}:${minutes.toString().padStart(2,'0')} ${period}`;
-  return `${hours}:${minutes.toString().padStart(2,'0')}`;
+  if (!time || time === '--:--' || time === 'Invalid Date') return '--:--';
+  
+  try {
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    // التحقق من صحة القيم
+    if (isNaN(hours) || isNaN(minutes)) return '--:--';
+    
+    if (format === '24h') {
+      return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
+    }
+    
+    const period = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12 || 12;
+    
+    if (format === '12h') {
+      return `${hours}:${minutes.toString().padStart(2,'0')} ${period}`;
+    }
+    
+    return `${hours}:${minutes.toString().padStart(2,'0')}`;
+  } catch (error) {
+    console.error('Error formatting time:', error, time);
+    return '--:--';
+  }
 }
 
+// دالة لتطبيق التقريب - نسخة محسنة
 function applyRounding(time, method) {
-  let [hours, minutes] = time.split(':').map(Number);
-  if (method === 'nearest') minutes = Math.round(minutes/5)*5;
-  else if (method === 'up') minutes = Math.ceil(minutes/5)*5;
-  else if (method === 'down') minutes = Math.floor(minutes/5)*5;
-  if (minutes === 60) { minutes = 0; hours += 1; if(hours===24) hours=0;}
-  return `${hours}:${minutes.toString().padStart(2,'0')}`;
+  if (!time || time === '--:--' || time === 'Invalid Date' || method === 'none') {
+    return time;
+  }
+  
+  try {
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    // التحقق من صحة القيم
+    if (isNaN(hours) || isNaN(minutes)) return time;
+    
+    if (method === 'nearest') {
+      minutes = Math.round(minutes / 5) * 5;
+    } else if (method === 'up') {
+      minutes = Math.ceil(minutes / 5) * 5;
+    } else if (method === 'down') {
+      minutes = Math.floor(minutes / 5) * 5;
+    }
+    
+    if (minutes === 60) { 
+      minutes = 0; 
+      hours += 1; 
+      if (hours === 24) hours = 0;
+    }
+    
+    return `${hours}:${minutes.toString().padStart(2,'0')}`;
+  } catch (error) {
+    console.error('Error applying rounding:', error, time);
+    return time;
+  }
+}
+
+// دالة مساعدة لتحويل الوقت إلى دقائق
+function convertTimeToMinutes(timeString) {
+  if (!timeString || timeString === '--:--') return 0;
+  
+  try {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return 0;
+    return hours * 60 + minutes;
+  } catch (error) {
+    console.error('Error converting time to minutes:', error);
+    return 0;
+  }
 }
 
 async function checkFileExists(url) {
@@ -53,6 +110,7 @@ async function checkFileExists(url) {
     return false;
   }
 }
+
 // دالة تطبيق المظهر
 function applyTheme(theme) {
     if (theme === 'dark') {
@@ -99,22 +157,22 @@ function watchSystemTheme() {
     }
 }
 
-// دالة لتنسيق الوقت مع التقريب
-function formatTime(time, format) {
-  let [hours, minutes] = time.split(':').map(Number);
-  if (format === '24h') return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
-  const period = hours >= 12 ? 'م' : 'ص';
-  hours = hours % 12 || 12;
-  if (format === '12h') return `${hours}:${minutes.toString().padStart(2,'0')} ${period}`;
-  return `${hours}:${minutes.toString().padStart(2,'0')}`;
-}
-
-// دالة لتطبيق التقريب
-function applyRounding(time, method) {
-  let [hours, minutes] = time.split(':').map(Number);
-  if (method === 'nearest') minutes = Math.round(minutes/5)*5;
-  else if (method === 'up') minutes = Math.ceil(minutes/5)*5;
-  else if (method === 'down') minutes = Math.floor(minutes/5)*5;
-  if (minutes === 60) { minutes = 0; hours += 1; if(hours===24) hours=0;}
-  return `${hours}:${minutes.toString().padStart(2,'0')}`;
+// دالة لعرض التاريخ الحالي
+function displayDate() {
+  try {
+    const now = new Date();
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    const dateString = now.toLocaleDateString('ar-SA', options);
+    const dateDisplay = document.getElementById('date-display');
+    if (dateDisplay) {
+      dateDisplay.textContent = dateString;
+    }
+  } catch (error) {
+    console.error('Error displaying date:', error);
+  }
 }
