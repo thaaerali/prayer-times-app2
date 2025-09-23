@@ -288,6 +288,55 @@ header .d-flex .location-marker {
 .prayer-notification .btn-close {
   filter: invert(1);
 }
+/* أنماط تبويب عن التطبيق */
+.about-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.about-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.about-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.about-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.about-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.developer-info {
+  border-left: 4px solid var(--bg-primary);
+}
+
+.about-content .list-unstyled li {
+  padding: 0.25rem 0;
+}
+
+/* تحسينات للوضع الداكن */
+.dark-mode .developer-info {
+  background-color: var(--nav-bg) !important;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-track {
+  background: #2d3748;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
 
 
 
