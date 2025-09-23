@@ -87,50 +87,114 @@ function getPrayerTimes(lat, lng, date, method) {
 }
 
 function calculateAndDisplayPrayerTimes() {
-  const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-  const method = settings.calculationMethod || 'MWL';
-  const timeFormat = settings.timeFormat || '24h';
-  const roundingMethod = settings.roundingMethod || 'nearest';
-
-  // إذا لم يكن هناك موقع محدد، نستخدم موقع افتراضي
-  let lat = currentLocation.latitude || 31.9539; // النجف كموقع افتراضي
-  let lng = currentLocation.longitude || 44.3736;
-
-  // الحصول على أوقات الصلاة باستخدام الموقع الحالي
-  const today = new Date();
-  const times = getPrayerTimes(lat, lng, today, method);
-
-  // تحديد الصلوات التي سيتم عرضها
-  const prayersToShow = ['fajr', 'sunrise', 'dhuhr'];
-
-  // إضافة العصر إذا كان مفعلاً
-  if (settings.showAsr) {
-    prayersToShow.push('asr');
+  if (!currentLocation.latitude || !currentLocation.longitude) {
+    document.getElementById('prayer-times').innerHTML = '<div class="text-center py-4">يرجى تحديد موقعك أولاً</div>';
+    return;
   }
 
-  prayersToShow.push('sunset', 'maghrib');
+  try {
+    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+    const calculationMethod = settings.calculationMethod || 'MWL';
+    const timeFormat = settings.timeFormat || '24h';
+    const roundingMethod = settings.roundingMethod || 'nearest';
+    const showAsr = settings.showAsr !== undefined ? settings.showAsr : true;
+    const showIsha = settings.showIsha !== undefined ? settings.showIsha : true;
 
-  // إضافة العشاء إذا كان مفعلاً
-  if (settings.showIsha) {
-    prayersToShow.push('isha');
+    // تكوين مكتبة PrayTimes
+    const prayTimes = new PrayTimes();
+    prayTimes.setMethod(calculationMethod);
+    
+    // الحصول على أوقات الصلاة
+    const date = new Date();
+    const times = prayTimes.getTimes(date, [currentLocation.latitude, currentLocation.longitude], 3, 'auto', '24h');
+    
+    // عرض أوقات الصلاة في RecyclerView
+    const prayers = [
+      { id: 'fajr', name: 'الفجر', time: times.fajr, icon: 'bi-sun', alwaysShow: true },
+      { id: 'sunrise', name: 'الشروق', time: times.sunrise, icon: 'bi-brightness-high', alwaysShow: true },
+      { id: 'dhuhr', name: 'الظهر', time: times.dhuhr, icon: 'bi-brightness-high-fill', alwaysShow: true },
+      { id: 'asr', name: 'العصر', time: times.asr, icon: 'bi-cloud-sun', alwaysShow: showAsr },
+      { id: 'maghrib', name: 'المغرب', time: times.maghrib, icon: 'bi-sunset', alwaysShow: true },
+      { id: 'isha', name: 'العشاء', time: times.isha, icon: 'bi-moon-stars', alwaysShow: showIsha }
+    ];
+
+    // إخفاء العناصر المخفية
+    prayers.forEach(prayer => {
+      const element = document.querySelector(`.prayer-item[data-prayer="${prayer.id}"]`);
+      if (element) {
+        element.style.display = prayer.alwaysShow ? 'flex' : 'none';
+      }
+    });
+
+    // تحديث الأوقات مع التنسيق والتقريب
+    prayers.forEach(prayer => {
+      if (prayer.alwaysShow) {
+        let formattedTime = applyRounding(prayer.time, roundingMethod);
+        formattedTime = formatTime(formattedTime, timeFormat);
+        
+        const timeElement = document.getElementById(`${prayer.id}-time`);
+        if (timeElement) {
+          timeElement.textContent = formattedTime;
+        }
+      }
+    });
+
+    // تحديد الصلاة الحالية
+    highlightCurrentPrayer(times);
+
+  } catch (error) {
+    console.error('Error calculating prayer times:', error);
+    document.getElementById('prayer-times').innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
+  }
+}
+
+// دالة لتحديد الصلاة الحالية
+function highlightCurrentPrayer(times) {
+  // إزالة التحديد من جميع العناصر
+  document.querySelectorAll('.prayer-item').forEach(item => {
+    item.classList.remove('highlight');
+  });
+
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes(); // الوقت الحالي بالدقائق
+  
+  // تحويل أوقات الصلاة إلى دقائق للمقارنة
+  const prayerTimes = [
+    { name: 'fajr', time: convertTimeToMinutes(times.fajr) },
+    { name: 'sunrise', time: convertTimeToMinutes(times.sunrise) },
+    { name: 'dhuhr', time: convertTimeToMinutes(times.dhuhr) },
+    { name: 'asr', time: convertTimeToMinutes(times.asr) },
+    { name: 'maghrib', time: convertTimeToMinutes(times.maghrib) },
+    { name: 'isha', time: convertTimeToMinutes(times.isha) }
+  ];
+
+  // تحديد الصلاة الحالية
+  let currentPrayer = null;
+  for (let i = 0; i < prayerTimes.length - 1; i++) {
+    if (currentTime >= prayerTimes[i].time && currentTime < prayerTimes[i + 1].time) {
+      currentPrayer = prayerTimes[i].name;
+      break;
+    }
+  }
+  
+  // إذا كان الوقت بعد العشاء وقبل الفجر، فإن الصلاة الحالية هي العشاء
+  if (!currentPrayer && (currentTime >= prayerTimes[prayerTimes.length - 1].time || currentTime < prayerTimes[0].time)) {
+    currentPrayer = prayerTimes[prayerTimes.length - 1].name;
   }
 
-  const prayerTimesElement = document.getElementById('prayer-times');
-  let html = '';
-  for (const key of prayersToShow) {
-    let rounded = applyRounding(times[key], roundingMethod);
-    let formatted = formatTime(rounded, timeFormat);
-
-    html += `
-      <div class="card mb-3 shadow-sm prayer-card">
-        <div class="card-body d-flex justify-content-between align-items-center">
-          <h5 class="card-title text-primary mb-0">${prayerNames[key]}</h5>
-          <span class="fs-5 fw-bold">${formatted}</span>
-        </div>
-      </div>
-    `;
+  // تطبيق التحديد
+  if (currentPrayer) {
+    const currentElement = document.querySelector(`.prayer-item[data-prayer="${currentPrayer}"]`);
+    if (currentElement) {
+      currentElement.classList.add('highlight');
+    }
   }
-  prayerTimesElement.innerHTML = html;
+}
+
+// دالة مساعدة لتحويل الوقت إلى دقائق
+function convertTimeToMinutes(timeString) {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
 }
 
 function displayDate() {
@@ -140,3 +204,4 @@ function displayDate() {
   const dateDisplay = document.getElementById('date-display');
   dateDisplay.textContent = `${gregorian} / ${islamic}`;
 }
+
