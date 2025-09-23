@@ -349,17 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
     saveManualLocationBtn.addEventListener('click', saveManualLocation);
   }
 
-  if (saveSettingsButton) {
-    saveSettingsButton.addEventListener('click', () => {
-      saveSettings();
-      const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settings-modal'));
-      if (settingsModal) {
-        settingsModal.hide();
-      }
-    });
-  }
-
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
