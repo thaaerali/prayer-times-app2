@@ -1,0 +1,220 @@
+/* dark-mode.css - إصدار محدث */
+:root {
+    --bg-primary: #0d6efd;
+    --text-primary: #212529;
+    --text-light: #f8f9fa;
+    --card-bg: #ffffff;
+    --body-bg: #f8f9fa;
+    --border-color: #dee2e6;
+    --header-bg: #0d6efd;
+    --footer-bg: #f8f9fa;
+    --footer-text: #212529;
+    --modal-bg: #ffffff;
+    --nav-bg: #f8f9fa;
+    --nav-active-bg: #e9ecef;
+}
+
+.dark-mode {
+    --bg-primary: #0a58ca;
+    --text-primary: #f8f9fa;
+    --text-light: #f8f9fa;
+    --card-bg: #2d3748;
+    --body-bg: #1a202c;
+    --border-color: #4a5568;
+    --header-bg: #0a58ca;
+    --footer-bg: #1a202c;
+    --footer-text: #f8f9fa;
+    --modal-bg: #2d3748;
+    --nav-bg: #2d3748;
+    --nav-active-bg: #4a5568;
+}
+
+/* تطبيق المتغيرات على جميع العناصر */
+body {
+    background-color: var(--body-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* الرأس */
+header.bg-primary {
+    background-color: var(--header-bg) !important;
+    color: var(--text-light);
+}
+
+/* البطاقات */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.bg-light {
+    background-color: var(--body-bg) !important;
+}
+
+/* النصوص */
+.text-muted {
+    color: #adb5bd !important;
+}
+
+.dark-mode .text-muted {
+    color: #9ca3af !important;
+}
+
+/* التنبيهات */
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.dark-mode .alert-info {
+    background-color: #1c3c48;
+    border-color: #2a5265;
+    color: #c6e4f0;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    color: #664d03;
+}
+
+.dark-mode .alert-warning {
+    background-color: #3a2e05;
+    border-color: #594a0a;
+    color: #e6cb7e;
+}
+
+/* عناصر القوائم */
+.list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.sound-item:hover {
+    background-color: var(--nav-active-bg);
+}
+
+.sound-item.active {
+    background-color: var(--nav-active-bg);
+    border-left: 3px solid var(--bg-primary);
+}
+
+/* عناصر النماذج */
+.form-control, 
+.form-select {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--bg-primary);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* النوافذ المنبثقة */
+.modal-content {
+    background-color: var(--modal-bg);
+    color: var(--text-primary);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border-color);
+}
+
+.btn-close {
+    filter: invert(0);
+}
+
+.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* التبويبات */
+.nav-link {
+    color: var(--text-primary);
+}
+
+.nav-link.active {
+    background-color: var(--nav-active-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.vertical-tabs .nav-link.active {
+    border-right: 3px solid var(--bg-primary) !important;
+}
+
+@media (max-width: 768px) {
+    .vertical-tabs .nav-link.active {
+        border-right: none !important;
+        border-bottom: 3px solid var(--bg-primary) !important;
+    }
+}
+
+/* رسائل الخطأ */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.dark-mode .error-message {
+    background-color: #4a2326;
+    color: #f1aeb5;
+    border-color: #842029;
+}
+
+/* بطاقات الصلاة */
+.prayer-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.prayer-card.highlight {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    border: 2px solid #ffc107 !important;
+}
+
+.dark-mode .prayer-card.highlight {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* التذييل */
+footer {
+    background-color: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+}
+
+/* الأزرار */
+.btn-outline-primary {
+    color: var(--bg-primary);
+    border-color: var(--bg-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bg-primary);
+    color: var(--text-light);
+}
+
+/* التبديلات */
+.form-check-input:checked {
+    background-color: var(--bg-primary);
+    border-color: var(--bg-primary);
+}
+
+/* إشعارات التوست */
+.toast {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
