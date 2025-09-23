@@ -81,7 +81,77 @@ body {
 .location-marker .bi {
   font-size: 1.2rem;
 }
+/* أنماط RecyclerView لأوقات الصلاة */
+.prayer-recyclerview {
+  background-color: var(--card-bg);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
 
+.prayer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.prayer-item:last-child {
+  border-bottom: none;
+}
+
+.prayer-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.prayer-item.highlight {
+  background-color: rgba(255, 193, 7, 0.2);
+  border-left: 4px solid #ffc107;
+}
+
+.dark-mode .prayer-item.highlight {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.prayer-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prayer-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--bg-primary);
+}
+
+.prayer-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+/* تحسينات للعرض على الجوال */
+@media (max-width: 576px) {
+  .prayer-item {
+    padding: 0.75rem;
+  }
+  
+  .prayer-name {
+    font-size: 1rem;
+  }
+  
+  .prayer-time {
+    font-size: 1.1rem;
+  }
+}
 /* تأكد من أن الزر يظهر بشكل صحيح في الرأس */
 header .d-flex .location-marker {
   margin-left: 0.5rem;
@@ -218,6 +288,7 @@ header .d-flex .location-marker {
 .prayer-notification .btn-close {
   filter: invert(1);
 }
+
 
 
 
