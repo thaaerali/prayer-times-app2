@@ -11,21 +11,30 @@ class LocationManager {
 
     bindEvents() {
         // فتح نافذة المواقع
-        document.getElementById('location-list-button').addEventListener('click', () => {
-            this.openLocationModal();
-        });
+        const locationListButton = document.getElementById('location-list-button');
+        if (locationListButton) {
+            locationListButton.addEventListener('click', () => {
+                this.openLocationModal();
+            });
+        }
 
         // حفظ الموقع الحالي
-        document.getElementById('save-current-location').addEventListener('click', () => {
-            this.saveCurrentLocation();
-        });
+        const saveCurrentLocationBtn = document.getElementById('save-current-location');
+        if (saveCurrentLocationBtn) {
+            saveCurrentLocationBtn.addEventListener('click', () => {
+                this.saveCurrentLocation();
+            });
+        }
 
         // السماح بالحفظ بالضغط على Enter
-        document.getElementById('new-location-name').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.saveCurrentLocation();
-            }
-        });
+        const newLocationName = document.getElementById('new-location-name');
+        if (newLocationName) {
+            newLocationName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.saveCurrentLocation();
+                }
+            });
+        }
     }
 
     loadLocations() {
@@ -39,12 +48,18 @@ class LocationManager {
 
     openLocationModal() {
         this.renderLocations();
-        const modal = new bootstrap.Modal(document.getElementById('location-list-modal'));
-        modal.show();
+        const modalElement = document.getElementById('location-list-modal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
     }
 
     async saveCurrentLocation() {
-        const locationName = document.getElementById('new-location-name').value.trim();
+        const locationNameInput = document.getElementById('new-location-name');
+        if (!locationNameInput) return;
+        
+        const locationName = locationNameInput.value.trim();
         
         if (!locationName) {
             this.showAlert('يرجى إدخال اسم الموقع', 'error');
@@ -69,7 +84,7 @@ class LocationManager {
 
             this.saveLocations();
             this.renderLocations();
-            document.getElementById('new-location-name').value = '';
+            locationNameInput.value = '';
             this.showAlert('تم حفظ الموقع بنجاح!', 'success');
 
         } catch (error) {
@@ -95,14 +110,16 @@ class LocationManager {
         const container = document.getElementById('locations-list');
         const noLocationsMessage = document.getElementById('no-locations-message');
         
+        if (!container) return;
+        
         container.innerHTML = '';
         
         if (this.locations.length === 0) {
-            noLocationsMessage.style.display = 'block';
+            if (noLocationsMessage) noLocationsMessage.style.display = 'block';
             return;
         }
 
-        noLocationsMessage.style.display = 'none';
+        if (noLocationsMessage) noLocationsMessage.style.display = 'none';
 
         this.locations.forEach((location, index) => {
             const locationElement = document.createElement('div');
@@ -148,16 +165,22 @@ class LocationManager {
 
     selectLocation(location) {
         // إغلاق النافذة
-        const modal = bootstrap.Modal.getInstance(document.getElementById('location-list-modal'));
-        modal.hide();
+        const modalElement = document.getElementById('location-list-modal');
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+        }
 
         // تحديث أوقات الصلاة للموقع المحدد
         if (typeof updatePrayerTimes === 'function') {
             updatePrayerTimes(location.lat, location.lng);
             
             // تحديث اسم المدينة في الواجهة
-            document.getElementById('city-name').textContent = location.name;
-            document.getElementById('coordinates').textContent = 
+            const cityNameElement = document.getElementById('city-name');
+            if (cityNameElement) cityNameElement.textContent = location.name;
+            
+            const coordinatesElement = document.getElementById('coordinates');
+            if (coordinatesElement) coordinatesElement.textContent = 
                 `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
         }
 
@@ -201,8 +224,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultLocation = locationManager.getDefaultLocation();
     if (defaultLocation && typeof updatePrayerTimes === 'function') {
         updatePrayerTimes(defaultLocation.lat, defaultLocation.lng);
-        document.getElementById('city-name').textContent = defaultLocation.name;
-        document.getElementById('coordinates').textContent = 
+        const cityNameElement = document.getElementById('city-name');
+        if (cityNameElement) cityNameElement.textContent = defaultLocation.name;
+        
+        const coordinatesElement = document.getElementById('coordinates');
+        if (coordinatesElement) coordinatesElement.textContent = 
             `${defaultLocation.lat.toFixed(4)}, ${defaultLocation.lng.toFixed(4)}`;
     }
 });
