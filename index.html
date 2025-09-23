@@ -10,6 +10,13 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="manifest" href="manifest.json">
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+        .then(reg => console.log("Service Worker مسجل:", reg.scope))
+        .catch(err => console.error("فشل تسجيل Service Worker:", err));
+    }
+  </script>
 
   <!-- ملفات CSS الخاصة بالمشروع -->
   <link rel="stylesheet" href="css/style.css">
@@ -43,11 +50,6 @@
       font-size: 1.4rem;
       color: #333;
     }
-    
-    /* تحسين مظهر الهدر بعد إزالة اسم المدينة */
-    header .text-center {
-      flex-grow: 1;
-    }
   </style>
 </head>
 <body class="bg-light">
@@ -57,18 +59,19 @@
 
   <!-- رأس الصفحة -->
   <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
-    <div class="text-center">
+    <div>
+      <!-- تم إزالة اسم المدينة من هنا -->
       <p id="date-display" class="mb-0 small opacity-75"></p>
     </div>
 
     <div class="d-flex align-items-center">
       <!-- علامة الموقع الشفافة -->
-      <button id="location-list-button" class="location-marker btn btn-link text-white p-0 me-2">
+      <button id="location-list-button" class="location-marker">
         <i class="bi bi-geo-alt-fill"></i>
       </button>
 
       <!-- زر الترس -->
-      <button id="settings-button" class="btn btn-light btn-sm">
+      <button id="settings-button" class="btn btn-light">
         <i class="bi bi-gear-fill"></i>
       </button>
     </div>
@@ -121,7 +124,7 @@
                   <div class="mb-3">
                     <label for="calculation-method" class="form-label fw-bold">طريقة الحساب:</label>
                     <select id="calculation-method" class="form-select">
-                      <option value="Hadi">تقويم الهادي</option>
+                      <option value="Hadi">تقويم الهادي 
                       <option value="MWL">رابطة العالم الإسلامي (مكة)</option>
                       <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
                       <option value="Egypt">هيئة المساحة المصرية</option>
@@ -385,49 +388,20 @@
 
   <!-- فوتر -->
   <footer class="text-center text-muted py-3 small">
-    © 2017 Prayer Times - Developer AzkaMothol by praytime.js
+    © 2017 Prayer Times - Developer  AzkaMothol by praytime.js
   </footer>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js")
-        .then(reg => console.log("Service Worker مسجل:", reg.scope))
-        .catch(err => console.error("فشل تسجيل Service Worker:", err));
-    }
-  </script>
-
-  <!-- ملفات JS الخاصة بالمشروع - تم إعادة ترتيبها -->
+  <!-- ملفات JS الخاصة بالمشروع -->
   <script src="js/utils.js"></script>
-  <script src="js/location-manager.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
   <script src="js/prayer-calculator.js"></script>
   <script src="js/audio-manager.js"></script>
   <script src="js/notifications.js"></script>
-  <script src="js/settings.js"></script>
-  <script src="js/app.js"></script>
-
-  <!-- تهيئة التطبيق بعد تحميل DOM -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // تهيئة التطبيق بعد تحميل جميع العناصر
-      if (typeof initApp === 'function') {
-        initApp();
-      }
-      
-      // تهيئة الإعدادات
-      if (typeof initSettings === 'function') {
-        initSettings();
-      }
-      
-      // تهيئة مدير الموقع
-      if (typeof initLocationManager === 'function') {
-        initLocationManager();
-      }
-    });
-  </script>
+  <script src="js/location-manager.js"></script>
 
 </body>
 </html>
