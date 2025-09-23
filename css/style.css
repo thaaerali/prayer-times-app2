@@ -1,5 +1,5 @@
 :root {
-    --bg-primary: #0d6efd;
+    --bg-primary: #9DB3B1;
     --text-primary: #212529;
     --text-light: #f8f9fa;
     --card-bg: #ffffff;
@@ -337,6 +337,7 @@ header .d-flex .location-marker {
 .dark-mode .about-content::-webkit-scrollbar-thumb:hover {
   background: #718096;
 }
+
 
 
 
