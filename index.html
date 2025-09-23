@@ -52,7 +52,7 @@
     </div>
   </header>
 
- <!-- أوقات الصلاة - RecyclerView Style -->
+<!-- أوقات الصلاة - RecyclerView Style -->
 <div id="prayer-times" class="container my-3">
   <div class="prayer-recyclerview">
     <div class="prayer-item" data-prayer="fajr">
@@ -83,9 +83,16 @@
       </div>
       <div class="prayer-time" id="asr-time">--:--</div>
     </div>
+    <div class="prayer-item" data-prayer="sunset">
+      <div class="prayer-name">
+        <i class="bi bi-sunset-fill prayer-icon"></i>
+        <span>الغروب</span>
+      </div>
+      <div class="prayer-time" id="sunset-time">--:--</div>
+    </div>
     <div class="prayer-item" data-prayer="maghrib">
       <div class="prayer-name">
-        <i class="bi bi-sunset prayer-icon"></i>
+        <i class="bi bi-moon prayer-icon"></i>
         <span>المغرب</span>
       </div>
       <div class="prayer-time" id="maghrib-time">--:--</div>
@@ -99,7 +106,6 @@
     </div>
   </div>
 </div>
-
   <!-- نافذة الإعدادات -->
   <div class="modal fade" id="settings-modal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -420,6 +426,7 @@
  
 </body>
 </html>
+
 
 
 
