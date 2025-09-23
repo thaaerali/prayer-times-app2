@@ -189,13 +189,9 @@ function calculateAndDisplayPrayerTimes() {
     const showAsr = settings.showAsr !== undefined ? settings.showAsr : true;
     const showIsha = settings.showIsha !== undefined ? settings.showIsha : true;
 
-    // تكوين مكتبة PrayTimes
-    const prayTimes = new PrayTimes();
-    prayTimes.setMethod(calculationMethod);
-    
-    // الحصول على أوقات الصلاة
+    // استخدام دالة getPrayerTimes من prayer-calculator.js
     const date = new Date();
-    const times = prayTimes.getTimes(date, [currentLocation.latitude, currentLocation.longitude], 3, 'auto', '24h');
+    const times = getPrayerTimes(currentLocation.latitude, currentLocation.longitude, date, calculationMethod);
     
     console.log('أوقات الصلاة المحسوبة:', times);
 
