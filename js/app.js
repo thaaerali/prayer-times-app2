@@ -201,6 +201,7 @@ function calculateAndDisplayPrayerTimes() {
       { id: 'sunrise', time: times.sunrise, alwaysShow: true },
       { id: 'dhuhr', time: times.dhuhr, alwaysShow: true },
       { id: 'asr', time: times.asr, alwaysShow: showAsr },
+      { id: 'sunset', time: times.sunset, alwaysShow: true }, // إضافة الغروب
       { id: 'maghrib', time: times.maghrib, alwaysShow: true },
       { id: 'isha', time: times.isha, alwaysShow: showIsha }
     ];
@@ -231,7 +232,7 @@ function calculateAndDisplayPrayerTimes() {
     prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
   }
 }
-
+// دالة لتحديد الصلاة الحالية
 // دالة لتحديد الصلاة الحالية
 function highlightCurrentPrayer(times) {
   // إزالة التحديد من جميع العناصر
@@ -248,6 +249,7 @@ function highlightCurrentPrayer(times) {
     { name: 'sunrise', time: convertTimeToMinutes(times.sunrise) },
     { name: 'dhuhr', time: convertTimeToMinutes(times.dhuhr) },
     { name: 'asr', time: convertTimeToMinutes(times.asr) },
+    { name: 'sunset', time: convertTimeToMinutes(times.sunset) }, // إضافة الغروب
     { name: 'maghrib', time: convertTimeToMinutes(times.maghrib) },
     { name: 'isha', time: convertTimeToMinutes(times.isha) }
   ].filter(prayer => prayer.time > 0); // تصفية الأوقات غير الصالحة
@@ -360,3 +362,4 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
