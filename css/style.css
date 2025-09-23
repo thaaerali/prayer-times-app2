@@ -337,23 +337,3 @@ header .d-flex .location-marker {
 .dark-mode .about-content::-webkit-scrollbar-thumb:hover {
   background: #718096;
 }
-/* تغيير لون الهيدر */
-header.bg-primary {
-    background-color: var(--bg-primary) !important;
-}
-
-/* تأكيد على تغيير اللون في جميع الحالات */
-header {
-    background-color: var(--bg-primary) !important;
-}
-
-/* إذا كان هناك أي عنصر آخر يطغى على اللون */
-.bg-primary {
-    background-color: var(--bg-primary) !important;
-}
-
-
-
-
-
-
