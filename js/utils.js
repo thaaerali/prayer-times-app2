@@ -98,3 +98,23 @@ function watchSystemTheme() {
         });
     }
 }
+
+// دالة لتنسيق الوقت مع التقريب
+function formatTime(time, format) {
+  let [hours, minutes] = time.split(':').map(Number);
+  if (format === '24h') return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
+  const period = hours >= 12 ? 'م' : 'ص';
+  hours = hours % 12 || 12;
+  if (format === '12h') return `${hours}:${minutes.toString().padStart(2,'0')} ${period}`;
+  return `${hours}:${minutes.toString().padStart(2,'0')}`;
+}
+
+// دالة لتطبيق التقريب
+function applyRounding(time, method) {
+  let [hours, minutes] = time.split(':').map(Number);
+  if (method === 'nearest') minutes = Math.round(minutes/5)*5;
+  else if (method === 'up') minutes = Math.ceil(minutes/5)*5;
+  else if (method === 'down') minutes = Math.floor(minutes/5)*5;
+  if (minutes === 60) { minutes = 0; hours += 1; if(hours===24) hours=0;}
+  return `${hours}:${minutes.toString().padStart(2,'0')}`;
+}
