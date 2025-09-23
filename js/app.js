@@ -1,19 +1,32 @@
 // التطبيق الرئيسي وتنسيق الأحداث
+
+// تعريف currentLocation ككائن عام
+let currentLocation = {
+  latitude: 31.9539,
+  longitude: 44.3736,
+  city: "النجف"
+};
+
 function getCurrentLocation() {
   const cityNameElement = document.getElementById('city-name');
   const prayerTimesElement = document.getElementById('prayer-times');
   const locationButton = document.getElementById('location-button');
   
-  cityNameElement.textContent = "جاري تحديد موقعك...";
-  prayerTimesElement.innerHTML = "<div class='text-center py-4'>جاري تحديد موقعك...</div>";
-  locationButton.disabled = true;
-  locationButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري التحديد...';
+  if (cityNameElement) cityNameElement.textContent = "جاري تحديد موقعك...";
+  if (prayerTimesElement) prayerTimesElement.innerHTML = "<div class='text-center py-4'>جاري تحديد موقعك...</div>";
+  if (locationButton) {
+    locationButton.disabled = true;
+    locationButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري التحديد...';
+  }
+  
   updateLocationStatus('جاري الوصول إلى موقعك...');
 
   if (!navigator.geolocation) {
     updateLocationStatus('المتصفح لا يدعم خدمة تحديد الموقع', true);
-    locationButton.disabled = false;
-    locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+    if (locationButton) {
+      locationButton.disabled = false;
+      locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+    }
     return;
   }
 
@@ -32,9 +45,10 @@ function getCurrentLocation() {
         const data = await response.json();
 
         currentLocation.city = data.city || data.locality || "موقع غير معروف";
-        cityNameElement.textContent = currentLocation.city;
+        if (cityNameElement) cityNameElement.textContent = currentLocation.city;
+        
         const coordinatesElement = document.getElementById('coordinates');
-        coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
+        if (coordinatesElement) coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
 
         updateLocationStatus('تم تحديد موقعك بنجاح');
 
@@ -45,18 +59,27 @@ function getCurrentLocation() {
         settings.cityName = currentLocation.city;
         localStorage.setItem('prayerSettings', JSON.stringify(settings));
 
-        calculateAndDisplayPrayerTimes();
+        if (typeof calculateAndDisplayPrayerTimes === 'function') {
+          calculateAndDisplayPrayerTimes();
+        }
       } catch (error) {
         console.error('Error getting location name:', error);
-        cityNameElement.textContent = `موقعك (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+        if (cityNameElement) cityNameElement.textContent = `موقعك (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+        
         const coordinatesElement = document.getElementById('coordinates');
-        coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
+        if (coordinatesElement) coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
+        
         updateLocationStatus('تم تحديد الموقع ولكن تعذر الحصول على اسم المدينة', true);
-        calculateAndDisplayPrayerTimes();
+        
+        if (typeof calculateAndDisplayPrayerTimes === 'function') {
+          calculateAndDisplayPrayerTimes();
+        }
       }
 
-      locationButton.disabled = false;
-      locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+      if (locationButton) {
+        locationButton.disabled = false;
+        locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+      }
     },
     // فشل الحصول على الموقع
     (error) => {
@@ -76,8 +99,10 @@ function getCurrentLocation() {
       }
 
       updateLocationStatus(errorMessage, true);
-      locationButton.disabled = false;
-      locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+      if (locationButton) {
+        locationButton.disabled = false;
+        locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+      }
 
       // استخدام موقع افتراضي في حالة الفشل
       if (!currentLocation.latitude || !currentLocation.longitude) {
@@ -85,10 +110,14 @@ function getCurrentLocation() {
         currentLocation.longitude = 44.3736;
         currentLocation.city = "النجف";
         const cityNameElement = document.getElementById('city-name');
-        cityNameElement.textContent = currentLocation.city;
+        if (cityNameElement) cityNameElement.textContent = currentLocation.city;
+        
         const coordinatesElement = document.getElementById('coordinates');
-        coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
-        calculateAndDisplayPrayerTimes();
+        if (coordinatesElement) coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
+        
+        if (typeof calculateAndDisplayPrayerTimes === 'function') {
+          calculateAndDisplayPrayerTimes();
+        }
       }
     },
     // خيارات إضافية
@@ -105,6 +134,8 @@ function saveManualLocation() {
   const cityNameElement = document.getElementById('city-name');
   const coordinatesElement = document.getElementById('coordinates');
   
+  if (!manualLocation) return;
+  
   const city = manualLocation.value.trim();
   if (city) {
     currentLocation.city = city;
@@ -112,8 +143,8 @@ function saveManualLocation() {
     currentLocation.latitude = 31.9539;
     currentLocation.longitude = 44.3736;
 
-    cityNameElement.textContent = city;
-    coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
+    if (cityNameElement) cityNameElement.textContent = city;
+    if (coordinatesElement) coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
 
     // حفظ الإعدادات
     const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
@@ -123,62 +154,77 @@ function saveManualLocation() {
     settings.cityName = city;
     localStorage.setItem('prayerSettings', JSON.stringify(settings));
 
-    showNotification('تم حفظ الموقع اليدوي بنجاح');
-    calculateAndDisplayPrayerTimes();
+    if (typeof showNotification === 'function') {
+      showNotification('تم حفظ الموقع اليدوي بنجاح');
+    }
+    
+    if (typeof calculateAndDisplayPrayerTimes === 'function') {
+      calculateAndDisplayPrayerTimes();
+    }
   } else {
-    showError('يرجى إدخال اسم المدينة');
+    if (typeof showError === 'function') {
+      showError('يرجى إدخال اسم المدينة');
+    }
   }
 }
-// تأكد من تضمين ملف location-manager.js في HTML قبل app.js
 
 // دالة مساعدة للاستخدام في location-manager
 function updatePrayerTimes(lat, lng) {
-    // هذه الدالة يجب أن تكون موجودة في مشروعك
     console.log('Updating prayer times for:', lat, lng);
     
-    // استدعاء دالة حساب أوقات الصلاة
-    if (typeof calculatePrayerTimes === 'function') {
-        calculatePrayerTimes(lat, lng);
-    }
+    // تحديث الموقع الحالي
+    currentLocation.latitude = lat;
+    currentLocation.longitude = lng;
     
-    // تحديث واجهة المستخدم
-   
+    // استدعاء دالة حساب أوقات الصلاة
+    if (typeof calculateAndDisplayPrayerTimes === 'function') {
+        calculateAndDisplayPrayerTimes();
+    }
 }
 
-// دالة مساعدة لعرض الإشعارات
-function showNotification(message, type = 'success') {
-    // استخدام نظام الإشعارات الموجود في التطبيق
-    const notification = document.getElementById('notification');
-    if (notification) {
-        notification.querySelector('.toast-body').textContent = message;
-        const toast = new bootstrap.Toast(notification);
-        toast.show();
-    }
+// دالة لعرض التاريخ
+function displayDate() {
+  const dateDisplay = document.getElementById('date-display');
+  if (dateDisplay) {
+    const now = new Date();
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    dateDisplay.textContent = now.toLocaleDateString('ar-SA', options);
+  }
 }
+
 // تهيئة التطبيق
 function initApp() {
   // التحقق من تحميل المكتبة أولاً
   if (typeof PrayTimes === 'undefined') {
-    document.getElementById('error-message').textContent = 'خطأ: لم يتم تحميل مكتبة PrayTimes بشكل صحيح. تأكد من وجود ملف praytimes.js في مجلد المشروع.';
-    document.getElementById('error-message').style.display = 'block';
+    const errorMessage = document.getElementById('error-message');
+    if (errorMessage) {
+      errorMessage.textContent = 'خطأ: لم يتم تحميل مكتبة PrayTimes بشكل صحيح. تأكد من وجود ملف praytimes.js في مجلد المشروع.';
+      errorMessage.style.display = 'block';
+    }
+    return;
   }
 
   // تحميل الإعدادات المحفوظة
-  loadSettings();
-   // تحميل وتطبيق المظهر
+  if (typeof loadSettings === 'function') {
+    loadSettings();
+  }
+
+  // تحميل وتطبيق المظهر
+  if (typeof loadTheme === 'function') {
     loadTheme();
+  }
+  
+  if (typeof watchSystemTheme === 'function') {
     watchSystemTheme();
-  // تهيئة إعدادات المظهر
-    initAppearanceSettings();
+  }
 
   // عرض التاريخ الحالي
   displayDate();
-
-  // تهيئة أحداث الأصوات
-  initSoundEvents();
-
-  // تهيئة أحداث المظهر
-  initAppearanceEvents();
 
   // محاولة الحصول على الموقع الحالي
   getCurrentLocation();
@@ -187,13 +233,16 @@ function initApp() {
   setInterval(displayDate, 60000);
 
   // تحديث أوقات الصلاة كل ساعة
-  setInterval(calculateAndDisplayPrayerTimes, 3600000);
+  setInterval(() => {
+    if (typeof calculateAndDisplayPrayerTimes === 'function') {
+      calculateAndDisplayPrayerTimes();
+    }
+  }, 3600000);
 
-  // تمكين التشغيل التلقائي والتحقق من الأذونات
-//  enableAutoPlay();
-  
   // بدء مراقبة الإشعارات
-  startNotificationChecker();
+  if (typeof startNotificationChecker === 'function') {
+    startNotificationChecker();
+  }
 }
 
 // أحداث النقر على الأزرار
@@ -201,28 +250,27 @@ document.addEventListener('DOMContentLoaded', function() {
   const settingsButton = document.getElementById('settings-button');
   const locationButton = document.getElementById('location-button');
   const saveManualLocationBtn = document.getElementById('save-manual-location');
-  const saveSettingsButton = document.getElementById('save-settings');
-  const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
+  const settingsModalElement = document.getElementById('settings-modal');
+  
+  let settingsModal = null;
+  if (settingsModalElement) {
+    settingsModal = new bootstrap.Modal(settingsModalElement);
+  }
 
-  settingsButton.addEventListener('click', () => {
-    settingsModal.show();
-  });
+  if (settingsButton && settingsModal) {
+    settingsButton.addEventListener('click', () => {
+      settingsModal.show();
+    });
+  }
 
-  locationButton.addEventListener('click', getCurrentLocation);
+  if (locationButton) {
+    locationButton.addEventListener('click', getCurrentLocation);
+  }
 
-  saveManualLocationBtn.addEventListener('click', saveManualLocation);
-
-  saveSettingsButton.addEventListener('click', () => {
-    saveSettings();
-    settingsModal.hide();
-  });
+  if (saveManualLocationBtn) {
+    saveManualLocationBtn.addEventListener('click', saveManualLocation);
+  }
 
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
-
 });
-
-
-
-
-
