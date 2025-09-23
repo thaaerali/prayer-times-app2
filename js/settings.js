@@ -447,3 +447,74 @@ function saveSettings() {
     localStorage.setItem('prayerSettings', JSON.stringify(settings));
     showNotification('تم حفظ الإعدادات بنجاح');
 }
+
+// متغيرات لإدارة المؤقت التلقائي
+let autoCloseTimer;
+const AUTO_CLOSE_DELAY = 15000; // 15 ثانية
+
+// دالة لبدء مؤتمر الإغلاق التلقائي
+function startAutoCloseTimer() {
+  // مسح المؤقت الحالي إذا كان موجوداً
+  clearTimeout(autoCloseTimer);
+  
+  // بدء مؤتمر جديد
+  autoCloseTimer = setTimeout(() => {
+    const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settings-modal'));
+    if (settingsModal) {
+      settingsModal.hide();
+      showNotification('تم إغلاق الإعدادات تلقائياً بعد فترة من عدم النشاط');
+    }
+  }, AUTO_CLOSE_DELAY);
+}
+
+// دالة لإعادة تعيين المؤتمر عند النشاط
+function resetAutoCloseTimer() {
+  startAutoCloseTimer();
+}
+
+// دالة لإعداد مستمعي الأحداث للنشاط
+function setupActivityListeners() {
+  const settingsModal = document.getElementById('settings-modal');
+  
+  // إعادة تعيين المؤتمر عند أي تفاعل مع النافذة
+  settingsModal.addEventListener('click', resetAutoCloseTimer);
+  settingsModal.addEventListener('keydown', resetAutoCloseTimer);
+  settingsModal.addEventListener('scroll', resetAutoCloseTimer);
+  settingsModal.addEventListener('mousemove', resetAutoCloseTimer);
+  settingsModal.addEventListener('touchstart', resetAutoCloseTimer);
+  
+  // إعادة تعيين المؤتمر عند تغيير التبويبات
+  const tabButtons = document.querySelectorAll('#v-pills-tab button');
+  tabButtons.forEach(button => {
+    button.addEventListener('click', resetAutoCloseTimer);
+  });
+  
+  // إعادة تعيين المؤتمر عند تغيير الإعدادات
+  const formElements = document.querySelectorAll('#settings-modal input, #settings-modal select, #settings-modal button');
+  formElements.forEach(element => {
+    element.addEventListener('change', resetAutoCloseTimer);
+    element.addEventListener('click', resetAutoCloseTimer);
+  });
+}
+
+// دالة لتهيئة الإعدادات التلقائية
+function setupAutoCloseSettings() {
+  const settingsModal = document.getElementById('settings-modal');
+  
+  // بدء المؤتمر عند فتح النافذة
+  settingsModal.addEventListener('shown.bs.modal', function() {
+    startAutoCloseTimer();
+    setupActivityListeners();
+  });
+  
+  // مسح المؤتمر عند إغلاق النافذة
+  settingsModal.addEventListener('hidden.bs.modal', function() {
+    clearTimeout(autoCloseTimer);
+  });
+}
+
+// استدعاء الدالة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+  setupAutoCloseSettings();
+  setupAutoSaveSettings(); // الدالة السابقة للحفظ التلقائي
+});
