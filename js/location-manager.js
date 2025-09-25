@@ -19,37 +19,37 @@ class LocationManager {
         }
     }
 
-    setupEventListeners() {
-        // فتح نافذة المواقع - التحقق من وجود العنصر أولاً
-        const locationListButton = document.getElementById('location-list-button');
-        if (locationListButton) {
-            locationListButton.addEventListener('click', () => {
-                this.openLocationModal();
-            });
-        } else {
-            console.warn('زر قائمة المواقع غير موجود');
-        }
+   setupEventListeners() {
+  // فتح نافذة المواقع - التحقق من وجود العنصر أولاً
+  const locationListButton = document.getElementById('location-list-button');
+  if (locationListButton) {
+    locationListButton.addEventListener('click', () => {
+      this.openLocationModal();
+    });
+  } else {
+    console.log('ℹ️ زر قائمة المواقع غير موجود في هذه الصفحة (متوقع في الإعدادات)');
+  }
 
-        // حفظ الموقع الحالي - التحقق من وجود العنصر أولاً
-        const saveLocationButton = document.getElementById('save-current-location');
-        if (saveLocationButton) {
-            saveLocationButton.addEventListener('click', () => {
-                this.saveCurrentLocation();
-            });
-        } else {
-            console.warn('زر حفظ الموقع غير موجود');
-        }
+  // حفظ الموقع الحالي - التحقق من وجود العنصر أولاً
+  const saveLocationButton = document.getElementById('save-current-location');
+  if (saveLocationButton) {
+    saveLocationButton.addEventListener('click', () => {
+      this.saveCurrentLocation();
+    });
+  } else {
+    console.log('ℹ️ زر حفظ الموقع غير موجود في هذه الصفحة');
+  }
 
-        // السماح بالحفظ بالضغط على Enter
-        const newLocationInput = document.getElementById('new-location-name');
-        if (newLocationInput) {
-            newLocationInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.saveCurrentLocation();
-                }
-            });
-        }
-    }
+  // السماح بالحفظ بالضغط على Enter
+  const newLocationInput = document.getElementById('new-location-name');
+  if (newLocationInput) {
+    newLocationInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.saveCurrentLocation();
+      }
+    });
+  }
+}
 
     loadLocations() {
         try {
@@ -390,3 +390,4 @@ if (document.readyState === 'loading') {
     // الصفحة محملة بالفعل
     setTimeout(initLocationManager, 100);
 }
+
