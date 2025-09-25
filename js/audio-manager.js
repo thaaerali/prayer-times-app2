@@ -306,32 +306,32 @@ function stopPrayerTimesMonitoring() {
 function initAudioManager() {
   console.log('=== تهيئة مدير الصوت ===');
   
-  // التحقق من وجود عنصر الصوت
+  // التحقق من وجود عنصر الصوت - لا توقف التهيئة إذا لم يوجد
   const adhanPlayer = document.getElementById('adhan-player');
   if (!adhanPlayer) {
-    console.error('❌ عنصر تشغيل الصوت غير موجود في الصفحة');
-    return false;
+    console.warn('⚠️ عنصر تشغيل الصوت غير موجود في هذه الصفحة، المراقبة ستكون محدودة');
+    // لا ترجع false، استمر في التهيئة ولكن بسجل تحذير
+  } else {
+    console.log('✅ عنصر تشغيل الصوت موجود');
+    
+    // إعداد مستمعي الأحداث للصوت فقط إذا كان العنصر موجوداً
+    adhanPlayer.onended = () => {
+      isAdhanPlaying = false;
+      console.log('✅ انتهى تشغيل الأذان');
+    };
+
+    adhanPlayer.onerror = (error) => {
+      isAdhanPlaying = false;
+      console.error('❌ حدث خطأ في تشغيل الصوت:', error);
+    };
   }
-  
-  console.log('✅ عنصر تشغيل الصوت موجود');
 
-  // إعداد مستمعي الأحداث للصوت
-  adhanPlayer.onended = () => {
-    isAdhanPlaying = false;
-    console.log('✅ انتهى تشغيل الأذان');
-  };
-
-  adhanPlayer.onerror = (error) => {
-    isAdhanPlaying = false;
-    console.error('❌ حدث خطأ في تشغيل الصوت:', error);
-  };
-
-  // بدء المراقبة بعد التأكد من تهيئة الصفحة
+  // بدء المراقبة في جميع الأحوال (حتى إذا لم يكن عنصر الصوت موجوداً)
   setTimeout(() => {
     console.log('بدء المراقبة بعد التأخير...');
     startPrayerTimesMonitoring();
     checkPrayerTimes(); // فحص أولي
-  }, 3000); // تأخير 3 ثواني لضمان تحميل الصفحة بالكامل
+  }, 3000);
   
   return true;
 }
@@ -359,3 +359,4 @@ if (typeof window !== 'undefined') {
   window.startPrayerTimesMonitoring = startPrayerTimesMonitoring;
   window.stopPrayerTimesMonitoring = stopPrayerTimesMonitoring;
 }
+
