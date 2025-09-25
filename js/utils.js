@@ -1,11 +1,15 @@
 // دوال مساعدة عامة
 
 // دالة لعرض رسائل الخطأ
+// دالة لعرض رسائل الخطأ
 function showError(message) {
   try {
     const errorMessageElement = document.getElementById('error-message');
     if (!errorMessageElement) {
-      console.error('عنصر عرض الخطأ غير موجود:', message);
+      // لا تسجل كخطأ إذا كان العنصر غير موجود (مثل صفحة الإعدادات)
+      if (!message.includes('غير موجود')) { // تجنب الرسائل حول عناصر غير موجودة
+        console.log('ℹ️ رسالة (العنصر غير موجود):', message);
+      }
       return;
     }
     
@@ -359,3 +363,4 @@ if (typeof window !== 'undefined') {
     initUtils();
   });
 }
+
