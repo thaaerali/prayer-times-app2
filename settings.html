@@ -527,7 +527,18 @@
       </div>
     </div>
   </div>
-
+  <!-- عنصر صوت مخفي -->
+<audio id="adhan-player" style="display: none;"></audio>
+  <!-- تعريف currentLocation قبل تحميل الملفات -->
+  <script>
+    if (typeof currentLocation === 'undefined') {
+      window.currentLocation = {
+        latitude: 31.9539,
+        longitude: 44.3736,
+        city: 'النجف'
+      };
+    }
+    </script>
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -663,11 +674,11 @@
       console.log('تم تهيئة أحداث صفحة الإعدادات بنجاح');
     }
 </script>
-  <!-- عنصر صوت مخفي -->
-<audio id="adhan-player" style="display: none;"></audio>
+
 </body>
 
 </html>
+
 
 
 
