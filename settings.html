@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الإعدادات - مواقيت الصلاة</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <!-- ملفات CSS الخاصة بالمشروع -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dark-mode.css">
+
+  <style>
+    /* تنسيقات خاصة بصفحة الإعدادات */
+    .settings-page {
+      min-height: 100vh;
+      background-color: var(--body-bg);
+    }
+
+    .settings-header {
+      background: linear-gradient(135deg, var(--bg-primary), #0a58ca);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .settings-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .settings-sidebar {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 20px;
+    }
+
+    .settings-content {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      min-height: 500px;
+    }
+
+    .nav-pills .nav-link {
+      color: var(--text-primary);
+      padding: 1rem 1.5rem;
+      border-radius: 0;
+      border-right: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: transparent;
+      color: var(--bg-primary);
+      border-right-color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .nav-pills .nav-link:hover:not(.active) {
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    .settings-section {
+      padding: 2rem;
+    }
+
+    .section-title {
+      color: var(--bg-primary);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-button {
+      color: white;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .back-button:hover {
+      color: rgba(255,255,255,0.8);
+    }
+
+    @media (max-width: 768px) {
+      .settings-sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+      
+      .nav-pills {
+        flex-direction: row !important;
+        overflow-x: auto;
+      }
+      
+      .nav-pills .nav-link {
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 3px solid transparent;
+      }
+      
+      .nav-pills .nav-link.active {
+        border-right: none;
+        border-bottom-color: var(--bg-primary);
+      }
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <!-- رأس صفحة الإعدادات -->
+  <header class="settings-header">
+    <div class="container">
+      <a href="index.html" class="back-button">
+        <i class="bi bi-arrow-right"></i>
+        العودة للتطبيق
+      </a>
+      <h1 class="display-5 fw-bold">إعدادات مواقيت الصلاة</h1>
+      <p class="lead mb-0">قم بتخصيص تطبيق مواقيت الصلاة حسب تفضيلاتك</p>
+    </div>
+  </header>
+
+  <!-- محتوى الإعدادات -->
+  <main class="settings-page">
+    <div class="container settings-container">
+      <div class="row g-4">
+        <!-- الشريط الجانبي -->
+        <div class="col-lg-3">
+          <div class="settings-sidebar">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+              <button class="nav-link active" id="v-pills-times-tab" data-bs-toggle="pill" data-bs-target="#v-pills-times" type="button" role="tab" aria-controls="v-pills-times" aria-selected="true">
+                <i class="bi bi-clock me-2"></i>أوقات الصلاة
+              </button>
+              <button class="nav-link" id="v-pills-location-tab" data-bs-toggle="pill" data-bs-target="#v-pills-location" type="button" role="tab" aria-controls="v-pills-location" aria-selected="false">
+                <i class="bi bi-geo-alt me-2"></i>الموقع
+              </button>
+              <button class="nav-link" id="v-pills-sound-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sound" type="button" role="tab" aria-controls="v-pills-sound" aria-selected="false">
+                <i class="bi bi-volume-up me-2"></i>الأصوات
+              </button>
+              <button class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" data-bs-target="#v-pills-appearance" type="button" role="tab" aria-controls="v-pills-appearance" aria-selected="false">
+                <i class="bi bi-palette me-2"></i>المظهر
+              </button>
+              <button class="nav-link" id="v-pills-about-tab" data-bs-toggle="pill" data-bs-target="#v-pills-about" type="button" role="tab" aria-controls="v-pills-about" aria-selected="false">
+                <i class="bi bi-info-circle me-2"></i>عن التطبيق
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- محتوى التبويبات -->
+        <div class="col-lg-9">
+          <div class="settings-content">
+            <div class="tab-content" id="v-pills-tabContent">
+              
+              <!-- إعدادات أوقات الصلاة -->
+              <div class="tab-pane fade show active" id="v-pills-times" role="tabpanel" aria-labelledby="v-pills-times-tab">
+                <div class="settings-section">
+                  <h3 class="section-title">إعدادات أوقات الصلاة</h3>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="calculation-method" class="form-label fw-bold">طريقة الحساب:</label>
+                        <select id="calculation-method" class="form-select">
+                          <option value="Hadi">تقويم الهادي</option>
+                          <option value="MWL">رابطة العالم الإسلامي (مكة)</option>
+                          <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
+                          <option value="Egypt">هيئة المساحة المصرية</option>
+                          <option value="Makkah">أم القرى</option>
+                          <option value="Karachi">جامعة العلوم الإسلامية Karachi</option>
+                          <option value="Tehran">معهد الجيوفيزياء University of Tehran</option>
+                          <option value="Jafari">الهيئة العامة للتقويم (إيران)</option>
+                        </select>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="time-format" class="form-label fw-bold">تنسيق الوقت:</label>
+                        <select id="time-format" class="form-select">
+                          <option value="24h">24 ساعة</option>
+                          <option value="12h">12 ساعة (am/pm)</option>
+                          <option value="12H">12 ساعة (بدون am/pm)</option>
+                        </select>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="rounding-method" class="form-label fw-bold">طريقة التقريب:</label>
+                        <select id="rounding-method" class="form-select">
+                          <option value="nearest">الأقرب</option>
+                          <option value="up">تقريب لأعلى</option>
+                          <option value="down">تقريب لأسفل</option>
+                          <option value="none">بدون تقريب</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-4">
+                        <label class="form-label fw-bold">الأوقات الإضافية للعرض:</label>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-asr">
+                          <label class="form-check-label" for="toggle-asr">العصر</label>
+                        </div>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" id="toggle-isha">
+                          <label class="form-check-label" for="toggle-isha">العشاء</label>
+                        </div>
+                        <small class="text-muted">الفجر، الشروق، الغروب، الظهر والمغرب دائمًا</small>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">الإشعارات عند دخول وقت الصلاة:</label>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-fajr-notification">
+                          <label class="form-check-label" for="toggle-fajr-notification">إشعار الفجر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-dhuhr-notification">
+                          <label class="form-check-label" for="toggle-dhuhr-notification">إشعار الظهر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-asr-notification">
+                          <label class="form-check-label" for="toggle-asr-notification">إشعار العصر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-maghrib-notification">
+                          <label class="form-check-label" for="toggle-maghrib-notification">إشعار المغرب</label>
+                        </div>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" id="toggle-isha-notification">
+                          <label class="form-check-label" for="toggle-isha-notification">إشعار العشاء</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- تحديد الموقع -->
+              <div class="tab-pane fade" id="v-pills-location" role="tabpanel" aria-labelledby="v-pills-location-tab">
+                <div class="settings-section">
+                  <h3 class="section-title">إعدادات الموقع</h3>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-4">
+                        <button id="location-button" class="btn btn-primary w-100 mb-3">
+                          <i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً
+                        </button>
+                        
+                        <div id="location-status" class="small text-muted"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="manual-location" class="form-label fw-bold">أدخل المدينة يدوياً:</label>
+                        <input type="text" id="manual-location" class="form-control" placeholder="مثال: النجف">
+                        <button id="save-manual-location" class="btn btn-outline-primary mt-2">حفظ الموقع اليدوي</button>
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">المواقع المحفوظة:</label>
+                        <button id="open-locations-list" class="btn btn-outline-secondary w-100">
+                          <i class="bi bi-list-ul"></i> إدارة المواقع
+                        </button>
+                      </div>
+
+                      <div class="card">
+                        <div class="card-body">
+                          <h6 class="card-title">المعلومات الحالية:</h6>
+                          <p class="mb-1"><strong>المدينة:</strong> <span id="current-city">النجف</span></p>
+                          <p class="mb-0"><strong>الإحداثيات:</strong> <span id="current-coords">31.9539, 44.3736</span></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- تبويب الأصوات -->
+              <div class="tab-pane fade" id="v-pills-sound" role="tabpanel" aria-labelledby="v-pills-sound-tab">
+                <div class="settings-section">
+                  <h3 class="section-title">إعدادات الأصوات</h3>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-4">
+                        <h6 class="fw-bold mb-3">صوت الأذان</h6>
+                        <div class="list-group" id="adhan-sounds-list">
+                          <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="abdul-basit">
+                            <div>
+                              <span class="fw-medium">أبا ذر الحلواجي</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary play-btn">
+                              <i class="bi bi-play-fill"></i>
+                            </button>
+                          </div>
+                          <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="mishary-rashid">
+                            <div>
+                              <span class="fw-medium">الشيخ شبر معله</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary play-btn">
+                              <i class="bi bi-play-fill"></i>
+                            </button>
+                          </div>
+                          <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="saud-al-shuraim">
+                            <div>
+                              <span class="fw-medium">الحاج مصطفى الصراف</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary play-btn">
+                              <i class="bi bi-play-fill"></i>
+                            </button>
+                          </div>
+                          <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-sound="yasser-al-dosari">
+                            <div>
+                              <span class="fw-medium">محمد التوخى</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary play-btn">
+                              <i class="bi bi-play-fill"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="mb-4">
+                        <h6 class="fw-bold mb-3">تشغيل الأذان تلقائياً</h6>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-fajr-adhan">
+                          <label class="form-check-label" for="toggle-fajr-adhan">أذان الفجر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-dhuhr-adhan">
+                          <label class="form-check-label" for="toggle-dhuhr-adhan">أذان الظهر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-asr-adhan">
+                          <label class="form-check-label" for="toggle-asr-adhan">أذان العصر</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                          <input class="form-check-input" type="checkbox" id="toggle-maghrib-adhan">
+                          <label class="form-check-label" for="toggle-maghrib-adhan">أذان المغرب</label>
+                        </div>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" id="toggle-isha-adhan">
+                          <label class="form-check-label" for="toggle-isha-adhan">أذان العشاء</label>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="volume-level" class="form-label fw-bold">مستوى الصوت:</label>
+                        <input type="range" class="form-range" id="volume-level" min="0" max="100" step="10">
+                        <div class="d-flex justify-content-between">
+                          <small>منخفض</small>
+                          <small>متوسط</small>
+                          <small>مرتفع</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- تبويب مظهر التطبيق -->
+              <div class="tab-pane fade" id="v-pills-appearance" role="tabpanel" aria-labelledby="v-pills-appearance-tab">
+                <div class="settings-section">
+                  <h3 class="section-title">إعدادات المظهر</h3>
+                  
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="list-group" id="appearance-list">
+                        <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-appearance="light">
+                          <div>
+                            <span class="fw-medium">الوضع النهاري</span>
+                            <small class="d-block text-muted">مظهر فاتح مناسب للنهار</small>
+                          </div>
+                          <i class="bi bi-sun-fill text-warning"></i>
+                        </div>
+                        <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-appearance="dark">
+                          <div>
+                            <span class="fw-medium">الوضع الليلي</span>
+                            <small class="d-block text-muted">مظهر داكن مريح للعين في الليل</small>
+                          </div>
+                          <i class="bi bi-moon-stars-fill text-info"></i>
+                        </div>
+                        <div class="list-group-item sound-item d-flex justify-content-between align-items-center" data-appearance="auto">
+                          <div>
+                            <span class="fw-medium">حسب النظام</span>
+                            <small class="d-block text-muted">يتبع إعدادات الجهاز</small>
+                          </div>
+                          <i class="bi bi-circle-half text-secondary"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- تبويب عن التطبيق -->
+              <div class="tab-pane fade" id="v-pills-about" role="tabpanel" aria-labelledby="v-pills-about-tab">
+                <div class="settings-section">
+                  <h3 class="section-title">عن التطبيق</h3>
+                  
+                  <div class="about-content">
+                    <div class="text-center mb-4">
+                      <i class="bi bi-clock-history display-1 text-primary mb-3"></i>
+                      <h3 class="fw-bold mb-3">مواقيت الصلاة</h3>
+                      <p class="text-muted mb-4">تطبيق دقيق لحساب أوقات الصلاة حسب موقعك الجغرافي</p>
+                    </div>
+
+                    <div class="row text-start mb-4">
+                      <div class="col-md-6">
+                        <h5 class="fw-bold mb-3">مميزات التطبيق</h5>
+                        <ul class="list-unstyled">
+                          <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            حساب دقيق لأوقات الصلاة
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            دعم لعدة طرق حسابية
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            إشعارات دخول وقت الصلاة
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            تشغيل تلقائي للأذان
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            واجهة مستخدم متجاوبة
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="col-md-6">
+                        <h5 class="fw-bold mb-3">المعلومات الفنية</h5>
+                        <ul class="list-unstyled">
+                          <li class="mb-2">
+                            <i class="bi bi-gear-fill text-primary me-2"></i>
+                            الإصدار: 2.0.0
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-calendar-check-fill text-primary me-2"></i>
+                            سنة التطوير: 2017
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-code-slash text-primary me-2"></i>
+                            Built with PrayTimes.js
+                          </li>
+                          <li class="mb-2">
+                            <i class="bi bi-palette-fill text-primary me-2"></i>
+                            دعم الوضع النهاري والليلي
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="developer-info bg-light p-4 rounded-3">
+                      <h5 class="fw-bold mb-3">معلومات المطور</h5>
+                      <p class="mb-2">
+                        <i class="bi bi-person-circle text-secondary me-2"></i>
+                        المطور: AzkaMothol
+                      </p>
+                      <p class="mb-0 text-muted">
+                        © 2017 Prayer Times - Developer AzkaMothol by praytime.js
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- إشعار -->
+  <div id="notification" class="toast align-items-center text-white bg-primary border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">تم حفظ الإعدادات بنجاح</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <!-- نافذة إدارة المواقع -->
+  <div class="modal fade" id="location-list-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">المواقع المحفوظة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="locations-container">
+            <div id="no-locations-message" class="text-center text-muted py-3">
+              لا توجد مواقع محفوظة
+            </div>
+            <div id="locations-list" class="list-group"></div>
+          </div>
+          
+          <div class="mt-3">
+            <div class="input-group">
+              <input type="text" id="new-location-name" 
+                     class="form-control" 
+                     placeholder="اسم الموقع (مثال: المنزل، العمل)">
+              <button id="save-current-location" class="btn btn-primary">
+                حفظ الموقع الحالي
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- ملفات JS الخاصة بالمشروع -->
+  <script src="js/utils.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/prayer-calculator.js"></script>
+  <script src="js/audio-manager.js"></script>
+  <script src="js/location-manager.js"></script>
+
+  <script>
+    // تهيئة الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      // تحميل الإعدادات
+      loadSettings();
+      
+      // تحديث معلومات الموقع الحالي
+      updateCurrentLocationInfo();
+      
+      // تهيئة الأحداث
+      initSettingsPageEvents();
+    });
+
+    function updateCurrentLocationInfo() {
+      const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+      const currentCity = document.getElementById('current-city');
+      const currentCoords = document.getElementById('current-coords');
+      
+      if (currentCity) {
+        currentCity.textContent = settings.cityName || 'النجف';
+      }
+      
+      if (currentCoords) {
+        currentCoords.textContent = `${settings.latitude || 31.9539}, ${settings.longitude || 44.3736}`;
+      }
+    }
+
+    function initSettingsPageEvents() {
+      // حدث حفظ الموقع اليدوي
+      document.getElementById('save-manual-location').addEventListener('click', function() {
+        const manualLocation = document.getElementById('manual-location');
+        const city = manualLocation.value.trim();
+        
+        if (city) {
+          const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+          settings.city = city;
+          settings.cityName = city;
+          localStorage.setItem('prayerSettings', JSON.stringify(settings));
+          
+          updateCurrentLocationInfo();
+          showNotification('تم حفظ الموقع اليدوي بنجاح');
+        }
+      });
+
+      // حدث تحديد الموقع التلقائي
+      document.getElementById('location-button').addEventListener('click', function() {
+        if (typeof getCurrentLocation === 'function') {
+          getCurrentLocation();
+        }
+      });
+
+      // حدث فتح نافذة المواقع
+      document.getElementById('open-locations-list').addEventListener('click', function() {
+        if (typeof locationManager !== 'undefined') {
+          locationManager.openLocationModal();
+        }
+      });
+
+      // الحفظ التلقائي عند تغيير الإعدادات
+      const autoSaveElements = [
+        'calculation-method', 'time-format', 'rounding-method',
+        'toggle-asr', 'toggle-isha', 'toggle-fajr-notification',
+        'toggle-dhuhr-notification', 'toggle-asr-notification',
+        'toggle-maghrib-notification', 'toggle-isha-notification',
+        'toggle-fajr-adhan', 'toggle-dhuhr-adhan', 'toggle-asr-adhan',
+        'toggle-maghrib-adhan', 'toggle-isha-adhan', 'volume-level'
+      ];
+
+      autoSaveElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('change', function() {
+            autoSaveSettings();
+            updateCurrentLocationInfo();
+          });
+        }
+      });
+
+      // تهيئة أحداث الصوت والمظهر
+      if (typeof initSoundEvents === 'function') {
+        initSoundEvents();
+      }
+      
+      if (typeof initAppearanceEvents === 'function') {
+        initAppearanceEvents();
+      }
+    }
+  </script>
+</body>
+</html>
