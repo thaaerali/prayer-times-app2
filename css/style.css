@@ -337,3 +337,101 @@ header .d-flex .location-marker {
 .dark-mode .about-content::-webkit-scrollbar-thumb:hover {
   background: #718096;
 }
+  /* تنسيقات خاصة بصفحة الإعدادات */
+    .settings-page {
+      min-height: 100vh;
+      background-color: var(--body-bg);
+    }
+
+    .settings-header {
+      background: linear-gradient(135deg, var(--bg-primary), #0a58ca);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .settings-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .settings-sidebar {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 20px;
+    }
+
+    .settings-content {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      min-height: 500px;
+    }
+
+    .nav-pills .nav-link {
+      color: var(--text-primary);
+      padding: 1rem 1.5rem;
+      border-radius: 0;
+      border-right: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: transparent;
+      color: var(--bg-primary);
+      border-right-color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .nav-pills .nav-link:hover:not(.active) {
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    .settings-section {
+      padding: 2rem;
+    }
+
+    .section-title {
+      color: var(--bg-primary);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-button {
+      color: white;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .back-button:hover {
+      color: rgba(255,255,255,0.8);
+    }
+
+    @media (max-width: 768px) {
+      .settings-sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+      
+      .nav-pills {
+        flex-direction: row !important;
+        overflow-x: auto;
+      }
+      
+      .nav-pills .nav-link {
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 3px solid transparent;
+      }
+      
+      .nav-pills .nav-link.active {
+        border-right: none;
+        border-bottom-color: var(--bg-primary);
+      }
+    }
