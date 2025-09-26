@@ -1,4 +1,5 @@
-// التطبيق الرئيسي وتنسيق الأحداث
+// app.js - التطبيق الرئيسي وتنسيق الأحداث
+
 let currentLocation = {
   latitude: 31.9539, // قيمة افتراضية للنجف
   longitude: 44.3736, // قيمة افتراضية للنجف
@@ -46,20 +47,15 @@ function getCurrentLocation() {
         currentLocation.city = data.city || data.locality || data.principalSubdivision || "موقع غير معروف";
         
         const cityNameElement = document.getElementById('city-name');
-        const coordinatesElement = document.getElementById('coordinates');
         
         if (cityNameElement) {
           cityNameElement.textContent = currentLocation.city;
-        }
-        
-        if (coordinatesElement) {
-          coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
         }
 
         updateLocationStatus('تم تحديد موقعك بنجاح');
 
         // حفظ الإعدادات مع الموقع الجديد
-        const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+        const settings = getStoredSettings();
         settings.latitude = lat;
         settings.longitude = lng;
         settings.cityName = currentLocation.city;
@@ -69,14 +65,9 @@ function getCurrentLocation() {
       } catch (error) {
         console.error('Error getting location name:', error);
         const cityNameElement = document.getElementById('city-name');
-        const coordinatesElement = document.getElementById('coordinates');
         
         if (cityNameElement) {
           cityNameElement.textContent = `موقعك (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
-        }
-        
-        if (coordinatesElement) {
-          coordinatesElement.textContent = `خط العرض: ${lat.toFixed(4)}°, خط الطول: ${lng.toFixed(4)}°`;
         }
         
         updateLocationStatus('تم تحديد الموقع ولكن تعذر الحصول على اسم المدينة', true);
@@ -128,7 +119,6 @@ function getCurrentLocation() {
 function saveManualLocation() {
   const manualLocation = document.getElementById('manual-location');
   const cityNameElement = document.getElementById('city-name');
-  const coordinatesElement = document.getElementById('coordinates');
   
   if (!manualLocation) return;
   
@@ -142,13 +132,9 @@ function saveManualLocation() {
     if (cityNameElement) {
       cityNameElement.textContent = city;
     }
-    
-    if (coordinatesElement) {
-      coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
-    }
 
     // حفظ الإعدادات
-    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+    const settings = getStoredSettings();
     settings.city = city;
     settings.latitude = currentLocation.latitude;
     settings.longitude = currentLocation.longitude;
@@ -182,7 +168,7 @@ function calculateAndDisplayPrayerTimes() {
       return;
     }
 
-    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+    const settings = getStoredSettings();
     const calculationMethod = settings.calculationMethod || 'MWL';
     const timeFormat = settings.timeFormat || '24h';
     const roundingMethod = settings.roundingMethod || 'nearest';
@@ -294,7 +280,7 @@ function initApp() {
   }
 
   // تحميل الإعدادات المحفوظة
-  loadSettings();
+  loadStoredSettings();
   
   // تحميل وتطبيق المظهر
   loadTheme();
@@ -305,14 +291,9 @@ function initApp() {
 
   // تعيين موقع افتراضي وعرض الأوقات مباشرة
   const cityNameElement = document.getElementById('city-name');
-  const coordinatesElement = document.getElementById('coordinates');
   
   if (cityNameElement) {
     cityNameElement.textContent = currentLocation.city;
-  }
-  
-  if (coordinatesElement) {
-    coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
   }
 
   // حساب وعرض أوقات الصلاة مباشرة
@@ -325,30 +306,147 @@ function initApp() {
   setInterval(calculateAndDisplayPrayerTimes, 3600000);
 }
 
-// أحداث النقر على الأزرار
+// ===== الدوال المساعدة الجديدة =====
+
+// الحصول على الإعدادات المخزنة
+function getStoredSettings() {
+  const defaultSettings = {
+    calculationMethod: 'MWL',
+    timeFormat: '24h',
+    roundingMethod: 'nearest',
+    adhanSound: 'abdul-basit',
+    volume: 50,
+    appearance: 'auto',
+    showAsr: true,
+    showIsha: true
+  };
+  
+  try {
+    const stored = localStorage.getItem('prayerSettings');
+    return stored ? { ...defaultSettings, ...JSON.parse(stored) } : defaultSettings;
+  } catch (error) {
+    console.error('خطأ في تحميل الإعدادات:', error);
+    return defaultSettings;
+  }
+}
+
+// تحميل الإعدادات المخزنة (بديل لـ loadSettings)
+function loadStoredSettings() {
+  const settings = getStoredSettings();
+  
+  // تطبيق الإعدادات على التطبيق
+  applyAppearanceSettings(settings);
+  
+  return settings;
+}
+
+// تطبيق إعدادات المظهر
+function applyAppearanceSettings(settings) {
+  const body = document.body;
+  
+  // إزالة جميع classes السابقة
+  body.classList.remove('light-mode', 'dark-mode');
+  
+  // تطبيق المظهر الجديد
+  if (settings.appearance === 'dark' || 
+      (settings.appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    body.classList.add('dark-mode');
+  } else {
+    body.classList.add('light-mode');
+  }
+}
+
+// تحميل الثيم
+function loadTheme() {
+  const settings = getStoredSettings();
+  applyAppearanceSettings(settings);
+}
+
+// مراقبة تغيير ثيم النظام
+function watchSystemTheme() {
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      const settings = getStoredSettings();
+      if (settings.appearance === 'auto') {
+        applyAppearanceSettings(settings);
+      }
+    });
+  }
+}
+
+// عرض التاريخ
+function displayDate() {
+  const dateElement = document.getElementById('date-display');
+  if (dateElement) {
+    const now = new Date();
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    dateElement.textContent = now.toLocaleDateString('ar-SA', options);
+  }
+}
+
+// تحديث حالة الموقع
+function updateLocationStatus(message, isError = false) {
+  const statusElement = document.getElementById('location-status');
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = isError ? 'mt-2 small text-danger' : 'mt-2 small text-success';
+  }
+}
+
+// عرض إشعار
+function showNotification(message) {
+  // يمكن تنفيذ هذه الدالة باستخدام Toast من Bootstrap
+  console.log('إشعار:', message);
+}
+
+// عرض خطأ
+function showError(message) {
+  const errorElement = document.getElementById('error-message');
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    
+    setTimeout(() => {
+      errorElement.style.display = 'none';
+    }, 5000);
+  }
+}
+
+// ===== تهيئة Service Worker =====
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then(reg => console.log("Service Worker مسجل:", reg.scope))
+    .catch(err => console.error("فشل تسجيل Service Worker:", err));
+}
+
+// ===== أحداث النقر على الأزرار =====
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM محمّل');
   
-  const settingsButton = document.getElementById('settings-button');
-  const locationButton = document.getElementById('location-button');
-  const saveManualLocationBtn = document.getElementById('save-manual-location');
-  const saveSettingsButton = document.getElementById('save-settings');
-
-  if (settingsButton) {
-    settingsButton.addEventListener('click', () => {
-      const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
-      settingsModal.show();
+  const locationListButton = document.getElementById('location-list-button');
+  
+  // زر قائمة المواقع - توجيه إلى صفحة الإعدادات
+  if (locationListButton) {
+    locationListButton.addEventListener('click', function() {
+      window.location.href = 'settings.html';
     });
-  }
-
-  if (locationButton) {
-    locationButton.addEventListener('click', getCurrentLocation);
-  }
-
-  if (saveManualLocationBtn) {
-    saveManualLocationBtn.addEventListener('click', saveManualLocation);
   }
 
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
+// ===== تصدير الدوال للاستخدام في ملفات أخرى =====
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    getCurrentLocation,
+    calculateAndDisplayPrayerTimes,
+    getStoredSettings,
+    currentLocation
+  };
+}
