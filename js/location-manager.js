@@ -241,7 +241,66 @@ function showNotification(message) {
         console.log(`💡 ${message}`);
     }
 }
+// في location-manager.js - أضف قبل نهاية الملف
 
+// دالة حفظ الموقع الحالي لصفحة الإعدادات
+function saveCurrentLocation(locationName = 'موقع محفوظ') {
+    try {
+        // استخدام currentLocation العالمي أو القيم الافتراضية
+        const currentLoc = typeof currentLocation !== 'undefined' ? currentLocation : {
+            latitude: 31.9539,
+            longitude: 44.3736,
+            city: 'النجف'
+        };
+        
+        if (!currentLoc.latitude || !currentLoc.longitude) {
+            throw new Error('لا يوجد موقع حالي محدد');
+        }
+
+        const locationData = {
+            name: locationName,
+            city: currentLoc.city,
+            latitude: currentLoc.latitude,
+            longitude: currentLoc.longitude
+        };
+
+        return addLocation(locationData);
+    } catch (error) {
+        console.error('❌ خطأ في حفظ الموقع الحالي:', error);
+        throw error;
+    }
+}
+
+// تحديث دالة handleSaveCurrentLocation في location-manager.js
+function handleSaveCurrentLocation() {
+    const locationNameInput = document.getElementById('new-location-name');
+    let locationName = 'موقع محفوظ';
+
+    if (locationNameInput && locationNameInput.value.trim()) {
+        locationName = locationNameInput.value.trim();
+    }
+
+    try {
+        const success = saveCurrentLocation(locationName);
+        
+        if (success) {
+            showNotification('✅ تم حفظ الموقع بنجاح');
+            
+            // مسح حقل الإدخال إذا كان موجوداً
+            if (locationNameInput) {
+                locationNameInput.value = '';
+            }
+            
+            // إعادة تحميل القائمة
+            renderLocations();
+        } else {
+            showError('❌ فشل في حفظ الموقع');
+        }
+    } catch (error) {
+        console.error('❌ خطأ في حفظ الموقع:', error);
+        showError('❌ حدث خطأ أثناء حفظ الموقع: ' + error.message);
+    }
+}
 function showError(message) {
     const errorElement = document.getElementById('error-message');
     if (errorElement) {
@@ -269,3 +328,4 @@ if (typeof module !== 'undefined' && module.exports) {
         openLocationList
     };
 }
+
