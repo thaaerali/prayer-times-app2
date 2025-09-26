@@ -12,6 +12,135 @@ function initializeGlobalVariables() {
     }
 }
 
+// دالة تحديد الموقع لصفحة الإعدادات
+function getCurrentLocationForSettings() {
+    const locationButton = document.getElementById('location-button');
+    const locationStatus = document.getElementById('location-status');
+    
+    if (locationButton) {
+        locationButton.disabled = true;
+        locationButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري التحديد...';
+    }
+    
+    if (locationStatus) {
+        locationStatus.textContent = 'جاري الوصول إلى موقعك...';
+        locationStatus.className = 'small text-info';
+    }
+
+    if (!navigator.geolocation) {
+        if (locationStatus) {
+            locationStatus.textContent = 'المتصفح لا يدعم خدمة تحديد الموقع';
+            locationStatus.className = 'small text-danger';
+        }
+        if (locationButton) {
+            locationButton.disabled = false;
+            locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+        }
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        // نجاح الحصول على الموقع
+        async (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // تحديث currentLocation العالمي
+            if (typeof currentLocation !== 'undefined') {
+                currentLocation.latitude = lat;
+                currentLocation.longitude = lng;
+            }
+
+            try {
+                // الحصول على اسم المدينة من الإحداثيات
+                const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=ar`);
+                const data = await response.json();
+
+                const cityName = data.city || data.locality || data.principalSubdivision || "موقع غير معروف";
+                
+                if (typeof currentLocation !== 'undefined') {
+                    currentLocation.city = cityName;
+                }
+
+                if (locationStatus) {
+                    locationStatus.textContent = 'تم تحديد موقعك بنجاح';
+                    locationStatus.className = 'small text-success';
+                }
+
+                // حفظ الإعدادات مع الموقع الجديد
+                const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+                settings.latitude = lat;
+                settings.longitude = lng;
+                settings.cityName = cityName;
+                localStorage.setItem('prayerSettings', JSON.stringify(settings));
+
+                // تحديث واجهة المستخدم
+                updateCurrentLocationInfo();
+                
+                showNotification('تم تحديد موقعك بنجاح');
+
+            } catch (error) {
+                console.error('Error getting location name:', error);
+                
+                if (locationStatus) {
+                    locationStatus.textContent = 'تم تحديد الموقع ولكن تعذر الحصول على اسم المدينة';
+                    locationStatus.className = 'small text-warning';
+                }
+                
+                // حفظ الإحداثيات بدون اسم المدينة
+                const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+                settings.latitude = lat;
+                settings.longitude = lng;
+                settings.cityName = `موقعك (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+                localStorage.setItem('prayerSettings', JSON.stringify(settings));
+
+                updateCurrentLocationInfo();
+                showNotification('تم تحديد الموقع بنجاح');
+            }
+
+            if (locationButton) {
+                locationButton.disabled = false;
+                locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+            }
+        },
+        // فشل الحصول على الموقع
+        (error) => {
+            console.error('Error getting location:', error);
+            let errorMessage = 'تعذر تحديد موقعك';
+
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = 'تم رفض الإذن للوصول إلى الموقع';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = 'معلومات الموقع غير متاحة';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = 'انتهت مهلة طلب الموقع';
+                    break;
+            }
+
+            if (locationStatus) {
+                locationStatus.textContent = errorMessage;
+                locationStatus.className = 'small text-danger';
+            }
+            
+            if (locationButton) {
+                locationButton.disabled = false;
+                locationButton.innerHTML = '<i class="bi bi-geo-alt-fill"></i> تحديد موقعي تلقائياً';
+            }
+
+            showError(errorMessage);
+        },
+        // خيارات إضافية
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+        }
+    );
+}
+
 // تحديث معلومات الموقع الحالي في واجهة الإعدادات
 function updateCurrentLocationInfo() {
     try {
@@ -24,7 +153,9 @@ function updateCurrentLocationInfo() {
         }
 
         if (currentCoords) {
-            currentCoords.textContent = `${settings.latitude || 31.9539}, ${settings.longitude || 44.3736}`;
+            const lat = settings.latitude || 31.9539;
+            const lng = settings.longitude || 44.3736;
+            currentCoords.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         }
         
         console.log('✅ تم تحديث معلومات الموقع الحالي');
@@ -95,12 +226,8 @@ function handleManualLocationSave() {
 
 // معالجة تحديد الموقع التلقائي
 function handleAutoLocation() {
-    if (typeof getCurrentLocation === 'function') {
-        getCurrentLocation();
-    } else {
-        console.error('❌ دالة getCurrentLocation غير متاحة');
-        showError('تعذر تحديد الموقع تلقائياً');
-    }
+    // استخدام الدالة المحلية لصفحة الإعدادات
+    getCurrentLocationForSettings();
 }
 
 // معالجة فتح نافذة المواقع
@@ -135,6 +262,35 @@ function setupAutoSaveEvents() {
             });
         }
     });
+}
+
+// دالة لعرض الإشعارات في صفحة الإعدادات
+function showNotification(message) {
+    const notificationEl = document.getElementById('notification');
+    if (notificationEl && typeof bootstrap !== 'undefined') {
+        const toastBody = notificationEl.querySelector('.toast-body');
+        if (toastBody) toastBody.textContent = message;
+        
+        const toast = new bootstrap.Toast(notificationEl);
+        toast.show();
+    } else {
+        console.log('إشعار:', message);
+    }
+}
+
+// دالة لعرض الأخطاء في صفحة الإعدادات
+function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+        }, 5000);
+    } else {
+        console.error('خطأ:', message);
+    }
 }
 
 // تهيئة صفحة الإعدادات الرئيسية
@@ -176,9 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // جعل الدوال متاحة globally للاختبار
 if (typeof window !== 'undefined') {
-    window.initSettingsPage = initSettingsPage;
-    window.updateCurrentLocationInfo = updateCurrentLocationInfo;
-    window.handleManualLocationSave = handleManualLocationSave;
+    window.getCurrentLocationForSettings = getCurrentLocationForSettings;
     window.handleAutoLocation = handleAutoLocation;
-    window.handleOpenLocations = handleOpenLocations;
+    window.handleManualLocationSave = handleManualLocationSave;
 }
