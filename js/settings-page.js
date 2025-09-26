@@ -58,9 +58,6 @@ function initSettingsPageEvents() {
     // الحفظ التلقائي عند تغيير الإعدادات
     setupAutoSaveEvents();
 
-    // تهيئة أحداث الصوت والمظهر
-    initSoundAndAppearanceEvents();
-
     console.log('✅ تم تهيئة أحداث صفحة الإعدادات بنجاح');
 }
 
@@ -70,13 +67,27 @@ function handleManualLocationSave() {
     const city = manualLocation ? manualLocation.value.trim() : '';
 
     if (city) {
+        // تحديث currentLocation العالمي
+        if (typeof currentLocation !== 'undefined') {
+            currentLocation.city = city;
+            currentLocation.latitude = 31.9539;
+            currentLocation.longitude = 44.3736;
+        }
+
         const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
         settings.city = city;
         settings.cityName = city;
+        settings.latitude = 31.9539;
+        settings.longitude = 44.3736;
         localStorage.setItem('prayerSettings', JSON.stringify(settings));
 
         updateCurrentLocationInfo();
         showNotification('تم حفظ الموقع اليدوي بنجاح');
+        
+        // إعادة تحميل الصفحة الرئيسية إذا كانت مفتوحة
+        if (window.opener) {
+            window.opener.location.reload();
+        }
     } else {
         showError('يرجى إدخال اسم المدينة');
     }
@@ -94,10 +105,10 @@ function handleAutoLocation() {
 
 // معالجة فتح نافذة المواقع
 function handleOpenLocations() {
-    if (typeof locationManager !== 'undefined' && locationManager.openLocationModal) {
-        locationManager.openLocationModal();
+    if (typeof openLocationList === 'function') {
+        openLocationList();
     } else {
-        console.error('❌ مدير المواقع غير متاح');
+        console.error('❌ دالة openLocationList غير متاحة');
         showError('تعذر فتح قائمة المواقع');
     }
 }
@@ -126,23 +137,6 @@ function setupAutoSaveEvents() {
     });
 }
 
-// تهيئة أحداث الصوت والمظهر
-function initSoundAndAppearanceEvents() {
-    if (typeof initSoundEvents === 'function') {
-        console.log('🔊 تهيئة أحداث الصوت...');
-        initSoundEvents();
-    } else {
-        console.error('❌ دالة initSoundEvents غير متاحة');
-    }
-
-    if (typeof initAppearanceEvents === 'function') {
-        console.log('🎨 تهيئة أحداث المظهر...');
-        initAppearanceEvents();
-    } else {
-        console.error('❌ دالة initAppearanceEvents غير متاحة');
-    }
-}
-
 // تهيئة صفحة الإعدادات الرئيسية
 function initSettingsPage() {
     console.log('🚀 بدء تهيئة صفحة الإعدادات...');
@@ -164,6 +158,13 @@ function initSettingsPage() {
     // تهيئة الأحداث
     initSettingsPageEvents();
     
+    // تهيئة إدارة المواقع
+    if (typeof initLocationManager === 'function') {
+        initLocationManager().then(() => {
+            console.log('✅ تم تهيئة إدارة المواقع في صفحة الإعدادات');
+        });
+    }
+    
     console.log('✅ تم تهيئة صفحة الإعدادات بنجاح');
 }
 
@@ -177,4 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof window !== 'undefined') {
     window.initSettingsPage = initSettingsPage;
     window.updateCurrentLocationInfo = updateCurrentLocationInfo;
+    window.handleManualLocationSave = handleManualLocationSave;
+    window.handleAutoLocation = handleAutoLocation;
+    window.handleOpenLocations = handleOpenLocations;
 }
