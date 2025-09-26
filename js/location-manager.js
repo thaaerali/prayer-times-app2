@@ -1,393 +1,342 @@
-class LocationManager {
-    constructor() {
-        this.locations = this.loadLocations();
-    }
+// location-manager.js - إدارة المواقع (متوافق مع الصفحتين)
 
-    init() {
-        this.bindEvents();
-        this.renderLocations();
-    }
+let savedLocations = [];
 
-    bindEvents() {
-        // الانتظار حتى يكون DOM جاهزاً بالكامل
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                this.setupEventListeners();
-            });
-        } else {
-            this.setupEventListeners();
-        }
-    }
-
-   setupEventListeners() {
-  // فتح نافذة المواقع - التحقق من وجود العنصر أولاً
-  const locationListButton = document.getElementById('location-list-button');
-  if (locationListButton) {
-    locationListButton.addEventListener('click', () => {
-      this.openLocationModal();
+// تهيئة إدارة المواقع
+function initLocationManager() {
+    return new Promise((resolve) => {
+        loadSavedLocations();
+        setupLocationEventListeners();
+        console.log('✅ تم تهيئة إدارة المواقع');
+        resolve();
     });
-  } else {
-    console.log('ℹ️ زر قائمة المواقع غير موجود في هذه الصفحة (متوقع في الإعدادات)');
-  }
-
-  // حفظ الموقع الحالي - التحقق من وجود العنصر أولاً
-  const saveLocationButton = document.getElementById('save-current-location');
-  if (saveLocationButton) {
-    saveLocationButton.addEventListener('click', () => {
-      this.saveCurrentLocation();
-    });
-  } else {
-    console.log('ℹ️ زر حفظ الموقع غير موجود في هذه الصفحة');
-  }
-
-  // السماح بالحفظ بالضغط على Enter
-  const newLocationInput = document.getElementById('new-location-name');
-  if (newLocationInput) {
-    newLocationInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.saveCurrentLocation();
-      }
-    });
-  }
 }
 
-    loadLocations() {
-        try {
-            const saved = localStorage.getItem('prayerLocations');
-            return saved ? JSON.parse(saved) : [];
-        } catch (error) {
-            console.error('خطأ في تحميل المواقع المحفوظة:', error);
-            return [];
+// تحميل المواقع المحفوظة
+function loadSavedLocations() {
+    try {
+        const locations = localStorage.getItem('savedLocations');
+        if (locations) {
+            savedLocations = JSON.parse(locations);
+        } else {
+            savedLocations = [];
         }
+        console.log(`📁 تم تحميل ${savedLocations.length} موقع محفوظ`);
+        return savedLocations;
+    } catch (error) {
+        console.error('❌ خطأ في تحميل المواقع المحفوظة:', error);
+        savedLocations = [];
+        return [];
+    }
+}
+
+// حفظ المواقع
+function saveLocations() {
+    try {
+        localStorage.setItem('savedLocations', JSON.stringify(savedLocations));
+        console.log('💾 تم حفظ المواقع');
+        return true;
+    } catch (error) {
+        console.error('❌ خطأ في حفظ المواقع:', error);
+        return false;
+    }
+}
+
+// إعداد مستمعي الأحداث (لصفحة الإعدادات فقط)
+function setupLocationEventListeners() {
+    // هذه الأحداث مخصصة لصفحة الإعدادات فقط
+    const saveLocationBtn = document.getElementById('save-current-location');
+    const newLocationInput = document.getElementById('new-location-name');
+    
+    if (saveLocationBtn) {
+        saveLocationBtn.addEventListener('click', handleSaveCurrentLocation);
+        console.log('✅ تم إعداد حدث حفظ الموقع');
+    } else {
+        console.log('ℹ️ زر حفظ الموقع غير موجود في هذه الصفحة (هذا طبيعي في الصفحة الرئيسية)');
     }
 
-    saveLocations() {
-        try {
-            localStorage.setItem('prayerLocations', JSON.stringify(this.locations));
-        } catch (error) {
-            console.error('خطأ في حفظ المواقع:', error);
-            this.showAlert('تعذر حفظ المواقع', 'error');
-        }
-    }
-
-    openLocationModal() {
-        if (!this.renderLocations()) {
-            console.error('تعذر عرض قائمة المواقع');
-            return;
-        }
-        
-        const modalElement = document.getElementById('location-list-modal');
-        if (!modalElement) {
-            console.error('نافذة المواقع غير موجودة');
-            return;
-        }
-
-        try {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } catch (error) {
-            console.error('خطأ في فتح نافذة المواقع:', error);
-            this.showAlert('تعذر فتح نافذة المواقع', 'error');
-        }
-    }
-
-    async saveCurrentLocation() {
-        const locationNameInput = document.getElementById('new-location-name');
-        if (!locationNameInput) {
-            this.showAlert('عنصر إدخال اسم الموقع غير موجود', 'error');
-            return;
-        }
-
-        const locationName = locationNameInput.value.trim();
-        
-        if (!locationName) {
-            this.showAlert('يرجى إدخال اسم الموقع', 'error');
-            return;
-        }
-
-        // التحقق من عدم التكرار
-        if (this.locations.some(loc => loc.name.toLowerCase() === locationName.toLowerCase())) {
-            this.showAlert('هذا الاسم موجود مسبقاً', 'error');
-            return;
-        }
-
-        try {
-            const position = await this.getCurrentPosition();
-            
-            this.locations.push({
-                name: locationName,
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                timestamp: new Date().toISOString()
-            });
-
-            this.saveLocations();
-            this.renderLocations();
-            locationNameInput.value = '';
-            this.showAlert('تم حفظ الموقع بنجاح!', 'success');
-
-        } catch (error) {
-            console.error('خطأ في حفظ الموقع:', error);
-            this.showAlert('تعذر الحصول على الموقع الحالي: ' + error.message, 'error');
-        }
-    }
-
-    getCurrentPosition() {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error('Geolocation غير مدعوم في هذا المتصفح'));
-                return;
+    if (newLocationInput) {
+        newLocationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSaveCurrentLocation();
             }
-
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 60000
-            });
         });
     }
 
-    renderLocations() {
-        const container = document.getElementById('locations-list');
-        const noLocationsMessage = document.getElementById('no-locations-message');
-        
-        if (!container) {
-            console.error('حاوية قائمة المواقع غير موجودة');
-            return false;
-        }
+    // تحديث القائمة عند تغيير المواقع
+    window.addEventListener('locationsUpdated', renderLocations);
+}
 
-        container.innerHTML = '';
-        
-        if (this.locations.length === 0) {
-            if (noLocationsMessage) {
-                noLocationsMessage.style.display = 'block';
-            }
-            return true;
-        }
+// حفظ الموقع الحالي
+function handleSaveCurrentLocation() {
+    const locationNameInput = document.getElementById('new-location-name');
+    let locationName = 'موقع محفوظ';
 
-        if (noLocationsMessage) {
-            noLocationsMessage.style.display = 'none';
-        }
-
-        try {
-            this.locations.forEach((location, index) => {
-                const locationElement = document.createElement('div');
-                locationElement.className = 'list-group-item location-item';
-                locationElement.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="location-name">${this.escapeHtml(location.name)}</div>
-                            <div class="location-coords">
-                                ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}
-                            </div>
-                        </div>
-                        <div class="location-actions">
-                            <button class="btn btn-sm btn-primary btn-location select-location" 
-                                    data-index="${index}">
-                                اختيار
-                            </button>
-                            <button class="btn btn-sm btn-danger btn-location delete-location" 
-                                    data-index="${index}">
-                                حذف
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(locationElement);
-            });
-
-            // إضافة event listeners للأزرار
-            container.querySelectorAll('.select-location').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = e.target.getAttribute('data-index');
-                    if (index && this.locations[index]) {
-                        this.selectLocation(this.locations[index]);
-                    }
-                });
-            });
-
-            container.querySelectorAll('.delete-location').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = e.target.getAttribute('data-index');
-                    if (index && this.locations[index]) {
-                        this.deleteLocation(parseInt(index));
-                    }
-                });
-            });
-
-            return true;
-        } catch (error) {
-            console.error('خطأ في عرض المواقع:', error);
-            return false;
-        }
+    if (locationNameInput && locationNameInput.value.trim()) {
+        locationName = locationNameInput.value.trim();
     }
 
-    selectLocation(location) {
-        // إغلاق النافذة
-        const modalElement = document.getElementById('location-list-modal');
-        if (modalElement) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
+    try {
+        // الحصول على الموقع الحالي من التطبيق الرئيسي
+        const currentLocation = window.currentLocation || getDefaultLocation();
+        
+        if (!currentLocation.latitude || !currentLocation.longitude) {
+            showError('❌ لا يوجد موقع حالي محدد');
+            return;
+        }
+
+        const locationData = {
+            name: locationName,
+            city: currentLocation.city || 'غير معروف',
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude
+        };
+
+        const success = addLocation(locationData);
+        
+        if (success) {
+            showNotification('✅ تم حفظ الموقع بنجاح');
+            
+            // مسح حقل الإدخال إذا كان موجوداً
+            if (locationNameInput) {
+                locationNameInput.value = '';
+            }
+            
+            // إعادة تحميل القائمة
+            renderLocations();
+        } else {
+            showError('❌ فشل في حفظ الموقع');
+        }
+    } catch (error) {
+        console.error('❌ خطأ في حفظ الموقع:', error);
+        showError('❌ حدث خطأ أثناء حفظ الموقع');
+    }
+}
+
+// إضافة موقع جديد
+function addLocation(locationData) {
+    const newLocation = {
+        id: Date.now().toString(),
+        name: locationData.name || 'موقع جديد',
+        city: locationData.city || 'غير معروف',
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        timestamp: new Date().toISOString()
+    };
+
+    // منع التكرار
+    const exists = savedLocations.some(loc => 
+        loc.latitude === locationData.latitude && 
+        loc.longitude === locationData.longitude
+    );
+
+    if (exists) {
+        showError('⚠️ هذا الموقع موجود مسبقاً');
+        return false;
+    }
+
+    savedLocations.unshift(newLocation);
+    
+    // حفظ فقط آخر 10 مواقع
+    if (savedLocations.length > 10) {
+        savedLocations = savedLocations.slice(0, 10);
+    }
+    
+    const saved = saveLocations();
+    if (saved) {
+        window.dispatchEvent(new CustomEvent('locationsUpdated'));
+    }
+    
+    return saved;
+}
+
+// حذف موقع
+function deleteLocation(locationId) {
+    const initialLength = savedLocations.length;
+    savedLocations = savedLocations.filter(location => location.id !== locationId);
+    
+    if (savedLocations.length !== initialLength) {
+        saveLocations();
+        window.dispatchEvent(new CustomEvent('locationsUpdated'));
+        return true;
+    }
+    return false;
+}
+
+// تبديل الموقع
+function switchLocation(locationId) {
+    const location = savedLocations.find(loc => loc.id === locationId);
+    if (!location) {
+        throw new Error('الموقع غير موجود');
+    }
+
+    // حفظ الموقع الجديد كموقع حالي
+    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+    settings.latitude = location.latitude;
+    settings.longitude = location.longitude;
+    settings.cityName = location.city;
+    localStorage.setItem('prayerSettings', JSON.stringify(settings));
+
+    // إرسال حدث تغيير الموقع
+    window.dispatchEvent(new CustomEvent('locationChanged', {
+        detail: location
+    }));
+
+    return location;
+}
+
+// عرض المواقع (لصفحة الإعدادات فقط)
+function renderLocations() {
+    const container = document.getElementById('locations-container');
+    if (!container) {
+        // هذا طبيعي في الصفحة الرئيسية
+        return;
+    }
+
+    const list = document.getElementById('locations-list');
+    const noLocationsMsg = document.getElementById('no-locations-message');
+
+    if (!list || !noLocationsMsg) {
+        console.error('❌ عناصر عرض المواقع غير موجودة');
+        return;
+    }
+
+    // مسح القائمة الحالية
+    list.innerHTML = '';
+
+    if (savedLocations.length === 0) {
+        noLocationsMsg.style.display = 'block';
+        list.style.display = 'none';
+    } else {
+        noLocationsMsg.style.display = 'none';
+        list.style.display = 'block';
+
+        savedLocations.forEach(location => {
+            const locationElement = createLocationElement(location);
+            list.appendChild(locationElement);
+        });
+    }
+}
+
+// إنشاء عنصر موقع (لصفحة الإعدادات)
+function createLocationElement(location) {
+    const div = document.createElement('div');
+    div.className = 'list-group-item location-item d-flex justify-content-between align-items-center';
+    div.innerHTML = `
+        <div>
+            <div class="fw-medium">${location.name}</div>
+            <small class="text-muted">${location.city} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})</small>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-primary switch-location-btn me-1" data-id="${location.id}" title="استخدام هذا الموقع">
+                <i class="bi bi-geo-alt"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger delete-location-btn" data-id="${location.id}" title="حذف الموقع">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+
+    // إضافة مستمعي الأحداث
+    const switchBtn = div.querySelector('.switch-location-btn');
+    const deleteBtn = div.querySelector('.delete-location-btn');
+
+    switchBtn.addEventListener('click', () => {
+        try {
+            switchLocation(location.id);
+            showNotification(`📍 تم التبديل إلى موقع ${location.name}`);
+            
+            // إغلاق modal إذا كان مفتوحاً
+            const modal = bootstrap.Modal.getInstance(document.getElementById('location-list-modal'));
             if (modal) {
                 modal.hide();
             }
+        } catch (error) {
+            showError(`❌ ${error.message}`);
         }
+    });
 
-        // تحديث أوقات الصلاة للموقع المحدد
-        if (typeof updatePrayerTimes === 'function') {
-            updatePrayerTimes(location.lat, location.lng);
+    deleteBtn.addEventListener('click', () => {
+        if (confirm(`هل تريد حذف موقع "${location.name}"؟`)) {
+            const deleted = deleteLocation(location.id);
+            if (deleted) {
+                showNotification('🗑️ تم حذف الموقع بنجاح');
+            } else {
+                showError('❌ فشل في حذف الموقع');
+            }
         }
+    });
 
-        // تحديث اسم المدينة في الواجهة
-        const cityNameElement = document.getElementById('city-name');
-        const coordinatesElement = document.getElementById('coordinates');
-        
-        if (cityNameElement) {
-            cityNameElement.textContent = location.name;
-        }
-        
-        if (coordinatesElement) {
-            coordinatesElement.textContent = `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
-        }
+    return div;
+}
 
-        // تحديث currentLocation العالمي إذا كان موجوداً
-        if (typeof currentLocation !== 'undefined') {
-            currentLocation.latitude = location.lat;
-            currentLocation.longitude = location.lng;
-            currentLocation.city = location.name;
-        }
+// موقع افتراضي
+function getDefaultLocation() {
+    return {
+        latitude: 31.9539,
+        longitude: 44.3736,
+        city: 'النجف'
+    };
+}
 
-        this.showAlert(`تم التبديل إلى ${location.name}`, 'success');
-    }
+// الحصول على قائمة المواقع
+function getSavedLocations() {
+    return [...savedLocations];
+}
 
-    deleteLocation(index) {
-        if (index < 0 || index >= this.locations.length) {
-            this.showAlert('الموقع غير موجود', 'error');
-            return;
-        }
+// البحث عن موقع بالاسم
+function findLocationByName(name) {
+    return savedLocations.find(location => 
+        location.name.toLowerCase().includes(name.toLowerCase()) ||
+        location.city.toLowerCase().includes(name.toLowerCase())
+    );
+}
 
-        const locationName = this.locations[index].name;
-        
-        if (confirm(`هل تريد حذف "${locationName}"؟`)) {
-            this.locations.splice(index, 1);
-            this.saveLocations();
-            this.renderLocations();
-            this.showAlert('تم حذف الموقع', 'success');
-        }
-    }
+// فتح قائمة المواقع (لصفحة الإعدادات)
+function openLocationList() {
+    renderLocations();
+    const modal = new bootstrap.Modal(document.getElementById('location-list-modal'));
+    modal.show();
+}
 
-    showAlert(message, type) {
-        // استخدام نظام الإشعارات الموجود في التطبيق
-        if (typeof showNotification === 'function') {
-            showNotification(message);
-        } else if (typeof showError === 'function' && type === 'error') {
-            showError(message);
-        } else {
-            // استخدام alert كبديل
-            alert(message);
-        }
-    }
-
-    // للحصول على الموقع الافتراضي أو الأخير
-    getDefaultLocation() {
-        if (this.locations.length > 0) {
-            return this.locations[this.locations.length - 1];
-        }
-        return null;
-    }
-
-    // دالة مساعدة لمنع هجمات XSS
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // دالة لإضافة موقع يدوياً
-    addManualLocation(name, lat, lng) {
-        if (!name || !lat || !lng) {
-            this.showAlert('بيانات الموقع غير كاملة', 'error');
-            return false;
-        }
-
-        // التحقق من عدم التكرار
-        if (this.locations.some(loc => loc.name.toLowerCase() === name.toLowerCase())) {
-            this.showAlert('هذا الاسم موجود مسبقاً', 'error');
-            return false;
-        }
-
-        this.locations.push({
-            name: name,
-            lat: parseFloat(lat),
-            lng: parseFloat(lng),
-            timestamp: new Date().toISOString()
-        });
-
-        this.saveLocations();
-        this.renderLocations();
-        this.showAlert('تم إضافة الموقع بنجاح!', 'success');
-        return true;
-    }
-
-    // دالة للحصول على جميع المواقع
-    getAllLocations() {
-        return [...this.locations];
-    }
-
-    // دالة للبحث عن موقع بالاسم
-    findLocationByName(name) {
-        return this.locations.find(loc => 
-            loc.name.toLowerCase() === name.toLowerCase()
-        );
+// ===== دعم الإشعارات =====
+function showNotification(message) {
+    // استخدام Toast إذا كان متاحاً، أو console كبديل
+    const toast = document.getElementById('notification-toast');
+    if (toast) {
+        const toastInstance = new bootstrap.Toast(toast);
+        toast.querySelector('.toast-body').textContent = message;
+        toastInstance.show();
+    } else {
+        console.log(`💡 ${message}`);
     }
 }
 
-// تهيئة مدير المواقع
-let locationManager;
-
-function initLocationManager() {
-    try {
-        locationManager = new LocationManager();
-        locationManager.init();
-        
-        // محاولة استخدام موقع محفوظ عند التحميل
-        const defaultLocation = locationManager.getDefaultLocation();
-        if (defaultLocation) {
-            if (typeof updatePrayerTimes === 'function') {
-                updatePrayerTimes(defaultLocation.lat, defaultLocation.lng);
-            }
-
-            const cityNameElement = document.getElementById('city-name');
-            const coordinatesElement = document.getElementById('coordinates');
-            
-            if (cityNameElement) {
-                cityNameElement.textContent = defaultLocation.name;
-            }
-            
-            if (coordinatesElement) {
-                coordinatesElement.textContent = `${defaultLocation.lat.toFixed(4)}, ${defaultLocation.lng.toFixed(4)}`;
-            }
-
-            // تحديث currentLocation العالمي
-            if (typeof currentLocation !== 'undefined') {
-                currentLocation.latitude = defaultLocation.lat;
-                currentLocation.longitude = defaultLocation.lng;
-                currentLocation.city = defaultLocation.name;
-            }
-        }
-        
-        console.log('مدير المواقع مهيأ بنجاح');
-        return locationManager;
-    } catch (error) {
-        console.error('خطأ في تهيئة مدير المواقع:', error);
-        return null;
+function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+        }, 5000);
+    } else {
+        console.error(`❌ ${message}`);
     }
 }
 
-// التهيئة عند تحميل الصفحة
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLocationManager);
-} else {
-    // الصفحة محملة بالفعل
-    setTimeout(initLocationManager, 100);
+// تصدير الدوال للاستخدام في ملفات أخرى
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initLocationManager,
+        loadSavedLocations,
+        addLocation,
+        deleteLocation,
+        saveCurrentLocation: handleSaveCurrentLocation,
+        switchLocation,
+        getSavedLocations,
+        findLocationByName,
+        renderLocations,
+        openLocationList
+    };
 }
-
