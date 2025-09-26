@@ -418,3 +418,10 @@ if (typeof module !== 'undefined' && module.exports) {
     currentLocation
   };
 }
+// جعل الدوال متاحة globally لصفحة الإعدادات
+if (typeof window !== 'undefined') {
+    window.getCurrentLocation = getCurrentLocation;
+    window.currentLocation = currentLocation;
+    window.calculateAndDisplayPrayerTimes = calculateAndDisplayPrayerTimes;
+}
+
