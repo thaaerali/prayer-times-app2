@@ -6,7 +6,6 @@ let savedLocations = [];
 function initLocationManager() {
     return new Promise((resolve) => {
         loadSavedLocations();
-        setupLocationEventListeners();
         console.log('✅ تم تهيئة إدارة المواقع');
         resolve();
     });
@@ -39,77 +38,6 @@ function saveLocations() {
     } catch (error) {
         console.error('❌ خطأ في حفظ المواقع:', error);
         return false;
-    }
-}
-
-// إعداد مستمعي الأحداث (لصفحة الإعدادات فقط)
-function setupLocationEventListeners() {
-    // هذه الأحداث مخصصة لصفحة الإعدادات فقط
-    const saveLocationBtn = document.getElementById('save-current-location');
-    const newLocationInput = document.getElementById('new-location-name');
-    
-    if (saveLocationBtn) {
-        saveLocationBtn.addEventListener('click', handleSaveCurrentLocation);
-        console.log('✅ تم إعداد حدث حفظ الموقع');
-    } else {
-        console.log('ℹ️ زر حفظ الموقع غير موجود في هذه الصفحة (هذا طبيعي في الصفحة الرئيسية)');
-    }
-
-    if (newLocationInput) {
-        newLocationInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSaveCurrentLocation();
-            }
-        });
-    }
-
-    // تحديث القائمة عند تغيير المواقع
-    window.addEventListener('locationsUpdated', renderLocations);
-}
-
-// حفظ الموقع الحالي
-function handleSaveCurrentLocation() {
-    const locationNameInput = document.getElementById('new-location-name');
-    let locationName = 'موقع محفوظ';
-
-    if (locationNameInput && locationNameInput.value.trim()) {
-        locationName = locationNameInput.value.trim();
-    }
-
-    try {
-        // الحصول على الموقع الحالي من التطبيق الرئيسي
-        const currentLocation = window.currentLocation || getDefaultLocation();
-        
-        if (!currentLocation.latitude || !currentLocation.longitude) {
-            showError('❌ لا يوجد موقع حالي محدد');
-            return;
-        }
-
-        const locationData = {
-            name: locationName,
-            city: currentLocation.city || 'غير معروف',
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude
-        };
-
-        const success = addLocation(locationData);
-        
-        if (success) {
-            showNotification('✅ تم حفظ الموقع بنجاح');
-            
-            // مسح حقل الإدخال إذا كان موجوداً
-            if (locationNameInput) {
-                locationNameInput.value = '';
-            }
-            
-            // إعادة تحميل القائمة
-            renderLocations();
-        } else {
-            showError('❌ فشل في حفظ الموقع');
-        }
-    } catch (error) {
-        console.error('❌ خطأ في حفظ الموقع:', error);
-        showError('❌ حدث خطأ أثناء حفظ الموقع');
     }
 }
 
@@ -302,10 +230,12 @@ function openLocationList() {
 // ===== دعم الإشعارات =====
 function showNotification(message) {
     // استخدام Toast إذا كان متاحاً، أو console كبديل
-    const toast = document.getElementById('notification-toast');
-    if (toast) {
+    const toast = document.getElementById('notification');
+    if (toast && typeof bootstrap !== 'undefined') {
+        const toastBody = toast.querySelector('.toast-body');
+        if (toastBody) toastBody.textContent = message;
+        
         const toastInstance = new bootstrap.Toast(toast);
-        toast.querySelector('.toast-body').textContent = message;
         toastInstance.show();
     } else {
         console.log(`💡 ${message}`);
@@ -332,7 +262,6 @@ if (typeof module !== 'undefined' && module.exports) {
         loadSavedLocations,
         addLocation,
         deleteLocation,
-        saveCurrentLocation: handleSaveCurrentLocation,
         switchLocation,
         getSavedLocations,
         findLocationByName,
