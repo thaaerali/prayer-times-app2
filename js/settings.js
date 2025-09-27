@@ -49,6 +49,7 @@ function loadSettings() {
   const soundSettings = JSON.parse(localStorage.getItem('soundSettings')) || {};
   const appearanceSettings = JSON.parse(localStorage.getItem('appearanceSettings')) || {};
   
+  // تحميل إعدادات الصلاة فقط إذا كانت العناصر موجودة
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const roundingMethodSelect = document.getElementById('rounding-method');
@@ -67,24 +68,25 @@ function loadSettings() {
   const toggleMaghribNotification = document.getElementById('toggle-maghrib-notification');
   const toggleIshaNotification = document.getElementById('toggle-isha-notification');
 
-  // تحميل إعدادات الصلاة
-  if (prayerSettings.calculationMethod) calculationMethodSelect.value = prayerSettings.calculationMethod;
-  if (prayerSettings.timeFormat) timeFormatSelect.value = prayerSettings.timeFormat;
-  if (prayerSettings.roundingMethod) roundingMethodSelect.value = prayerSettings.roundingMethod;
-  if (prayerSettings.city) manualLocation.value = prayerSettings.city;
+  // تحميل إعدادات الصلاة (فقط إذا كانت العناصر موجودة)
+  if (calculationMethodSelect && prayerSettings.calculationMethod) calculationMethodSelect.value = prayerSettings.calculationMethod;
+  if (timeFormatSelect && prayerSettings.timeFormat) timeFormatSelect.value = prayerSettings.timeFormat;
+  if (roundingMethodSelect && prayerSettings.roundingMethod) roundingMethodSelect.value = prayerSettings.roundingMethod;
+  if (manualLocation && prayerSettings.city) manualLocation.value = prayerSettings.city;
+  
   if (prayerSettings.latitude) currentLocation.latitude = prayerSettings.latitude;
   if (prayerSettings.longitude) currentLocation.longitude = prayerSettings.longitude;
   if (prayerSettings.cityName) currentLocation.city = prayerSettings.cityName;
 
-  toggleAsr.checked = prayerSettings.showAsr !== undefined ? prayerSettings.showAsr : true;
-  toggleIsha.checked = prayerSettings.showIsha !== undefined ? prayerSettings.showIsha : true;
+  if (toggleAsr) toggleAsr.checked = prayerSettings.showAsr !== undefined ? prayerSettings.showAsr : true;
+  if (toggleIsha) toggleIsha.checked = prayerSettings.showIsha !== undefined ? prayerSettings.showIsha : true;
 
-  // تحميل إعدادات الإشعارات
-  toggleFajrNotification.checked = prayerSettings.fajrNotification !== undefined ? prayerSettings.fajrNotification : true;
-  toggleDhuhrNotification.checked = prayerSettings.dhuhrNotification !== undefined ? prayerSettings.dhuhrNotification : true;
-  toggleAsrNotification.checked = prayerSettings.asrNotification !== undefined ? prayerSettings.asrNotification : true;
-  toggleMaghribNotification.checked = prayerSettings.maghribNotification !== undefined ? prayerSettings.maghribNotification : true;
-  toggleIshaNotification.checked = prayerSettings.ishaNotification !== undefined ? prayerSettings.ishaNotification : true;
+  // تحميل إعدادات الإشعارات (فقط إذا كانت العناصر موجودة)
+  if (toggleFajrNotification) toggleFajrNotification.checked = prayerSettings.fajrNotification !== undefined ? prayerSettings.fajrNotification : true;
+  if (toggleDhuhrNotification) toggleDhuhrNotification.checked = prayerSettings.dhuhrNotification !== undefined ? prayerSettings.dhuhrNotification : true;
+  if (toggleAsrNotification) toggleAsrNotification.checked = prayerSettings.asrNotification !== undefined ? prayerSettings.asrNotification : true;
+  if (toggleMaghribNotification) toggleMaghribNotification.checked = prayerSettings.maghribNotification !== undefined ? prayerSettings.maghribNotification : true;
+  if (toggleIshaNotification) toggleIshaNotification.checked = prayerSettings.ishaNotification !== undefined ? prayerSettings.ishaNotification : true;
 
   // تحميل إعدادات الصوت
   if (soundSettings.selectedSound) {
@@ -94,14 +96,13 @@ function loadSettings() {
   }
 
   // تعيين القيم الافتراضية للتشغيل التلقائي إذا لم تكن محددة
-  toggleFajrAdhan.checked = soundSettings.playFajrAdhan !== undefined ? soundSettings.playFajrAdhan : true;
-  toggleDhuhrAdhan.checked = soundSettings.playDhuhrAdhan !== undefined ? soundSettings.playDhuhrAdhan : true;
-  toggleAsrAdhan.checked = soundSettings.playAsrAdhan !== undefined ? soundSettings.playAsrAdhan : true;
-  toggleMaghribAdhan.checked = soundSettings.playMaghribAdhan !== undefined ? soundSettings.playMaghribAdhan : true;
-  toggleIshaAdhan.checked = soundSettings.playIshaAdhan !== undefined ? soundSettings.playIshaAdhan : true;
+  if (toggleFajrAdhan) toggleFajrAdhan.checked = soundSettings.playFajrAdhan !== undefined ? soundSettings.playFajrAdhan : true;
+  if (toggleDhuhrAdhan) toggleDhuhrAdhan.checked = soundSettings.playDhuhrAdhan !== undefined ? soundSettings.playDhuhrAdhan : true;
+  if (toggleAsrAdhan) toggleAsrAdhan.checked = soundSettings.playAsrAdhan !== undefined ? soundSettings.playAsrAdhan : true;
+  if (toggleMaghribAdhan) toggleMaghribAdhan.checked = soundSettings.playMaghribAdhan !== undefined ? soundSettings.playMaghribAdhan : true;
+  if (toggleIshaAdhan) toggleIshaAdhan.checked = soundSettings.playIshaAdhan !== undefined ? soundSettings.playIshaAdhan : true;
 
-  if (soundSettings.volumeLevel !== undefined) volumeLevel.value = soundSettings.volumeLevel;
-  else volumeLevel.value = 80; // قيمة حجم افتراضية
+  if (volumeLevel) volumeLevel.value = soundSettings.volumeLevel !== undefined ? soundSettings.volumeLevel : 80;
 
   // تحميل إعدادات المظهر
   if (appearanceSettings.appearance) {
@@ -122,8 +123,10 @@ function loadSettings() {
     applyAppearance(oldSettings.appearance);
   }
 
-  // إضافة مستمعي الأحداث للحفظ التلقائي
-  initAutoSaveEvents();
+  // إضافة مستمعي الأحداث للحفظ التلقائي (فقط إذا كانت الصفحة نشطة)
+  if (document.getElementById('settings-page').classList.contains('active')) {
+    initAutoSaveEvents();
+  }
 
   return {
     ...prayerSettings,
@@ -154,34 +157,40 @@ function autoSaveSettings() {
   const toggleMaghribNotification = document.getElementById('toggle-maghrib-notification');
   const toggleIshaNotification = document.getElementById('toggle-isha-notification');
 
+  // التحقق من وجود العناصر قبل استخدامها
+  if (!calculationMethodSelect || !timeFormatSelect || !roundingMethodSelect) {
+    console.log('عناصر الإعدادات غير موجودة، تأجيل الحفظ');
+    return;
+  }
+
   // حفظ إعدادات الصلاة والموقع بشكل منفصل
   const prayerSettings = {
     calculationMethod: calculationMethodSelect.value,
     timeFormat: timeFormatSelect.value,
     roundingMethod: roundingMethodSelect.value,
-    city: manualLocation.value,
+    city: manualLocation ? manualLocation.value : '',
     latitude: currentLocation.latitude,
     longitude: currentLocation.longitude,
     cityName: currentLocation.city,
-    showAsr: toggleAsr.checked,
-    showIsha: toggleIsha.checked,
+    showAsr: toggleAsr ? toggleAsr.checked : true,
+    showIsha: toggleIsha ? toggleIsha.checked : true,
     // إعدادات الإشعارات
-    fajrNotification: toggleFajrNotification.checked,
-    dhuhrNotification: toggleDhuhrNotification.checked,
-    asrNotification: toggleAsrNotification.checked,
-    maghribNotification: toggleMaghribNotification.checked,
-    ishaNotification: toggleIshaNotification.checked
+    fajrNotification: toggleFajrNotification ? toggleFajrNotification.checked : true,
+    dhuhrNotification: toggleDhuhrNotification ? toggleDhuhrNotification.checked : true,
+    asrNotification: toggleAsrNotification ? toggleAsrNotification.checked : true,
+    maghribNotification: toggleMaghribNotification ? toggleMaghribNotification.checked : true,
+    ishaNotification: toggleIshaNotification ? toggleIshaNotification.checked : true
   };
   
   // حفظ إعدادات الصوت بشكل منفصل
   const soundSettings = {
     selectedSound: selectedSound,
-    playFajrAdhan: toggleFajrAdhan.checked,
-    playDhuhrAdhan: toggleDhuhrAdhan.checked,
-    playAsrAdhan: toggleAsrAdhan.checked,
-    playMaghribAdhan: toggleMaghribAdhan.checked,
-    playIshaAdhan: toggleIshaAdhan.checked,
-    volumeLevel: volumeLevel.value
+    playFajrAdhan: toggleFajrAdhan ? toggleFajrAdhan.checked : true,
+    playDhuhrAdhan: toggleDhuhrAdhan ? toggleDhuhrAdhan.checked : true,
+    playAsrAdhan: toggleAsrAdhan ? toggleAsrAdhan.checked : true,
+    playMaghribAdhan: toggleMaghribAdhan ? toggleMaghribAdhan.checked : true,
+    playIshaAdhan: toggleIshaAdhan ? toggleIshaAdhan.checked : true,
+    volumeLevel: volumeLevel ? volumeLevel.value : 80
   };
   
   // حفظ إعدادات المظهر بشكل منفصل
@@ -202,28 +211,38 @@ function autoSaveSettings() {
 
 // تهيئة أحداث الحفظ التلقائي
 function initAutoSaveEvents() {
-  // إعدادات الصلاة
-  document.getElementById('calculation-method').addEventListener('change', autoSaveSettings);
-  document.getElementById('time-format').addEventListener('change', autoSaveSettings);
-  document.getElementById('rounding-method').addEventListener('change', autoSaveSettings);
-  document.getElementById('manual-location').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-asr').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-isha').addEventListener('change', autoSaveSettings);
+  console.log('تهيئة أحداث الحفظ التلقائي...');
   
-  // إعدادات الإشعارات
-  document.getElementById('toggle-fajr-notification').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-dhuhr-notification').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-asr-notification').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-maghrib-notification').addEventListener('change', autoSaveSettings);
-  document.getElementById('toggle-isha-notification').addEventListener('change', autoSaveSettings);
-  
-  // إعدادات الصوت (تمت إضافتها في initSoundEvents)
-  
-  // إعدادات المظهر (تمت إضافتها في initAppearanceEvents)
+  // قائمة بجميع عناصر الإعدادات التي تحتاج event listeners
+  const settingsElements = [
+    'calculation-method', 'time-format', 'rounding-method', 'manual-location',
+    'toggle-asr', 'toggle-isha', 'toggle-fajr-notification', 'toggle-dhuhr-notification',
+    'toggle-asr-notification', 'toggle-maghrib-notification', 'toggle-isha-notification',
+    'toggle-fajr-adhan', 'toggle-dhuhr-adhan', 'toggle-asr-adhan', 'toggle-maghrib-adhan',
+    'toggle-isha-adhan', 'volume-level'
+  ];
+
+  settingsElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      // إزالة أي event listeners سابقة لمنع التكرار
+      element.replaceWith(element.cloneNode(true));
+      
+      // إضافة event listener جديدة
+      const newElement = document.getElementById(id);
+      newElement.addEventListener('change', autoSaveSettings);
+    } else {
+      console.warn(`العنصر ${id} غير موجود، تم تخطيه`);
+    }
+  });
+
+  // تهيئة أحداث الصوت والمظهر
+  initSoundEvents();
+  initAppearanceEvents();
 }
 
 function saveSettings() {
-  // الحصول على العناصر من DOM
+  // الحصول على العناصر من DOM مع التحقق من وجودها
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const roundingMethodSelect = document.getElementById('rounding-method');
@@ -347,18 +366,22 @@ function applyAppearance(appearance) {
 function initSoundEvents() {
   const soundItems = document.querySelectorAll('#adhan-sounds-list .sound-item');
   
-  // حدث النقر على عنصر صوت
   soundItems.forEach(item => {
-    item.addEventListener('click', (e) => {
+    // إزالة أي event listeners سابقة
+    const newItem = item.cloneNode(true);
+    item.parentNode.replaceChild(newItem, item);
+    
+    // إضافة event listener جديدة
+    newItem.addEventListener('click', (e) => {
       if (e.target.classList.contains('play-btn') || e.target.parentElement.classList.contains('play-btn')) {
         // تشغيل الصوت عند النقر على زر التشغيل
-        const soundId = item.dataset.sound;
+        const soundId = newItem.dataset.sound;
         if (typeof playAdhanSound === 'function') {
           playAdhanSound(soundId);
         }
       } else {
         // تحديد الصوت عند النقر على العنصر
-        selectSound(item.dataset.sound);
+        selectSound(newItem.dataset.sound);
         
         // حفظ إعدادات الصوت تلقائياً
         autoSaveSettings();
@@ -370,27 +393,16 @@ function initSoundEvents() {
   const volumeLevel = document.getElementById('volume-level');
   const adhanPlayer = document.getElementById('adhan-player');
   
-  volumeLevel.addEventListener('input', () => {
-    if (adhanPlayer) {
-      adhanPlayer.volume = volumeLevel.value / 100;
-    }
-    
-    // حفظ مستوى الصوت تلقائياً
-    autoSaveSettings();
-  });
-
-  // أحداث التبديل للتشغيل التلقائي للأذان
-  const toggleIds = [
-    'toggle-fajr-adhan',
-    'toggle-dhuhr-adhan',
-    'toggle-asr-adhan',
-    'toggle-maghrib-adhan',
-    'toggle-isha-adhan'
-  ];
-  
-  toggleIds.forEach(id => {
-    document.getElementById(id).addEventListener('change', autoSaveSettings);
-  });
+  if (volumeLevel) {
+    volumeLevel.addEventListener('input', () => {
+      if (adhanPlayer) {
+        adhanPlayer.volume = volumeLevel.value / 100;
+      }
+      
+      // حفظ مستوى الصوت تلقائياً
+      autoSaveSettings();
+    });
+  }
 }
 
 // تهيئة الأحداث الخاصة بمظهر التطبيق
@@ -398,9 +410,14 @@ function initAppearanceEvents() {
   const appearanceItems = document.querySelectorAll('#appearance-list .sound-item');
   
   appearanceItems.forEach(item => {
-    item.addEventListener('click', () => {
-      selectAppearance(item.dataset.appearance);
-      applyAppearance(item.dataset.appearance);
+    // إزالة أي event listeners سابقة
+    const newItem = item.cloneNode(true);
+    item.parentNode.replaceChild(newItem, item);
+    
+    // إضافة event listener جديدة
+    newItem.addEventListener('click', () => {
+      selectAppearance(newItem.dataset.appearance);
+      applyAppearance(newItem.dataset.appearance);
       
       // حفظ إعدادات المظهر تلقائياً
       autoSaveSettings();
@@ -418,101 +435,56 @@ function initAppearanceEvents() {
   }
 }
 
-// فتح قائمة المواقع من الإعدادات
-document.getElementById('open-locations-list').addEventListener('click', () => {
-  if (typeof locationManager !== 'undefined') {
-      locationManager.openLocationModal();
-      
-      // إغلاق نافذة الإعدادات عند فتح نافذة المواقع
-      const settingsModal = bootstrap.Modal.getInstance(document.getElementById('settings-modal'));
-      if (settingsModal) {
-        settingsModal.hide();
-      }
-  }
-});
-
 // استدعاء دالة الترحيل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
   migrateOldSettings();
   loadSettings();
 });
 
-// تهيئة أحداث الحفظ عند فتح النافذة
+// تهيئة أحداث الحفظ عند فتح صفحة الإعدادات
+function initSettingsPageEvents() {
+  // تهيئة الأحداث فقط إذا كانت صفحة الإعدادات نشطة
+  if (document.getElementById('settings-page').classList.contains('active')) {
+    console.log('تهيئة أحداث صفحة الإعدادات...');
+    initAutoSaveEvents();
+  }
+}
+
+// استدعاء تهيئة الأحداث عند التنقل إلى صفحة الإعدادات
+function onSettingsPageOpen() {
+  // تأخير بسيط لضمان تحميل DOM
+  setTimeout(() => {
+    initSettingsPageEvents();
+    loadSettings(); // إعادة تحميل الإعدادات للتأكد من أنها محدثة
+  }, 100);
+}
+
+// إزالة الأحداث القديمة المتعلقة بالنافذة المنبثقة
+// حذف هذه الأجزاء لأننا لم نعد نستخدم النافذة المنبثقة:
+/*
 document.getElementById('settings-modal').addEventListener('shown.bs.modal', function() {
   initAutoSaveEvents();
   initSoundEvents();
   initAppearanceEvents();
 });
-// حفظ الإعدادات عند إغلاق نافذة الإعدادات
+
 document.getElementById('settings-modal').addEventListener('hidden.bs.modal', function() {
-  // التأكد من حفظ أي إعدادات أخيرة قبل إغلاق النافذة
   autoSaveSettings();
-  
-  // إعادة حساب أوقات الصلاة بعد إغلاق النافذة
   calculateAndDisplayPrayerTimes();
-  
-  // إعادة تشغيل مراقبة الإشعارات
   if (typeof startNotificationChecker === 'function') {
     startNotificationChecker();
   }
 });
+*/
 
-
-// تهيئة إعدادات المظهر
-function initAppearanceSettings() {
-    const appearanceOptions = document.querySelectorAll('.appearance-option');
+// تحديث دالة togglePages في app.js لاستدعاء تهيئة الأحداث
+// أضف هذا في دالة togglePages في app.js:
+/*
+function togglePages() {
+    // ... الكود الحالي ...
     
-    appearanceOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            appearanceOptions.forEach(opt => opt.classList.remove('active'));
-            this.classList.add('active');
-            
-            const theme = this.getAttribute('data-theme');
-            applyTheme(theme);
-            
-            // حفظ الإعدادات كاملة
-            saveSettings();
-        });
-    });
-    
-    // تحميل الإعدادات المحفوظة
-    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-    const savedTheme = settings.appearance || 'light';
-    
-    // تفعيل الخيار المناسب
-    const activeOption = document.querySelector(`.appearance-option[data-theme="${savedTheme}"]`);
-    if (activeOption) {
-        activeOption.classList.add('active');
+    if (settingsPage.classList.contains('active')) {
+        onSettingsPageOpen(); // تهيئة أحداث الإعدادات
     }
 }
-
-// تأكد من أن دالة saveSettings تتضمن إعدادات المظهر
-function saveSettings() {
-    const selectedSound = document.querySelector('#adhan-sounds-list .sound-item.active')?.dataset.sound || 'abdul-basit';
-    const selectedAppearance = document.querySelector('#appearance-list .appearance-option.active')?.dataset.appearance || 'light';
-    
-    const settings = {
-        calculationMethod: calculationMethodSelect.value,
-        timeFormat: timeFormatSelect.value,
-        roundingMethod: roundingMethodSelect.value,
-        city: manualLocation.value,
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-        cityName: currentLocation.city,
-        showAsr: toggleAsr.checked,
-        showIsha: toggleIsha.checked,
-        // إعدادات الصوت
-        selectedSound: selectedSound,
-        playFajrAdhan: toggleFajrAdhan.checked,
-        playDhuhrAdhan: toggleDhuhrAdhan.checked,
-        playAsrAdhan: toggleAsrAdhan.checked,
-        playMaghribAdhan: toggleMaghribAdhan.checked,
-        playIshaAdhan: toggleIshaAdhan.checked,
-        volumeLevel: volumeLevel.value,
-        // إعدادات المظهر
-        appearance: selectedAppearance
-    };
-    
-    localStorage.setItem('prayerSettings', JSON.stringify(settings));
-    showNotification('تم حفظ الإعدادات بنجاح');
-}
+*/
