@@ -337,3 +337,22 @@ header .d-flex .location-marker {
 .dark-mode .about-content::-webkit-scrollbar-thumb:hover {
   background: #718096;
 }
+
+/* تحسين زر الإعدادات الحالي للتنقل */
+.settings-button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-button:hover {
+    transform: scale(1.1);
+}
+
+/* تأكد من أن الصفحات مخفية بشكل صحيح */
+#settingsPage {
+    display: none;
+}
+
+#homePage {
+    display: block;
+}
