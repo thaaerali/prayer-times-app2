@@ -356,3 +356,25 @@ header .d-flex .location-marker {
 #homePage {
     display: block;
 }
+/* تنسيقات نظام الصفحات */
+.page {
+    display: none;
+    min-height: 100vh;
+}
+
+.page.active {
+    display: block;
+}
+
+/* إخفاء النافذة المنبثقة للإعدادات */
+#settings-modal {
+    display: none !important;
+}
+
+/* تنسيق زر العودة */
+#back-button {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 1.2rem;
+}
