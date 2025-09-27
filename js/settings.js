@@ -458,33 +458,31 @@ function onSettingsPageOpen() {
     loadSettings(); // إعادة تحميل الإعدادات للتأكد من أنها محدثة
   }, 100);
 }
-
-// إزالة الأحداث القديمة المتعلقة بالنافذة المنبثقة
-// حذف هذه الأجزاء لأننا لم نعد نستخدم النافذة المنبثقة:
-/*
-document.getElementById('settings-modal').addEventListener('shown.bs.modal', function() {
-  initAutoSaveEvents();
-  initSoundEvents();
-  initAppearanceEvents();
-});
-
-document.getElementById('settings-modal').addEventListener('hidden.bs.modal', function() {
-  autoSaveSettings();
-  calculateAndDisplayPrayerTimes();
-  if (typeof startNotificationChecker === 'function') {
-    startNotificationChecker();
+// دالة لتهيئة أحداث صفحة الإعدادات
+function initSettingsPageEvents() {
+  console.log('تهيئة أحداث صفحة الإعدادات...');
+  
+  // تهيئة الأحداث فقط إذا كانت صفحة الإعدادات نشطة
+  const settingsPage = document.getElementById('settings-page');
+  if (!settingsPage || !settingsPage.classList.contains('active')) {
+    console.log('صفحة الإعدادات غير نشطة، تأجيل تهيئة الأحداث');
+    return;
   }
-});
-*/
 
-// تحديث دالة togglePages في app.js لاستدعاء تهيئة الأحداث
-// أضف هذا في دالة togglePages في app.js:
-/*
-function togglePages() {
-    // ... الكود الحالي ...
-    
-    if (settingsPage.classList.contains('active')) {
-        onSettingsPageOpen(); // تهيئة أحداث الإعدادات
-    }
+  // تهيئة أحداث الحفظ التلقائي
+  initAutoSaveEvents();
+  
+  // تحميل الإعدادات الحالية
+  loadSettings();
 }
-*/
+
+// استدعاء تهيئة الأحداث عند فتح صفحة الإعدادات
+function onSettingsPageOpen() {
+  // تأخير بسيط لضمان تحميل DOM
+  setTimeout(() => {
+    initSettingsPageEvents();
+  }, 100);
+}
+
+// تحديث دالة togglePages في app.js لاستدعاء تهيئة الأحداث (تم إضافتها بالفعل في app.js أعلاه)
+
