@@ -5,6 +5,55 @@ let currentLocation = {
   city: 'النجف'
 };
 
+// دالة للتنقل بين الصفحات بضغطة زر واحدة
+function togglePages() {
+    const homePage = document.getElementById('home');
+    const settingsPage = document.getElementById('settings');
+    const settingsIcon = document.querySelector('.settings-icon');
+    
+    console.log('تبديل الصفحات:', {
+        homePage: homePage,
+        settingsPage: settingsPage,
+        settingsIcon: settingsIcon
+    });
+    
+    if (homePage && settingsPage) {
+        if (homePage.classList.contains('active')) {
+            // الانتقال إلى صفحة الإعدادات
+            console.log('الانتقال إلى الإعدادات');
+            homePage.classList.remove('active');
+            settingsPage.classList.add('active');
+            if (settingsIcon) settingsIcon.textContent = '🏠'; // تغيير الأيقونة إلى منزل
+        } else {
+            // الانتقال إلى الصفحة الرئيسية
+            console.log('الانتقال إلى الصفحة الرئيسية');
+            settingsPage.classList.remove('active');
+            homePage.classList.add('active');
+            if (settingsIcon) settingsIcon.textContent = '⚙️'; // إرجاع الأيقونة إلى ترس
+        }
+    } else {
+        console.error('لم يتم العثور على الصفحات المطلوبة');
+    }
+}
+
+// تعديل وظيفة زر الإعدادات الحالي
+function initNavigation() {
+    const settingsButton = document.querySelector('.settings-button');
+    console.log('تهيئة التنقل - زر الإعدادات:', settingsButton);
+    
+    if (settingsButton) {
+        // إزالة أي event listeners سابقة
+        const newSettingsButton = settingsButton.cloneNode(true);
+        settingsButton.parentNode.replaceChild(newSettingsButton, settingsButton);
+        
+        // إضافة الوظيفة الجديدة للزر الجديد
+        const currentSettingsButton = document.querySelector('.settings-button');
+        currentSettingsButton.onclick = togglePages;
+        
+        console.log('تم تعيين وظيفة التنقل لزر الإعدادات');
+    }
+}
+
 function getCurrentLocation() {
   const cityNameElement = document.getElementById('city-name');
   const locationButton = document.getElementById('location-button');
@@ -158,7 +207,7 @@ function saveManualLocation() {
     showNotification('تم حفظ الموقع اليدوي بنجاح');
     calculateAndDisplayPrayerTimes();
   } else {
-    showError('يرجى إدخال اسم المدينة');
+    showError('يرجاء إدخال اسم المدينة');
   }
 }
 
@@ -171,7 +220,7 @@ function calculateAndDisplayPrayerTimes() {
   }
 
   if (!currentLocation.latitude || !currentLocation.longitude) {
-    prayerTimesContainer.innerHTML = '<div class="text-center py-4">يرجى تحديد موقعك أولاً</div>';
+    prayerTimesContainer.innerHTML = '<div class="text-center py-4">يرجاء تحديد موقعك أولاً</div>';
     return;
   }
 
@@ -232,7 +281,7 @@ function calculateAndDisplayPrayerTimes() {
     prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
   }
 }
-// دالة لتحديد الصلاة الحالية
+
 // دالة لتحديد الصلاة الحالية
 function highlightCurrentPrayer(times) {
   // إزالة التحديد من جميع العناصر
@@ -315,6 +364,9 @@ function initApp() {
     coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
   }
 
+  // تهيئة نظام التنقل
+  initNavigation();
+
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
 
@@ -329,62 +381,12 @@ function initApp() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM محمّل');
   
-  const settingsButton = document.getElementById('settings-button');
-  const locationButton = document.getElementById('location-button');
-  const saveManualLocationBtn = document.getElementById('save-manual-location');
-  const saveSettingsButton = document.getElementById('save-settings');
-
-  if (settingsButton) {
-    settingsButton.addEventListener('click', () => {
-      const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
-      settingsModal.show();
-    });
-  }
-
-  if (locationButton) {
-    locationButton.addEventListener('click', getCurrentLocation);
-  }
-
-  if (saveManualLocationBtn) {
-    saveManualLocationBtn.addEventListener('click', saveManualLocation);
+  // إزالة الأحداث القديمة لزر الإعدادات
+  const oldSettingsButton = document.getElementById('settings-button');
+  if (oldSettingsButton) {
+    oldSettingsButton.removeEventListener('click', () => {});
   }
 
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
-
-// دالة للتنقل بين الصفحات بضغطة زر واحدة
-function togglePages() {
-    const homePage = document.getElementById('homePage');
-    const settingsPage = document.getElementById('settingsPage');
-    const settingsIcon = document.querySelector('.settings-icon');
-    
-    if (homePage && settingsPage) {
-        if (homePage.style.display !== 'none') {
-            // الانتقال إلى صفحة الإعدادات
-            homePage.style.display = 'none';
-            settingsPage.style.display = 'block';
-            settingsIcon.textContent = '🏠'; // تغيير الأيقونة إلى منزل
-        } else {
-            // الانتقال إلى الصفحة الرئيسية
-            homePage.style.display = 'block';
-            settingsPage.style.display = 'none';
-            settingsIcon.textContent = '⚙️'; // إرجاع الأيقونة إلى ترس
-        }
-    }
-}
-
-// تعديل وظيفة زر الإعدادات الحالي
-function initNavigation() {
-    const settingsButton = document.querySelector('.settings-button');
-    if (settingsButton) {
-        // استبدال الوظيفة القديمة بوظيفة التنقل
-        settingsButton.onclick = togglePages;
-    }
-}
-
-// تهيئة عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    initNavigation();
-});
-
