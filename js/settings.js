@@ -454,3 +454,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
   }
 });
+// في نهاية settings.js أضف هذه الدوال:
+
+// تهيئة أحداث الحفظ عند فتح صفحة الإعدادات
+function initSettingsPageEvents() {
+  console.log('تهيئة أحداث صفحة الإعدادات...');
+  
+  // تهيئة الأحداث فقط إذا كانت صفحة الإعدادات نشطة
+  const settingsPage = document.getElementById('settings-page');
+  if (settingsPage && settingsPage.classList.contains('active')) {
+    // تأخير بسيط لضمان تحميل DOM بالكامل
+    setTimeout(() => {
+      initAutoSaveEvents();
+      loadSettings(); // إعادة تحميل الإعدادات للتأكد من أنها محدثة
+    }, 300);
+  }
+}
+
+// دالة لتهيئة الأحداث عند فتح صفحة الإعدادات
+function onSettingsPageOpen() {
+  console.log('فتح صفحة الإعدادات، تهيئة الأحداث...');
+  initSettingsPageEvents();
+}
