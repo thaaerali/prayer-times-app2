@@ -38,20 +38,70 @@ function togglePages() {
 
 // تعديل وظيفة زر الإعدادات الحالي
 function initNavigation() {
-    const settingsButton = document.querySelector('.settings-button');
+    // البحث عن زر الإعدادات بطرق مختلفة
+    let settingsButton = document.querySelector('.settings-button');
+    
+    if (!settingsButton) {
+        settingsButton = document.getElementById('settings-button');
+    }
+    
+    if (!settingsButton) {
+        settingsButton = document.querySelector('button[data-bs-target="#settings-modal"]');
+    }
+    
+    if (!settingsButton) {
+        // البحث عن أي زر يحتوي على أيقونة الإعدادات
+        settingsButton = document.querySelector('button .settings-icon');
+        if (settingsButton) {
+            settingsButton = settingsButton.closest('button');
+        }
+    }
+    
     console.log('تهيئة التنقل - زر الإعدادات:', settingsButton);
     
     if (settingsButton) {
         // إزالة أي event listeners سابقة
-        const newSettingsButton = settingsButton.cloneNode(true);
-        settingsButton.parentNode.replaceChild(newSettingsButton, settingsButton);
+        settingsButton.replaceWith(settingsButton.cloneNode(true));
         
         // إضافة الوظيفة الجديدة للزر الجديد
-        const currentSettingsButton = document.querySelector('.settings-button');
-        currentSettingsButton.onclick = togglePages;
+        const currentSettingsButton = document.querySelector('.settings-button') || 
+                                    document.getElementById('settings-button') ||
+                                    document.querySelector('button[data-bs-target="#settings-modal"]');
         
-        console.log('تم تعيين وظيفة التنقل لزر الإعدادات');
+        if (currentSettingsButton) {
+            currentSettingsButton.onclick = togglePages;
+            console.log('تم تعيين وظيفة التنقل لزر الإعدادات');
+        }
+    } else {
+        console.error('لم يتم العثور على زر الإعدادات');
+        
+        // محاولة إنشاء زر إذا لم يتم العثور عليه
+        createNavigationButton();
     }
+}
+
+// إنشاء زر تنقل إذا لم يكن موجوداً
+function createNavigationButton() {
+    console.log('محاولة إنشاء زر تنقل جديد...');
+    
+    const existingButton = document.querySelector('.nav-toggle');
+    if (existingButton) {
+        existingButton.onclick = togglePages;
+        console.log('تم استخدام زر التنقل الموجود');
+        return;
+    }
+    
+    const navButton = document.createElement('button');
+    navButton.className = 'nav-toggle settings-button';
+    navButton.innerHTML = '<span class="settings-icon">⚙️</span>';
+    navButton.style.position = 'fixed';
+    navButton.style.top = '20px';
+    navButton.style.right = '20px';
+    navButton.style.zIndex = '1000';
+    navButton.onclick = togglePages;
+    
+    document.body.appendChild(navButton);
+    console.log('تم إنشاء زر تنقل جديد');
 }
 
 function getCurrentLocation() {
@@ -278,7 +328,7 @@ function calculateAndDisplayPrayerTimes() {
 
   } catch (error) {
     console.error('Error calculating prayer times:', error);
-    prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
+    prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger'>حدث خطأ في حساب أوقات الصلاة</div>';
   }
 }
 
@@ -364,8 +414,8 @@ function initApp() {
     coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
   }
 
-  // تهيئة نظام التنقل
-  initNavigation();
+  // تهيئة نظام التنقل (مع تأخير بسيط لضمان تحميل جميع العناصر)
+  setTimeout(initNavigation, 100);
 
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
@@ -381,12 +431,6 @@ function initApp() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM محمّل');
   
-  // إزالة الأحداث القديمة لزر الإعدادات
-  const oldSettingsButton = document.getElementById('settings-button');
-  if (oldSettingsButton) {
-    oldSettingsButton.removeEventListener('click', () => {});
-  }
-
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
