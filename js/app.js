@@ -4,6 +4,20 @@ let currentLocation = {
   longitude: 44.3736, // قيمة افتراضية للنجف
   city: 'النجف'
 };
+const homePage = document.getElementById("home-page");
+const settingsPage = document.getElementById("settings-page");
+const settingsBtn = document.getElementById("settings-btn");
+const backHomeBtn = document.getElementById("back-home");
+
+settingsBtn.addEventListener("click", () => {
+  homePage.style.display = "none";
+  settingsPage.style.display = "block";
+});
+
+backHomeBtn.addEventListener("click", () => {
+  settingsPage.style.display = "none";
+  homePage.style.display = "block";
+});
 
 function getCurrentLocation() {
   const cityNameElement = document.getElementById('city-name');
@@ -352,5 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
