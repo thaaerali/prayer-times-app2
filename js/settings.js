@@ -452,3 +452,189 @@ document.addEventListener('DOMContentLoaded', function() {
   migrateOldSettings();
   loadSettings();
 });
+// دالة محدثة للحفظ التلقائي للإعدادات
+function autoSaveSettings() {
+  console.log('الحفظ التلقائي للإعدادات...');
+  
+  const selectedSound = document.querySelector('#adhan-sounds-list .sound-item.active')?.dataset.sound || 'abdul-basit';
+  const selectedAppearance = document.querySelector('#appearance-list .sound-item.active')?.dataset.appearance || 'auto';
+  const calculationMethodSelect = document.getElementById('calculation-method');
+  const timeFormatSelect = document.getElementById('time-format');
+  const roundingMethodSelect = document.getElementById('rounding-method');
+  const manualLocation = document.getElementById('manual-location');
+  const toggleAsr = document.getElementById('toggle-asr');
+  const toggleIsha = document.getElementById('toggle-isha');
+
+  // التحقق من وجود العناصر قبل استخدامها
+  if (!calculationMethodSelect || !timeFormatSelect || !roundingMethodSelect) {
+    console.log('عناصر الإعدادات غير موجودة، تأجيل الحفظ');
+    return;
+  }
+
+  // حفظ إعدادات الصلاة والموقع
+  const prayerSettings = {
+    calculationMethod: calculationMethodSelect.value,
+    timeFormat: timeFormatSelect.value,
+    roundingMethod: roundingMethodSelect.value,
+    city: manualLocation ? manualLocation.value : '',
+    latitude: currentLocation.latitude,
+    longitude: currentLocation.longitude,
+    cityName: currentLocation.city,
+    showAsr: toggleAsr ? toggleAsr.checked : true,
+    showIsha: toggleIsha ? toggleIsha.checked : true
+  };
+  
+  // حفظ إعدادات الصوت
+  const soundSettings = {
+    selectedSound: selectedSound,
+    playFajrAdhan: document.getElementById('toggle-fajr-adhan')?.checked ?? true,
+    playDhuhrAdhan: document.getElementById('toggle-dhuhr-adhan')?.checked ?? true,
+    playAsrAdhan: document.getElementById('toggle-asr-adhan')?.checked ?? true,
+    playMaghribAdhan: document.getElementById('toggle-maghrib-adhan')?.checked ?? true,
+    playIshaAdhan: document.getElementById('toggle-isha-adhan')?.checked ?? true,
+    volumeLevel: document.getElementById('volume-level')?.value ?? 80
+  };
+  
+  // حفظ إعدادات المظهر
+  const appearanceSettings = {
+    appearance: selectedAppearance
+  };
+
+  // حفظ كل مجموعة إعدادات بشكل منفصل
+  localStorage.setItem('prayerSettings', JSON.stringify(prayerSettings));
+  localStorage.setItem('soundSettings', JSON.stringify(soundSettings));
+  localStorage.setItem('appearanceSettings', JSON.stringify(appearanceSettings));
+
+  console.log('تم الحفظ التلقائي للإعدادات:', {
+    prayerSettings,
+    soundSettings,
+    appearanceSettings
+  });
+
+  // تطبيق المظهر بعد الحفظ
+  applyAppearance(selectedAppearance);
+  
+  // تحديث الصفحة الرئيسية فوراً
+  if (typeof updateHomePageFromSettings === 'function') {
+    updateHomePageFromSettings();
+  }
+}
+
+// دالة محسنة لتهيئة أحداث الحفظ التلقائي
+function initAutoSaveEvents() {
+  console.log('تهيئة أحداث الحفظ التلقائي...');
+  
+  // قائمة بجميع عناصر الإعدادات التي تحتاج event listeners
+  const settingsElements = [
+    'calculation-method', 'time-format', 'rounding-method', 'manual-location',
+    'toggle-asr', 'toggle-isha', 'toggle-fajr-adhan', 'toggle-dhuhr-adhan',
+    'toggle-asr-adhan', 'toggle-maghrib-adhan', 'toggle-isha-adhan', 'volume-level'
+  ];
+
+  settingsElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      // إزالة أي event listeners سابقة
+      const newElement = element.cloneNode(true);
+      element.parentNode.replaceChild(newElement, element);
+      
+      // إضافة event listener جديدة
+      document.getElementById(id).addEventListener('change', function() {
+        console.log(`تغيير في ${id}:`, this.value || this.checked);
+        autoSaveSettings();
+      });
+    }
+  });
+
+  // تهيئة أحداث الصوت والمظهر
+  initSoundEvents();
+  initAppearanceEvents();
+}
+
+// دالة محسنة لتهيئة أحداث صفحة الإعدادات
+function initSettingsPageEvents() {
+  console.log('تهيئة أحداث صفحة الإعدادات...');
+  
+  // تهيئة الأحداث فقط إذا كانت صفحة الإعدادات نشطة
+  const settingsPage = document.getElementById('settings-page');
+  if (!settingsPage || !settingsPage.classList.contains('active')) {
+    console.log('صفحة الإعدادات غير نشطة، تأجيل تهيئة الأحداث');
+    return;
+  }
+
+  // تحميل الإعدادات الحالية أولاً
+  loadSettings();
+  
+  // ثم تهيئة أحداث الحفظ التلقائي
+  setTimeout(() => {
+    initAutoSaveEvents();
+  }, 100);
+}
+
+// دالة محسنة لتطبيق المظهر
+function applyAppearance(appearance) {
+  console.log('تطبيق المظهر:', appearance);
+  
+  let darkMode = false;
+
+  if (appearance === 'dark') {
+    darkMode = true;
+  } else if (appearance === 'auto') {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      darkMode = true;
+    }
+  }
+
+  if (darkMode) {
+    document.body.classList.add('dark-mode');
+    document.body.classList.remove('bg-light');
+  } else {
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('bg-light');
+  }
+  
+  // إشعار بتغيير المظهر
+  if (typeof showNotification === 'function') {
+    showNotification(`تم تطبيق الوضع ${darkMode ? 'الليلي' : 'النهاري'}`);
+  }
+}
+
+// تحديث دالة togglePages في app.js لاستدعاء التحديثات
+// استبدل دالة togglePages الحالية في app.js بهذا:
+function togglePages() {
+    const homePage = document.getElementById('home-page');
+    const settingsPage = document.getElementById('settings-page');
+    const settingsIcon = document.querySelector('.settings-icon');
+    
+    console.log('تبديل الصفحات:', {
+        homePage: homePage,
+        settingsPage: settingsPage,
+        settingsIcon: settingsIcon
+    });
+    
+    if (homePage && settingsPage) {
+        if (homePage.classList.contains('active')) {
+            // الانتقال إلى صفحة الإعدادات
+            console.log('الانتقال إلى الإعدادات');
+            homePage.classList.remove('active');
+            settingsPage.classList.add('active');
+            if (settingsIcon) settingsIcon.textContent = '🏠';
+            
+            // تهيئة أحداث الإعدادات عند فتح الصفحة
+            setTimeout(() => {
+                initSettingsPageEvents();
+            }, 100);
+        } else {
+            // الانتقال إلى الصفحة الرئيسية
+            console.log('الانتقال إلى الصفحة الرئيسية');
+            settingsPage.classList.remove('active');
+            homePage.classList.add('active');
+            if (settingsIcon) settingsIcon.textContent = '⚙️';
+            
+            // إعادة حساب الأوقات وتحديث الصفحة الرئيسية
+            updateHomePageFromSettings();
+        }
+    } else {
+        console.error('لم يتم العثور على الصفحات المطلوبة');
+    }
+}
