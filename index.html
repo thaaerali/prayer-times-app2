@@ -9,14 +9,14 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<link rel="manifest" href="manifest.json">
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js")
-      .then(reg => console.log("Service Worker مسجل:", reg.scope))
-      .catch(err => console.error("فشل تسجيل Service Worker:", err));
-  }
-</script>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js")
+        .then(reg => console.log("Service Worker مسجل:", reg.scope))
+        .catch(err => console.error("فشل تسجيل Service Worker:", err));
+    }
+  </script>
 
   <!-- ملفات CSS الخاصة بالمشروع -->
   <link rel="stylesheet" href="css/style.css">
@@ -31,135 +31,147 @@
   <!-- رسالة الخطأ -->
   <div id="error-message" class="error-message container my-3"></div>
 
-  <!-- رأس الصفحة -->
-  <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
-    <div>
-       <h1 id="city-name" class="h4 mb-1"></h1>
-    
-      <p id="date-display" class="mb-0 small opacity-75"></p>
-    </div>
+  <!-- الصفحة الرئيسية -->
+  <div id="home-page" class="page active">
+    <!-- رأس الصفحة -->
+    <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
+      <div>
+        <h1 id="city-name" class="h4 mb-1"></h1>
+        <p id="date-display" class="mb-0 small opacity-75"></p>
+      </div>
 
-    <div class="d-flex align-items-center">
-      <!-- علامة الموقع الشفافة -->
-      <button id="location-list-button" class="location-marker">
-        <i class="bi bi-geo-alt-fill"></i>
-      </button>
-      <!-- زر الترس -->
-   <button id="settings-button" class="btn btn-light">
-        <i class="bi bi-gear-fill"></i>
-      </button>
-    </div>
-  </header>
+      <div class="d-flex align-items-center">
+        <!-- علامة الموقع الشفافة -->
+        <button id="location-list-button" class="location-marker">
+          <i class="bi bi-geo-alt-fill"></i>
+        </button>
+        <!-- زر الترس -->
+        <button id="settings-button" class="btn btn-light settings-button">
+          <i class="bi bi-gear-fill settings-icon"></i>
+        </button>
+      </div>
+    </header>
 
-<!-- أوقات الصلاة - RecyclerView Style -->
-<div id="prayer-times" class="container my-3">
-  <div class="prayer-recyclerview">
-    <div class="prayer-item" data-prayer="fajr">
-      <div class="prayer-name">
-        <i class="bi bi-sun prayer-icon"></i>
-        <span>الفجر</span>
+    <!-- أوقات الصلاة - RecyclerView Style -->
+    <div id="prayer-times" class="container my-3">
+      <div class="prayer-recyclerview">
+        <div class="prayer-item" data-prayer="fajr">
+          <div class="prayer-name">
+            <i class="bi bi-sun prayer-icon"></i>
+            <span>الفجر</span>
+          </div>
+          <div class="prayer-time" id="fajr-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="sunrise">
+          <div class="prayer-name">
+            <i class="bi bi-brightness-high prayer-icon"></i>
+            <span>الشروق</span>
+          </div>
+          <div class="prayer-time" id="sunrise-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="dhuhr">
+          <div class="prayer-name">
+            <i class="bi bi-brightness-high-fill prayer-icon"></i>
+            <span>الظهر</span>
+          </div>
+          <div class="prayer-time" id="dhuhr-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="asr">
+          <div class="prayer-name">
+            <i class="bi bi-cloud-sun prayer-icon"></i>
+            <span>العصر</span>
+          </div>
+          <div class="prayer-time" id="asr-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="sunset">
+          <div class="prayer-name">
+            <i class="bi bi-sunset-fill prayer-icon"></i>
+            <span>الغروب</span>
+          </div>
+          <div class="prayer-time" id="sunset-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="maghrib">
+          <div class="prayer-name">
+            <i class="bi bi-moon prayer-icon"></i>
+            <span>المغرب</span>
+          </div>
+          <div class="prayer-time" id="maghrib-time">--:--</div>
+        </div>
+        <div class="prayer-item" data-prayer="isha">
+          <div class="prayer-name">
+            <i class="bi bi-moon-stars prayer-icon"></i>
+            <span>العشاء</span>
+          </div>
+          <div class="prayer-time" id="isha-time">--:--</div>
+        </div>
       </div>
-      <div class="prayer-time" id="fajr-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="sunrise">
-      <div class="prayer-name">
-        <i class="bi bi-brightness-high prayer-icon"></i>
-        <span>الشروق</span>
-      </div>
-      <div class="prayer-time" id="sunrise-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="dhuhr">
-      <div class="prayer-name">
-        <i class="bi bi-brightness-high-fill prayer-icon"></i>
-        <span>الظهر</span>
-      </div>
-      <div class="prayer-time" id="dhuhr-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="asr">
-      <div class="prayer-name">
-        <i class="bi bi-cloud-sun prayer-icon"></i>
-        <span>العصر</span>
-      </div>
-      <div class="prayer-time" id="asr-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="sunset">
-      <div class="prayer-name">
-        <i class="bi bi-sunset-fill prayer-icon"></i>
-        <span>الغروب</span>
-      </div>
-      <div class="prayer-time" id="sunset-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="maghrib">
-      <div class="prayer-name">
-        <i class="bi bi-moon prayer-icon"></i>
-        <span>المغرب</span>
-      </div>
-      <div class="prayer-time" id="maghrib-time">--:--</div>
-    </div>
-    <div class="prayer-item" data-prayer="isha">
-      <div class="prayer-name">
-        <i class="bi bi-moon-stars prayer-icon"></i>
-        <span>العشاء</span>
-      </div>
-      <div class="prayer-time" id="isha-time">--:--</div>
     </div>
   </div>
-</div>
-  <!-- نافذة الإعدادات -->
-  <div class="modal fade" id="settings-modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">الإعدادات</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+  <!-- صفحة الإعدادات -->
+  <div id="settings-page" class="page">
+    <!-- رأس صفحة الإعدادات -->
+    <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 mb-1">الإعدادات</h1>
+      </div>
+
+      <div class="d-flex align-items-center">
+        <!-- زر العودة للصفحة الرئيسية -->
+        <button id="back-button" class="btn btn-light">
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- محتوى الإعدادات -->
+    <div class="container my-3">
+      <div class="row">
+        <!-- التبويبات العمودية -->
+        <div class="col-md-3">
+          <div class="nav flex-column nav-pills vertical-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-times-tab" data-bs-toggle="pill" data-bs-target="#v-pills-times" type="button" role="tab" aria-controls="v-pills-times" aria-selected="true">
+              الصلاة
+            </button>
+            <button class="nav-link" id="v-pills-location-tab" data-bs-toggle="pill" data-bs-target="#v-pills-location" type="button" role="tab" aria-controls="v-pills-location" aria-selected="false">
+              الموقع
+            </button>
+            <!-- تبويب الأصوات -->
+            <button class="nav-link" id="v-pills-sound-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sound" type="button" role="tab" aria-controls="v-pills-sound" aria-selected="false">
+              الأصوات
+            </button>
+            <!-- تبويب مظهر التطبيق -->
+            <button class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" data-bs-target="#v-pills-appearance" type="button" role="tab" aria-controls="v-pills-appearance" aria-selected="false">
+              المظهر
+            </button>
+            <!-- تبويب جديد: عن التطبيق -->
+            <button class="nav-link" id="v-pills-about-tab" data-bs-toggle="pill" data-bs-target="#v-pills-about" type="button" role="tab" aria-controls="v-pills-about" aria-selected="false">
+              عن التطبيق
+            </button>
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="row">
-            <!-- التبويبات العمودية -->
-            <div class="col-md-3">
-              <div class="nav flex-column nav-pills vertical-tabs" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <button class="nav-link active" id="v-pills-times-tab" data-bs-toggle="pill" data-bs-target="#v-pills-times" type="button" role="tab" aria-controls="v-pills-times" aria-selected="true">
-                   الصلاة
-                </button>
-                <button class="nav-link" id="v-pills-location-tab" data-bs-toggle="pill" data-bs-target="#v-pills-location" type="button" role="tab" aria-controls="v-pills-location" aria-selected="false">
-                 الموقع
-                </button>
-                <!-- تبويب الأصوات -->
-                <button class="nav-link" id="v-pills-sound-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sound" type="button" role="tab" aria-controls="v-pills-sound" aria-selected="false">
-                  الأصوات
-                </button>
-                <!-- تبويب مظهر التطبيق -->
-                <button class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" data-bs-target="#v-pills-appearance" type="button" role="tab" aria-controls="v-pills-appearance" aria-selected="false">
-                 المظهر
-                </button>
-                </button>
-              <!-- تبويب جديد: عن التطبيق -->
-              <button class="nav-link" id="v-pills-about-tab" data-bs-toggle="pill" data-bs-target="#v-pills-about" type="button" role="tab" aria-controls="v-pills-about" aria-selected="false">
-               عن التطبيق
-              </button>
+
+        <!-- محتوى التبويبات -->
+        <div class="col-md-9">
+          <div class="tab-content" id="v-pills-tabContent">
+            <!-- إعدادات أوقات الصلاة -->
+            <div class="tab-pane fade show active" id="v-pills-times" role="tabpanel" aria-labelledby="v-pills-times-tab">
+              <!-- نفس محتوى إعدادات الصلاة من النافذة المنبثقة -->
+              <div class="mb-3">
+                <label for="calculation-method" class="form-label fw-bold">طريقة الحساب:</label>
+                <select id="calculation-method" class="form-select">
+                  <option value="Hadi">تقويم الهادي</option>
+                  <option value="MWL">رابطة العالم الإسلامي (مكة)</option>
+                  <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
+                  <option value="Egypt">هيئة المساحة المصرية</option>
+                  <option value="Makkah">أم القرى</option>
+                  <option value="Karachi">جامعة العلوم الإسلامية Karachi</option>
+                  <option value="Tehran">معهد الجيوفيزياء University of Tehran</option>
+                  <option value="Jafari">الهيئة العامة للتقويم (إيران)</option>
+                </select>
               </div>
-            </div>
 
-            <!-- محتوى التبويبات -->
-            <div class="col-md-9">
-              <div class="tab-content" id="v-pills-tabContent">
-                <!-- إعدادات أوقات الصلاة -->
-                <div class="tab-pane fade show active" id="v-pills-times" role="tabpanel" aria-labelledby="v-pills-times-tab">
-                  <div class="mb-3">
-                    <label for="calculation-method" class="form-label fw-bold">طريقة الحساب:</label>
-                    <select id="calculation-method" class="form-select">
-                      <option value="Hadi">تقويم الهادي 
-                      <option value="MWL">رابطة العالم الإسلامي (مكة)</option>
-                      <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
-                      <option value="Egypt">هيئة المساحة المصرية</option>
-                      <option value="Makkah">أم القرى</option>
-                      <option value="Karachi">جامعة العلوم الإسلامية Karachi</option>
-                      <option value="Tehran">معهد الجيوفيزياء University of Tehran</option>
-                      <option value="Jafari">الهيئة العامة للتقويم (إيران)</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
+             <div class="mb-3">
                     <label for="time-format" class="form-label fw-bold">تنسيق الوقت:</label>
                     <select id="time-format" class="form-select">
                       <option value="24h">24 ساعة</option>
@@ -484,6 +496,7 @@
     </div>
   </div>
 
+
   <!-- عنصر صوت مخفي -->
   <audio id="adhan-player" style="display: none;"></audio>
 
@@ -501,8 +514,3 @@
  
 </body>
 </html>
-
-
-
-
-
