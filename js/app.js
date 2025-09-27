@@ -5,6 +5,57 @@ let currentLocation = {
   city: 'النجف'
 };
 
+// دالة للتنقل بين الصفحات بضغطة زر واحدة
+function togglePages() {
+    const homePage = document.getElementById('home-page');
+    const settingsPage = document.getElementById('settings-page');
+    const settingsIcon = document.querySelector('.settings-icon');
+    
+    console.log('تبديل الصفحات:', {
+        homePage: homePage,
+        settingsPage: settingsPage,
+        settingsIcon: settingsIcon
+    });
+    
+    if (homePage && settingsPage) {
+        if (homePage.classList.contains('active')) {
+            // الانتقال إلى صفحة الإعدادات
+            console.log('الانتقال إلى الإعدادات');
+            homePage.classList.remove('active');
+            settingsPage.classList.add('active');
+            if (settingsIcon) settingsIcon.className = 'bi bi-house-fill'; // تغيير الأيقونة إلى منزل
+        } else {
+            // الانتقال إلى الصفحة الرئيسية
+            console.log('الانتقال إلى الصفحة الرئيسية');
+            settingsPage.classList.remove('active');
+            homePage.classList.add('active');
+            if (settingsIcon) settingsIcon.className = 'bi bi-gear-fill'; // إرجاع الأيقونة إلى ترس
+        }
+    } else {
+        console.error('لم يتم العثور على الصفحات المطلوبة');
+    }
+}
+
+// تهيئة نظام التنقل
+function initNavigation() {
+    const settingsButton = document.getElementById('settings-button');
+    const backButton = document.getElementById('back-button');
+    
+    console.log('تهيئة التنقل:', {
+        settingsButton: settingsButton,
+        backButton: backButton
+    });
+    
+    if (settingsButton) {
+        // إزالة أي event listeners سابقة
+        settingsButton.onclick = togglePages;
+    }
+    
+    if (backButton) {
+        backButton.onclick = togglePages;
+    }
+}
+
 function getCurrentLocation() {
   const cityNameElement = document.getElementById('city-name');
   const locationButton = document.getElementById('location-button');
@@ -232,7 +283,7 @@ function calculateAndDisplayPrayerTimes() {
     prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
   }
 }
-// دالة لتحديد الصلاة الحالية
+
 // دالة لتحديد الصلاة الحالية
 function highlightCurrentPrayer(times) {
   // إزالة التحديد من جميع العناصر
@@ -315,6 +366,9 @@ function initApp() {
     coordinatesElement.textContent = `خط العرض: ${currentLocation.latitude.toFixed(4)}°, خط الطول: ${currentLocation.longitude.toFixed(4)}°`;
   }
 
+  // تهيئة نظام التنقل
+  initNavigation();
+
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
 
@@ -329,16 +383,14 @@ function initApp() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM محمّل');
   
-  const settingsButton = document.getElementById('settings-button');
   const locationButton = document.getElementById('location-button');
   const saveManualLocationBtn = document.getElementById('save-manual-location');
   const saveSettingsButton = document.getElementById('save-settings');
 
-  if (settingsButton) {
-    settingsButton.addEventListener('click', () => {
-      const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
-      settingsModal.show();
-    });
+  // إزالة الحدث القديم لزر الإعدادات (النافذة المنبثقة)
+  const oldSettingsButton = document.getElementById('settings-button');
+  if (oldSettingsButton) {
+    oldSettingsButton.onclick = null;
   }
 
   if (locationButton) {
@@ -352,5 +404,3 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
-
-
