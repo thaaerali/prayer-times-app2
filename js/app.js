@@ -536,3 +536,51 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+// إضافة event listener لزر العودة في صفحة الإعدادات
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM محمّل');
+  
+  // إزالة الأحداث القديمة لزر الإعدادات
+  const oldSettingsButton = document.getElementById('settings-button');
+  if (oldSettingsButton) {
+    oldSettingsButton.onclick = null;
+  }
+
+  // إضافة event listener لزر العودة
+  const backButton = document.getElementById('back-button');
+  if (backButton) {
+    backButton.addEventListener('click', togglePages);
+  }
+
+  // إضافة event listener لزر حفظ الموقع اليدوي
+  const saveManualLocationBtn = document.getElementById('save-manual-location');
+  if (saveManualLocationBtn) {
+    saveManualLocationBtn.addEventListener('click', saveManualLocation);
+  }
+
+  // إضافة event listener لزر تحديد الموقع التلقائي
+  const locationButton = document.getElementById('location-button');
+  if (locationButton) {
+    locationButton.addEventListener('click', getCurrentLocation);
+  }
+
+  // تهيئة التطبيق عند تحميل الصفحة
+  initApp();
+});
+
+// دالة لتحديث الصفحة الرئيسية عند تغيير الإعدادات
+function updateHomePageFromSettings() {
+  console.log('تحديث الصفحة الرئيسية من الإعدادات...');
+  
+  // تحديث المظهر
+  loadTheme();
+  
+  // تحديث أوقات الصلاة
+  calculateAndDisplayPrayerTimes();
+  
+  // تحديث اسم المدينة
+  const cityNameElement = document.getElementById('city-name');
+  if (cityNameElement && currentLocation.city) {
+    cityNameElement.textContent = currentLocation.city;
+  }
+}
