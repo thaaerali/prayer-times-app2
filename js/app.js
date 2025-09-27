@@ -353,4 +353,38 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 });
 
+// دالة للتنقل بين الصفحات بضغطة زر واحدة
+function togglePages() {
+    const homePage = document.getElementById('homePage');
+    const settingsPage = document.getElementById('settingsPage');
+    const settingsIcon = document.querySelector('.settings-icon');
+    
+    if (homePage && settingsPage) {
+        if (homePage.style.display !== 'none') {
+            // الانتقال إلى صفحة الإعدادات
+            homePage.style.display = 'none';
+            settingsPage.style.display = 'block';
+            settingsIcon.textContent = '🏠'; // تغيير الأيقونة إلى منزل
+        } else {
+            // الانتقال إلى الصفحة الرئيسية
+            homePage.style.display = 'block';
+            settingsPage.style.display = 'none';
+            settingsIcon.textContent = '⚙️'; // إرجاع الأيقونة إلى ترس
+        }
+    }
+}
+
+// تعديل وظيفة زر الإعدادات الحالي
+function initNavigation() {
+    const settingsButton = document.querySelector('.settings-button');
+    if (settingsButton) {
+        // استبدال الوظيفة القديمة بوظيفة التنقل
+        settingsButton.onclick = togglePages;
+    }
+}
+
+// تهيئة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    initNavigation();
+});
 
