@@ -304,13 +304,14 @@ function selectAppearance(appearanceId) {
       item.classList.remove('active');
     }
   });
-  function applyAppearance(appearance) {
+}
+
+function applyAppearance(appearance) {
   let darkMode = false;
 
   if (appearance === 'dark') {
     darkMode = true;
   } else if (appearance === 'auto') {
-    // التحقق من تفضيلات النظام
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       darkMode = true;
     }
@@ -396,29 +397,38 @@ function initAppearanceEvents() {
   }
 }
 
-// استدعاء دالة الترحيل عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-  migrateOldSettings();
-  loadSettings();
-});
+// تهيئة أحداث الحفظ التلقائي
+function initAutoSaveEvents() {
+  console.log('تهيئة أحداث الحفظ التلقائي...');
+  
+  // قائمة بجميع عناصر الإعدادات التي تحتاج event listeners
+  const settingsElements = [
+    'calculation-method', 'time-format', 'rounding-method', 'manual-location',
+    'toggle-asr', 'toggle-isha', 'toggle-fajr-notification', 'toggle-dhuhr-notification',
+    'toggle-asr-notification', 'toggle-maghrib-notification', 'toggle-isha-notification',
+    'toggle-fajr-adhan', 'toggle-dhuhr-adhan', 'toggle-asr-adhan', 'toggle-maghrib-adhan',
+    'toggle-isha-adhan', 'volume-level'
+  ];
 
-// تهيئة أحداث الحفظ عند فتح صفحة الإعدادات
-function initSettingsPageEvents() {
-  // تهيئة الأحداث فقط إذا كانت صفحة الإعدادات نشطة
-  if (document.getElementById('settings-page').classList.contains('active')) {
-    console.log('تهيئة أحداث صفحة الإعدادات...');
-    initAutoSaveEvents();
-  }
+  settingsElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      // إزالة أي event listeners سابقة لمنع التكرار
+      element.replaceWith(element.cloneNode(true));
+      
+      // إضافة event listener جديدة
+      const newElement = document.getElementById(id);
+      newElement.addEventListener('change', autoSaveSettings);
+    } else {
+      console.warn(`العنصر ${id} غير موجود، تم تخطيه`);
+    }
+  });
+
+  // تهيئة أحداث الصوت والمظهر
+  initSoundEvents();
+  initAppearanceEvents();
 }
 
-// استدعاء تهيئة الأحداث عند التنقل إلى صفحة الإعدادات
-function onSettingsPageOpen() {
-  // تأخير بسيط لضمان تحميل DOM
-  setTimeout(() => {
-    initSettingsPageEvents();
-    loadSettings(); // إعادة تحميل الإعدادات للتأكد من أنها محدثة
-  }, 100);
-}
 // دالة لتهيئة أحداث صفحة الإعدادات
 function initSettingsPageEvents() {
   console.log('تهيئة أحداث صفحة الإعدادات...');
@@ -437,12 +447,8 @@ function initSettingsPageEvents() {
   loadSettings();
 }
 
-// استدعاء تهيئة الأحداث عند فتح صفحة الإعدادات
-function onSettingsPageOpen() {
-  // تأخير بسيط لضمان تحميل DOM
-  setTimeout(() => {
-    initSettingsPageEvents();
-  }, 100);
-}
-
-// تحديث دالة togglePages في app.js لاستدعاء تهيئة الأحداث (تم إضافتها بالفعل في app.js أعلاه)
+// استدعاء دالة الترحيل عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+  migrateOldSettings();
+  loadSettings();
+});
