@@ -24,6 +24,14 @@ function togglePages() {
             homePage.classList.remove('active');
             settingsPage.classList.add('active');
             if (settingsIcon) settingsIcon.className = 'bi bi-house-fill'; // تغيير الأيقونة إلى منزل
+            
+            // تهيئة أحداث الإعدادات بعد الانتقال
+            setTimeout(() => {
+                if (typeof onSettingsPageOpen === 'function') {
+                    onSettingsPageOpen();
+                }
+            }, 100);
+            
         } else {
             // الانتقال إلى الصفحة الرئيسية
             console.log('الانتقال إلى الصفحة الرئيسية');
@@ -280,7 +288,7 @@ function calculateAndDisplayPrayerTimes() {
 
   } catch (error) {
     console.error('Error calculating prayer times:', error);
-    prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
+    prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger'>حدث خطأ في حساب أوقات الصلاة</div>';
   }
 }
 
@@ -369,6 +377,15 @@ function initApp() {
   // تهيئة نظام التنقل
   initNavigation();
 
+  // إذا كانت صفحة الإعدادات نشطة عند التحميل (بعد تحديث الصفحة)
+  if (document.getElementById('settings-page').classList.contains('active')) {
+    setTimeout(() => {
+      if (typeof onSettingsPageOpen === 'function') {
+        onSettingsPageOpen();
+      }
+    }, 500);
+  }
+
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
 
@@ -404,3 +421,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
+// دالة افتراضية لتهيئة صفحة الإعدادات (سيتم تعريفها في settings.js)
+function onSettingsPageOpen() {
+  console.log('تهيئة صفحة الإعدادات...');
+  // هذه الدالة سيتم تعريفها في settings.js
+  if (typeof initSettingsPageEvents === 'function') {
+    initSettingsPageEvents();
+  }
+}
