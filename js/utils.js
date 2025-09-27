@@ -176,3 +176,44 @@ function displayDate() {
     console.error('Error displaying date:', error);
   }
 }
+// دالة محسنة لعرض الإشعارات
+function showNotification(message, type = 'success') {
+  console.log(`إشعار [${type}]: ${message}`);
+  
+  // استخدام toast من Bootstrap إذا كان متاحاً
+  const notificationEl = document.getElementById('notification');
+  if (notificationEl && typeof bootstrap !== 'undefined') {
+    const toastBody = notificationEl.querySelector('.toast-body');
+    if (toastBody) {
+      toastBody.textContent = message;
+      
+      // تغيير لون الخلفية حسب النوع
+      if (type === 'error') {
+        notificationEl.classList.remove('bg-primary');
+        notificationEl.classList.add('bg-danger');
+      } else {
+        notificationEl.classList.remove('bg-danger');
+        notificationEl.classList.add('bg-primary');
+      }
+      
+      const toast = new bootstrap.Toast(notificationEl);
+      toast.show();
+      return;
+    }
+  }
+  
+  // fallback بسيط
+  alert(message);
+}
+
+// دالة محسنة لتحديث حالة الموقع
+function updateLocationStatus(message, isError = false) {
+  const statusElement = document.getElementById('location-status');
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = `location-status ${isError ? 'text-danger' : 'text-success'}`;
+    
+    // إظهار العنصر إذا كان مخفياً
+    statusElement.style.display = 'block';
+  }
+}
