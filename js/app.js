@@ -57,38 +57,50 @@ function initNavigation() {
 }
 // دالة لعرض التاريخ الميلادي والهجري
 function displayDate() {
-  const now = new Date();
-  
-  // التاريخ الميلادي
-  const gregorianOptions = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
-    timeZone: 'Asia/Baghdad'
-  };
-  const gregorianDate = now.toLocaleDateString('ar-IQ', gregorianOptions);
-  
-  // التاريخ الهجري
-  const hijriOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    calendar: 'islamic',
-    timeZone: 'Asia/Baghdad'
-  };
-  const hijriDate = now.toLocaleDateString('ar-IQ', hijriOptions);
-  
-  // تحديث العناصر في الصفحة
-  const gregorianElement = document.querySelector('.gregorian-date');
-  const hijriElement = document.querySelector('.hijri-date');
-  
-  if (gregorianElement) {
-    gregorianElement.textContent = gregorianDate;
-  }
-  
-  if (hijriElement) {
-    hijriElement.textContent = hijriDate;
+  try {
+    const now = new Date();
+    
+    // التاريخ الميلادي
+    const gregorianOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      timeZone: 'Asia/Baghdad'
+    };
+    const gregorianDate = now.toLocaleDateString('ar-IQ', gregorianOptions);
+    
+    // التاريخ الهجري
+    const hijriOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      calendar: 'islamic',
+      timeZone: 'Asia/Baghdad'
+    };
+    const hijriDate = now.toLocaleDateString('ar-IQ', hijriOptions);
+    
+    console.log('التاريخ الميلادي:', gregorianDate);
+    console.log('التاريخ الهجري:', hijriDate);
+    
+    // تحديث العناصر في الصفحة
+    const gregorianElement = document.getElementById('gregorian-date');
+    const hijriElement = document.getElementById('hijri-date');
+    
+    console.log('العناصر:', { gregorianElement, hijriElement });
+    
+    if (gregorianElement) {
+      gregorianElement.textContent = gregorianDate;
+      console.log('تم تحديث الميلادي');
+    }
+    
+    if (hijriElement) {
+      hijriElement.textContent = hijriDate;
+      console.log('تم تحديث الهجري');
+    }
+    
+  } catch (error) {
+    console.error('خطأ في عرض التاريخ:', error);
   }
 }
 // دالة لتحديث حالة الموقع
@@ -591,4 +603,5 @@ function updateHomePageFromSettings() {
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
 
