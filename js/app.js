@@ -430,35 +430,7 @@ function highlightCurrentPrayer(times) {
   }
 }
 
-// دالة لعرض التاريخ
-function displayDate() {
-  const now = new Date();
-  const options = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
-    timeZone: 'Asia/Baghdad'
-  };
-  
-  const dateString = now.toLocaleDateString('ar-IQ', options);
-  const timeString = now.toLocaleTimeString('ar-IQ', { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    timeZone: 'Asia/Baghdad'
-  });
-  
-  const dateElement = document.getElementById('current-date');
-  const timeElement = document.getElementById('current-time');
-  
-  if (dateElement) {
-    dateElement.textContent = dateString;
-  }
-  
-  if (timeElement) {
-    timeElement.textContent = timeString;
-  }
-}
+
 
 // دالة لتحميل المظهر
 function loadTheme() {
@@ -628,6 +600,7 @@ displayDate();
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
 
 
 
