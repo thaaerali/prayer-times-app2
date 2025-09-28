@@ -5,27 +5,20 @@ let currentLocation = {
   city: 'النجف'
 };
 
-// دالة للتنقل بين الصفحات
+// دالة للتنقل بين الصفحات - بدون تغيير الأيقونة
 function togglePages() {
     const homePage = document.getElementById('home-page');
     const settingsPage = document.getElementById('settings-page');
-    const settingsIcon = document.querySelector('.settings-icon');
-    
-    console.log('تبديل الصفحات:', {
-        homePage: homePage,
-        settingsPage: settingsPage,
-        settingsIcon: settingsIcon
-    });
-    
+
+    console.log('تبديل الصفحات');
+
     if (homePage && settingsPage) {
         if (homePage.classList.contains('active')) {
             // الانتقال إلى صفحة الإعدادات
-            console.log('الانتقال إلى الإعدادات');
             homePage.classList.remove('active');
             settingsPage.classList.add('active');
-            if (settingsIcon) settingsIcon.textContent = '🏠'; // تغيير الأيقونة إلى منزل
-            
-            // تهيئة أحداث الإعدادات عند فتح الصفحة
+
+            // تهيئة أحداث الإعدادات
             setTimeout(() => {
                 if (typeof initSettingsPageEvents === 'function') {
                     initSettingsPageEvents();
@@ -36,12 +29,10 @@ function togglePages() {
             }, 100);
         } else {
             // الانتقال إلى الصفحة الرئيسية
-            console.log('الانتقال إلى الصفحة الرئيسية');
             settingsPage.classList.remove('active');
             homePage.classList.add('active');
-            if (settingsIcon) settingsIcon.textContent = '⚙️'; // إرجاع الأيقونة إلى ترس
-            
-            // إعادة حساب الأوقات عند العودة للصفحة الرئيسية
+
+            // إعادة حساب الأوقات
             calculateAndDisplayPrayerTimes();
         }
     } else {
