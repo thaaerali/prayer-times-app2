@@ -87,12 +87,4 @@ function convertTimeToMinutes(timeString) {
   return hours * 60 + minutes;
 }
 
-function displayDate() {
-  const now = new Date();
-  const gregorian = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const islamic = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
-  const dateDisplay = document.getElementById('date-display');
-  if (dateDisplay) {
-    dateDisplay.textContent = `${gregorian} / ${islamic}`;
-  }
-}
+
