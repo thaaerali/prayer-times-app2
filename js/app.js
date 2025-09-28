@@ -617,7 +617,8 @@ function updateHomePageFromSettings() {
   
   // تحديث المظهر
   loadTheme();
-  
+  // عرض التاريخ الحالي
+displayDate();
   // تحديث أوقات الصلاة
   calculateAndDisplayPrayerTimes();
   
@@ -627,6 +628,7 @@ function updateHomePageFromSettings() {
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
 
 
 
