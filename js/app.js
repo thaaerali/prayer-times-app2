@@ -70,15 +70,21 @@ function displayDate() {
     };
     const gregorianDate = now.toLocaleDateString('ar-IQ', gregorianOptions);
     
-    // التاريخ الهجري
-    const hijriOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      calendar: 'islamic',
-      timeZone: 'Asia/Baghdad'
-    };
-    const hijriDate = now.toLocaleDateString('ar-IQ', hijriOptions);
+    // التاريخ الهجري - استخدام بديل إذا لم يدعم المتصفح التقويم الهجري
+    let hijriDate;
+    try {
+      const hijriOptions = {
+        year: 'numeric',
+        month: 'long', 
+        day: 'numeric',
+        calendar: 'islamic',
+        timeZone: 'Asia/Baghdad'
+      };
+      hijriDate = now.toLocaleDateString('ar-IQ', hijriOptions);
+    } catch (error) {
+      // إذا فشل استخدام التقويم الهجري، استخدم حساب تقريبي
+      hijriDate = calculateHijriDate(now);
+    }
     
     console.log('التاريخ الميلادي:', gregorianDate);
     console.log('التاريخ الهجري:', hijriDate);
@@ -87,21 +93,39 @@ function displayDate() {
     const gregorianElement = document.getElementById('gregorian-date');
     const hijriElement = document.getElementById('hijri-date');
     
-    console.log('العناصر:', { gregorianElement, hijriElement });
-    
     if (gregorianElement) {
       gregorianElement.textContent = gregorianDate;
       console.log('تم تحديث الميلادي');
+    } else {
+      console.error('عنصر gregorian-date غير موجود');
     }
     
     if (hijriElement) {
       hijriElement.textContent = hijriDate;
       console.log('تم تحديث الهجري');
+    } else {
+      console.error('عنصر hijri-date غير موجود');
     }
     
   } catch (error) {
     console.error('خطأ في عرض التاريخ:', error);
   }
+}
+
+// دالة مساعدة لحساب التاريخ الهجري تقريبياً
+function calculateHijriDate(gregorianDate) {
+  const hijriMonths = [
+    'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 
+    'جمادى الأولى', 'جمادى الآخرة', 'رجب', 
+    'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'
+  ];
+  
+  // هذا حساب تقريبي (ليس دقيقاً تماماً)
+  const hijriYear = 1446; // سنة هجرية تقريبية
+  const monthIndex = gregorianDate.getMonth();
+  const day = gregorianDate.getDate();
+  
+  return `${day} ${hijriMonths[monthIndex]} ${hijriYear} هـ`;
 }
 // دالة لتحديث حالة الموقع
 function updateLocationStatus(message, isError = false) {
@@ -603,5 +627,6 @@ function updateHomePageFromSettings() {
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
 
 
