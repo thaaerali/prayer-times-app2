@@ -27,7 +27,7 @@ function updateLocationStatus(message, isError = false) {
   locationStatus.className = isError ? 'mt-2 small text-danger' : 'mt-2 small text-success';
 }
 
-// دالة لتنسيق الوقت مع التقريب - نسخة محسنة
+// دالة لتنسيق الوقت - نسخة محسنة
 function formatTime(time, format) {
   if (!time || time === '--:--' || time === 'Invalid Date') return '--:--';
   
@@ -52,39 +52,6 @@ function formatTime(time, format) {
   } catch (error) {
     console.error('Error formatting time:', error, time);
     return '--:--';
-  }
-}
-
-// دالة لتطبيق التقريب - نسخة محسنة
-function applyRounding(time, method) {
-  if (!time || time === '--:--' || time === 'Invalid Date' || method === 'none') {
-    return time;
-  }
-  
-  try {
-    let [hours, minutes] = time.split(':').map(Number);
-    
-    // التحقق من صحة القيم
-    if (isNaN(hours) || isNaN(minutes)) return time;
-    
-    if (method === 'nearest') {
-      minutes = Math.round(minutes / 5) * 5;
-    } else if (method === 'up') {
-      minutes = Math.ceil(minutes / 5) * 5;
-    } else if (method === 'down') {
-      minutes = Math.floor(minutes / 5) * 5;
-    }
-    
-    if (minutes === 60) { 
-      minutes = 0; 
-      hours += 1; 
-      if (hours === 24) hours = 0;
-    }
-    
-    return `${hours}:${minutes.toString().padStart(2,'0')}`;
-  } catch (error) {
-    console.error('Error applying rounding:', error, time);
-    return time;
   }
 }
 
