@@ -467,19 +467,3 @@ header .d-flex .location-marker {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
-
-/* تأثير تألق */
-header.glow {
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.5) !important;
-}
-
-/* تأثير شفافية */
-header.transparent {
-  background: rgba(102, 126, 234, 0.9) !important;
-  backdrop-filter: blur(10px);
-}
-
-/* حدود دائرية */
-header.rounded {
-  border-radius: 0 0 20px 20px;
-}
