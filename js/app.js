@@ -55,7 +55,42 @@ function initNavigation() {
         console.log('تم تعيين وظيفة التنقل لزر الإعدادات');
     }
 }
-
+// دالة لعرض التاريخ الميلادي والهجري
+function displayDate() {
+  const now = new Date();
+  
+  // التاريخ الميلادي
+  const gregorianOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    timeZone: 'Asia/Baghdad'
+  };
+  const gregorianDate = now.toLocaleDateString('ar-IQ', gregorianOptions);
+  
+  // التاريخ الهجري
+  const hijriOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    calendar: 'islamic',
+    timeZone: 'Asia/Baghdad'
+  };
+  const hijriDate = now.toLocaleDateString('ar-IQ', hijriOptions);
+  
+  // تحديث العناصر في الصفحة
+  const gregorianElement = document.querySelector('.gregorian-date');
+  const hijriElement = document.querySelector('.hijri-date');
+  
+  if (gregorianElement) {
+    gregorianElement.textContent = gregorianDate;
+  }
+  
+  if (hijriElement) {
+    hijriElement.textContent = hijriDate;
+  }
+}
 // دالة لتحديث حالة الموقع
 function updateLocationStatus(message, isError = false) {
     const statusElement = document.getElementById('location-status');
@@ -556,3 +591,4 @@ function updateHomePageFromSettings() {
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
