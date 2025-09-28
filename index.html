@@ -29,8 +29,7 @@
     <!-- رأس الصفحة -->
     <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
       <div>
-        <h1 id="city-name" class="h4 mb-1"></h1>
-        <p id="date-display" class="mb-0 small opacity-75"></p>
+        <h1 class="h4 mb-1">مواقيت الصلاة</h1>
       </div>
 
       <div class="d-flex align-items-center">
@@ -44,6 +43,20 @@
         </button>
       </div>
     </header>
+
+    <!-- معلومات المدينة والتاريخ -->
+    <div class="container my-4">
+      <div class="text-center">
+        <!-- اسم المدينة -->
+        <h2 id="city-name" class="h3 mb-2 text-primary">النجف</h2>
+        
+        <!-- التاريخ -->
+        <div id="date-display" class="text-muted">
+          <div class="gregorian-date mb-1"></div>
+          <div class="hijri-date small"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- أوقات الصلاة - RecyclerView Style -->
     <div id="prayer-times" class="container my-3">
@@ -100,6 +113,9 @@
       </div>
     </div>
   </div>
+
+  <!-- باقي الكود يبقى كما هو -->
+  <!-- ... -->
 
   <!-- صفحة الإعدادات -->
   <div id="settings-page" class="page">
@@ -497,3 +513,4 @@
  
 </body>
 </html>
+
