@@ -242,23 +242,6 @@ function convertTimeToMinutes(timeStr) {
   return hours * 60 + minutes;
 }
 
-// دالة لتطبيق التقريب
-function applyRounding(time, method) {
-  if (method === 'none') return time;
-  
-  const [hours, minutes] = time.split(':').map(Number);
-  
-  if (method === 'nearest') {
-    const roundedMinutes = Math.round(minutes / 5) * 5;
-    if (roundedMinutes === 60) {
-      return `${hours + 1}:00`;
-    }
-    return `${hours}:${roundedMinutes.toString().padStart(2, '0')}`;
-  }
-  
-  return time;
-}
-
 // دالة لتنسيق الوقت
 function formatTime(time, format) {
   if (format === '12h') {
@@ -293,7 +276,6 @@ function calculateAndDisplayPrayerTimes() {
     const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
     const calculationMethod = settings.calculationMethod || 'MWL';
     const timeFormat = settings.timeFormat || '24h';
-    const roundingMethod = settings.roundingMethod || 'nearest';
     const showAsr = settings.showAsr !== undefined ? settings.showAsr : true;
     const showIsha = settings.showIsha !== undefined ? settings.showIsha : true;
 
@@ -318,8 +300,7 @@ function calculateAndDisplayPrayerTimes() {
         element.style.display = prayer.alwaysShow ? 'flex' : 'none';
         
         if (prayer.alwaysShow) {
-          let formattedTime = applyRounding(prayer.time, roundingMethod);
-          formattedTime = formatTime(formattedTime, timeFormat);
+          let formattedTime = formatTime(prayer.time, timeFormat);
           
           const timeElement = document.getElementById(`${prayer.id}-time`);
           if (timeElement) {
