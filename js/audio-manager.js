@@ -9,12 +9,14 @@ const adhanSounds = {
 async function playAdhanSound(soundId) {
   const soundUrl = adhanSounds[soundId];
   const adhanPlayer = document.getElementById('adhan-player');
-  const volumeLevel = document.getElementById('volume-level');
 
   if (!soundUrl) {
     showError('لم يتم العثور على ملف الصوت المحدد');
     return;
   }
+
+  // استخدام مستوى صوت ثابت (70%) بدلاً من العنصر المحذوف
+  const volumeLevel = 0.7; // يمكن تغيير هذه القيمة كما تريد
 
   // التحقق من وجود الملف أولاً
   const fileExists = await checkFileExists(soundUrl);
@@ -26,7 +28,7 @@ async function playAdhanSound(soundId) {
 
   // تشغيل الصوت
   adhanPlayer.src = soundUrl;
-  adhanPlayer.volume = volumeLevel.value / 100;
+  adhanPlayer.volume = volumeLevel;
 
   try {
     const promise = adhanPlayer.play();
@@ -45,7 +47,18 @@ async function playAdhanSound(soundId) {
   }
 }
 
-// دالة للتحقق من أذونات الصوت (ممكن تتركها أو تحذفها)
+// دالة للتحقق من وجود الملف (إذا كانت موجودة)
+async function checkFileExists(url) {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    console.error('Error checking file:', error);
+    return false;
+  }
+}
+
+// دالة للتحقق من أذونات الصوت
 function checkAudioPermissions() {
   try {
     const testAudio = new Audio();
@@ -107,7 +120,7 @@ function shouldPlayAdhan(prayer, settings) {
   }
 }
 
-// ✅ بدء المراقبة مباشرة بدون enableAutoPlay ولا interaction-alert
+// بدء المراقبة مباشرة
 document.addEventListener("DOMContentLoaded", () => {
   setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
   setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
