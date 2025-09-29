@@ -75,7 +75,7 @@ function getPrayerTimes(lat, lng, date, method) {
             asr: times.asr,
             sunset: times.sunset,
             maghrib: times.maghrib,
-            isha: times.isha
+            isha: times.isha,
             midnight: times.midnight
         };
     } catch (error) {
@@ -90,6 +90,7 @@ function convertTimeToMinutes(timeString) {
   const [hours, minutes] = timeString.split(':').map(Number);
   return hours * 60 + minutes;
 }
+
 
 
 
