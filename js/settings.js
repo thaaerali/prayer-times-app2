@@ -53,8 +53,10 @@ function loadSettings() {
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const manualLocation = document.getElementById('manual-location');
-  const toggleAsr = document.getElementById('toggle-asr');
+  const toggleAsr = document.getElementById('toggle-imsak');
+   const toggleAsr = document.getElementById('toggle-asr');
   const toggleIsha = document.getElementById('toggle-isha');
+  const toggleIsha = document.getElementById('toggle-midnight');
   const toggleFajrAdhan = document.getElementById('toggle-fajr-adhan');
   const toggleDhuhrAdhan = document.getElementById('toggle-dhuhr-adhan');
   const toggleAsrAdhan = document.getElementById('toggle-asr-adhan');
@@ -75,9 +77,11 @@ function loadSettings() {
   if (prayerSettings.latitude) currentLocation.latitude = prayerSettings.latitude;
   if (prayerSettings.longitude) currentLocation.longitude = prayerSettings.longitude;
   if (prayerSettings.cityName) currentLocation.city = prayerSettings.cityName;
-
+  
+  if (toggleImsak) toggleImsak.checked = prayerSettings.showImsak !== undefined ? prayerSettings.showImsak : true;
   if (toggleAsr) toggleAsr.checked = prayerSettings.showAsr !== undefined ? prayerSettings.showAsr : true;
   if (toggleIsha) toggleIsha.checked = prayerSettings.showIsha !== undefined ? prayerSettings.showIsha : true;
+  if (toggleMidnight) toggleMidnight.checked = prayerSettings.showMidnight !== undefined ? prayerSettings.showMidnight : true;
 
   // تحميل إعدادات الإشعارات
   if (toggleFajrNotification) toggleFajrNotification.checked = prayerSettings.fajrNotification !== undefined ? prayerSettings.fajrNotification : true;
@@ -140,8 +144,10 @@ function autoSaveSettings() {
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const manualLocation = document.getElementById('manual-location');
+  const toggleImsak = document.getElementById('toggle-imsak');
   const toggleAsr = document.getElementById('toggle-asr');
   const toggleIsha = document.getElementById('toggle-isha');
+  const toggleMidnight = document.getElementById('toggle-midnight');
 
   // التحقق من وجود العناصر قبل استخدامها
   if (!calculationMethodSelect || !timeFormatSelect) {
@@ -199,8 +205,10 @@ function saveSettings() {
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const manualLocation = document.getElementById('manual-location');
+  const toggleImsak = document.getElementById('toggle-imsak');
   const toggleAsr = document.getElementById('toggle-asr');
   const toggleIsha = document.getElementById('toggle-isha');
+    const toggleMidnight = document.getElementById('toggle-midnight');
   const toggleFajrAdhan = document.getElementById('toggle-fajr-adhan');
   const toggleDhuhrAdhan = document.getElementById('toggle-dhuhr-adhan');
   const toggleAsrAdhan = document.getElementById('toggle-asr-adhan');
@@ -418,8 +426,8 @@ function initAutoSaveEvents() {
   
   // قائمة بجميع عناصر الإعدادات التي تحتاج event listeners
   const settingsElements = [
-    'calculation-method', 'time-format', 'manual-location',
-    'toggle-asr', 'toggle-isha', 'toggle-fajr-notification', 'toggle-dhuhr-notification',
+    'calculation-method', 'time-format', 'manual-location','toggle-imsak',
+    'toggle-asr', 'toggle-isha','toggle-midnight', 'toggle-fajr-notification', 'toggle-dhuhr-notification',
     'toggle-asr-notification', 'toggle-maghrib-notification', 'toggle-isha-notification',
     'toggle-fajr-adhan', 'toggle-dhuhr-adhan', 'toggle-asr-adhan', 'toggle-maghrib-adhan',
     'toggle-isha-adhan', 'volume-level'
@@ -476,8 +484,10 @@ function autoSaveSettings() {
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const manualLocation = document.getElementById('manual-location');
+  const toggleImsak = document.getElementById('toggle-imsak');
   const toggleAsr = document.getElementById('toggle-asr');
   const toggleIsha = document.getElementById('toggle-isha');
+  const toggleMidnight = document.getElementById('toggle-midnight');
 
   // التحقق من وجود العناصر قبل استخدامها
   if (!calculationMethodSelect || !timeFormatSelect) {
@@ -493,8 +503,10 @@ function autoSaveSettings() {
     latitude: currentLocation.latitude,
     longitude: currentLocation.longitude,
     cityName: currentLocation.city,
+    showImsak: toggleImsak ? toggleImsak.checked : true,
     showAsr: toggleAsr ? toggleAsr.checked : true,
-    showIsha: toggleIsha ? toggleIsha.checked : true
+    showIsha: toggleIsha ? toggleIsha.checked : true,
+    showMidnight: toggleMidnight ? toggleMidnight.checked : true
   };
   
   // حفظ إعدادات الصوت
@@ -539,8 +551,8 @@ function initAutoSaveEvents() {
   
   // قائمة بجميع عناصر الإعدادات التي تحتاج event listeners
   const settingsElements = [
-    'calculation-method', 'time-format', 'manual-location',
-    'toggle-asr', 'toggle-isha', 'toggle-fajr-adhan', 'toggle-dhuhr-adhan',
+    'calculation-method', 'time-format', 'manual-location','toggle-imsak',
+    'toggle-asr', 'toggle-isha','toggle-midnight', 'toggle-fajr-adhan', 'toggle-dhuhr-adhan',
     'toggle-asr-adhan', 'toggle-maghrib-adhan', 'toggle-isha-adhan', 'volume-level'
   ];
 
@@ -611,4 +623,3 @@ function applyAppearance(appearance) {
     showNotification(`تم تطبيق الوضع ${darkMode ? 'الليلي' : 'النهاري'}`);
   }
 }
-
