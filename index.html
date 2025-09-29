@@ -58,6 +58,12 @@
     <!-- أوقات الصلاة - RecyclerView Style -->
     <div id="prayer-times" class="container my-3">
       <div class="prayer-recyclerview">
+         <div class="prayer-item" data-prayer="imsak">
+          <div class="prayer-name">
+          <span>الإمساك</span>
+          </div>
+          <div class="prayer-time" id="imsak-time">--:--</div>
+        </div>
         <div class="prayer-item" data-prayer="fajr">
           <div class="prayer-name">
             <span>الفجر</span>
@@ -99,6 +105,12 @@
             <span>العشاء</span>
           </div>
           <div class="prayer-time" id="isha-time">--:--</div>
+        </div>
+         <div class="prayer-item" data-prayer="midnight">
+          <div class="prayer-name">
+          <span>منتصف الليل</span>
+          </div>
+          <div class="prayer-time" id="midnight-time">--:--</div>
         </div>
       </div>
     </div>
@@ -179,6 +191,10 @@
 
                   <div class="mb-3">
                     <label class="form-label fw-bold">  عرض الوقت:</label>
+                      <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="toggle-imsak">
+                      <label class="form-check-label" for="toggle-imsak">الإمساك</label>
+                    </div>
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" id="toggle-asr">
                       <label class="form-check-label" for="toggle-asr">العصر</label>
@@ -186,6 +202,10 @@
                     <div class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" id="toggle-isha">
                       <label class="form-check-label" for="toggle-isha">العشاء</label>
+                    </div>
+                     <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="toggle-midnight">
+                      <label class="form-check-label" for="toggle-midnight">منتصف الليل</label>
                     </div>
                     <small class="text-muted">الفجر، الشروق، الغروب، الظهر والمغرب دائمًا</small>
                   </div>
@@ -437,3 +457,4 @@
  
 </body>
 </html>
+
