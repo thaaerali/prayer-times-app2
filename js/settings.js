@@ -267,17 +267,49 @@ function saveSettings() {
   }
 }
 
+// دالة محسنة لاختيار الصوت
 function selectSound(soundId) {
   const soundItems = document.querySelectorAll('#adhan-sounds-list .sound-item');
   soundItems.forEach(item => {
     if (item.dataset.sound === soundId) {
       item.classList.add('active');
+      // حفظ فوري للإعدادات
+      const soundSettings = JSON.parse(localStorage.getItem('soundSettings')) || {};
+      soundSettings.selectedSound = soundId;
+      localStorage.setItem('soundSettings', JSON.stringify(soundSettings));
     } else {
       item.classList.remove('active');
     }
   });
 }
 
+// تحسين دالة initSoundEvents
+function initSoundEvents() {
+  const soundItems = document.querySelectorAll('#adhan-sounds-list .sound-item');
+  
+  soundItems.forEach(item => {
+    // إزالة أي event listeners سابقة
+    const newItem = item.cloneNode(true);
+    item.parentNode.replaceChild(newItem, item);
+    
+    // إضافة event listener جديدة
+    newItem.addEventListener('click', (e) => {
+      if (e.target.classList.contains('play-btn') || e.target.parentElement.classList.contains('play-btn')) {
+        // تشغيل الصوت عند النقر على زر التشغيل
+        const soundId = newItem.dataset.sound;
+        if (typeof playAdhanSound === 'function') {
+          playAdhanSound(soundId);
+        }
+      } else {
+        // تحديد الصوت عند النقر على العنصر
+        selectSound(newItem.dataset.sound);
+        
+        // عرض تأكيد
+        showNotification(`تم اختيار صوت: ${newItem.querySelector('.fw-medium').textContent}`);
+      }
+    });
+  });
+}
 function selectAppearance(appearanceId) {
   const appearanceItems = document.querySelectorAll('#appearance-list .sound-item');
   appearanceItems.forEach(item => {
@@ -579,3 +611,4 @@ function applyAppearance(appearance) {
     showNotification(`تم تطبيق الوضع ${darkMode ? 'الليلي' : 'النهاري'}`);
   }
 }
+
