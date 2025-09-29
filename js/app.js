@@ -600,8 +600,3 @@ displayDate();
     cityNameElement.textContent = currentLocation.city;
   }
 }
-
-
-
-
-
