@@ -347,8 +347,10 @@ function calculateAndDisplayPrayerTimes() {
     const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
     const calculationMethod = settings.calculationMethod || 'MWL';
     const timeFormat = settings.timeFormat || '24h';
+    const showImsak = settings.showImsak !== undefined ? settings.showImsak : true;
     const showAsr = settings.showAsr !== undefined ? settings.showAsr : true;
     const showIsha = settings.showIsha !== undefined ? settings.showIsha : true;
+    const showMidnight = settings.showMidnight !== undefined ? settings.showMidnight : true;
 
     const date = new Date();
     const times = getPrayerTimes(currentLocation.latitude, currentLocation.longitude, date, calculationMethod);
@@ -356,13 +358,15 @@ function calculateAndDisplayPrayerTimes() {
     console.log('أوقات الصلاة المحسوبة:', times);
 
     const prayers = [
+      { id: 'imsak', time: times.imsak, alwaysShow: showImsak },
       { id: 'fajr', time: times.fajr, alwaysShow: true },
       { id: 'sunrise', time: times.sunrise, alwaysShow: true },
       { id: 'dhuhr', time: times.dhuhr, alwaysShow: true },
       { id: 'asr', time: times.asr, alwaysShow: showAsr },
       { id: 'sunset', time: times.sunset, alwaysShow: true },
       { id: 'maghrib', time: times.maghrib, alwaysShow: true },
-      { id: 'isha', time: times.isha, alwaysShow: showIsha }
+      { id: 'isha', time: times.isha, alwaysShow: showIsha },
+      { id: 'midnight', time: times.midnight, alwaysShow: showMidnight }
     ];
 
     prayers.forEach(prayer => {
@@ -399,13 +403,15 @@ function highlightCurrentPrayer(times) {
   const currentTime = now.getHours() * 60 + now.getMinutes();
   
   const prayerTimes = [
+    { name: 'imsak', time: convertTimeToMinutes(times.imsak) },
     { name: 'fajr', time: convertTimeToMinutes(times.fajr) },
     { name: 'sunrise', time: convertTimeToMinutes(times.sunrise) },
     { name: 'dhuhr', time: convertTimeToMinutes(times.dhuhr) },
     { name: 'asr', time: convertTimeToMinutes(times.asr) },
     { name: 'sunset', time: convertTimeToMinutes(times.sunset) },
     { name: 'maghrib', time: convertTimeToMinutes(times.maghrib) },
-    { name: 'isha', time: convertTimeToMinutes(times.isha) }
+    { name: 'isha', time: convertTimeToMinutes(times.isha) },
+    { name: 'midnight', time: convertTimeToMinutes(times.midnight) }
   ].filter(prayer => prayer.time > 0);
 
   if (prayerTimes.length === 0) return;
@@ -600,3 +606,4 @@ displayDate();
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
