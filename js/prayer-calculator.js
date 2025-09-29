@@ -1,5 +1,6 @@
 // إدارة حسابات أوقات الصلاة
 const prayerNames = {
+  imsak: 'الإمساك',
   fajr: 'الفجر',
   sunrise: 'الشروق',
   dhuhr: 'الظهر',
@@ -7,10 +8,11 @@ const prayerNames = {
   sunset: 'الغروب',
   maghrib: 'المغرب',
   isha: 'العشاء'
+  midnight: 'منتصف الليل'
 };
 
 // ترتيب الصلوات حسب الوقت
-const prayerOrder = ['fajr', 'sunrise', 'dhuhr', 'asr', 'sunset', 'maghrib', 'isha'];
+const prayerOrder = ['imsak','fajr', 'sunrise', 'dhuhr', 'asr', 'sunset', 'maghrib', 'isha', 'midnight'];
 
 // دالة مساعدة لإرجاع أوقات الصلاة الافتراضية
 function getDefaultPrayerTimes() {
@@ -66,6 +68,7 @@ function getPrayerTimes(lat, lng, date, method) {
         }
 
         return {
+            imsak: times.imsak,
             fajr: times.fajr,
             sunrise: times.sunrise,
             dhuhr: times.dhuhr,
@@ -73,6 +76,7 @@ function getPrayerTimes(lat, lng, date, method) {
             sunset: times.sunset,
             maghrib: times.maghrib,
             isha: times.isha
+            midnight: times.midnight
         };
     } catch (error) {
         console.error('Error calculating prayer times:', error);
@@ -86,5 +90,6 @@ function convertTimeToMinutes(timeString) {
   const [hours, minutes] = timeString.split(':').map(Number);
   return hours * 60 + minutes;
 }
+
 
 
