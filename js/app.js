@@ -387,6 +387,8 @@ function calculateAndDisplayPrayerTimes() {
     console.error('Error calculating prayer times:', error);
     prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
   }
+}
+
 // دالة لتحديد الصلاة الحالية
 function highlightCurrentPrayer(times) {
   document.querySelectorAll('.prayer-item').forEach(item => {
@@ -427,6 +429,9 @@ function highlightCurrentPrayer(times) {
     }
   }
 }
+
+
+
 // دالة لتحميل المظهر
 function loadTheme() {
   const appearanceSettings = JSON.parse(localStorage.getItem('appearanceSettings')) || {};
@@ -595,10 +600,6 @@ displayDate();
     cityNameElement.textContent = currentLocation.city;
   }
 }
-
-
-
-
 
 
 
