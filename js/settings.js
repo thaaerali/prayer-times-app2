@@ -53,10 +53,10 @@ function loadSettings() {
   const calculationMethodSelect = document.getElementById('calculation-method');
   const timeFormatSelect = document.getElementById('time-format');
   const manualLocation = document.getElementById('manual-location');
-  const toggleAsr = document.getElementById('toggle-imsak');
+  const toggleImsak = document.getElementById('toggle-imsak');
    const toggleAsr = document.getElementById('toggle-asr');
   const toggleIsha = document.getElementById('toggle-isha');
-  const toggleIsha = document.getElementById('toggle-midnight');
+  const toggleMidnight = document.getElementById('toggle-midnight');
   const toggleFajrAdhan = document.getElementById('toggle-fajr-adhan');
   const toggleDhuhrAdhan = document.getElementById('toggle-dhuhr-adhan');
   const toggleAsrAdhan = document.getElementById('toggle-asr-adhan');
@@ -623,3 +623,4 @@ function applyAppearance(appearance) {
     showNotification(`تم تطبيق الوضع ${darkMode ? 'الليلي' : 'النهاري'}`);
   }
 }
+
