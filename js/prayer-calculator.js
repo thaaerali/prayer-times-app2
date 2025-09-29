@@ -7,7 +7,7 @@ const prayerNames = {
   asr: 'العصر',
   sunset: 'الغروب',
   maghrib: 'المغرب',
-  isha: 'العشاء'
+  isha: 'العشاء',
   midnight: 'منتصف الليل'
 };
 
@@ -90,6 +90,7 @@ function convertTimeToMinutes(timeString) {
   const [hours, minutes] = timeString.split(':').map(Number);
   return hours * 60 + minutes;
 }
+
 
 
 
