@@ -81,41 +81,37 @@ function checkAudioPermissions() {
 function checkPrayerTimes() {
   const now = new Date();
   const currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-  const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+  
+  // قراءة إعدادات الصوت من المكان الصحيح
+  const soundSettings = JSON.parse(localStorage.getItem('soundSettings')) || {};
+  const prayerSettings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
 
   // الحصول على أوقات الصلاة الحالية
   const times = getPrayerTimes(
     currentLocation.latitude || 31.9539, 
     currentLocation.longitude || 44.3736, 
     now,
-    settings.calculationMethod || 'MWL'
+    prayerSettings.calculationMethod || 'MWL'
   );
 
   // التحقق من كل صلاة إذا حان وقتها
   const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
   prayers.forEach(prayer => {
-    if (shouldPlayAdhan(prayer, settings) && isPrayerTime(times[prayer], currentTime)) {
-      playAdhanSound(settings.selectedSound || 'abdul-basit');
+    if (shouldPlayAdhan(prayer, soundSettings) && isPrayerTime(times[prayer], currentTime)) {
+      // استخدام الصوت المحدد من إعدادات الصوت
+      playAdhanSound(soundSettings.selectedSound || 'abdul-basit');
     }
   });
 }
 
-// دالة مساعدة للتحقق إذا حان وقت الصلاة
-function isPrayerTime(prayerTime, currentTime) {
-  const [prayerHours, prayerMinutes] = prayerTime.split(':').map(Number);
-  const [currentHours, currentMinutes] = currentTime.split(':').map(Number);
-
-  return prayerHours === currentHours && prayerMinutes === currentMinutes;
-}
-
 // دالة للتحقق إذا كان التشغيل التلقائي مفعل للصلاة
-function shouldPlayAdhan(prayer, settings) {
+function shouldPlayAdhan(prayer, soundSettings) {
   switch(prayer) {
-    case 'fajr': return settings.playFajrAdhan !== false;
-    case 'dhuhr': return settings.playDhuhrAdhan !== false;
-    case 'asr': return settings.playAsrAdhan !== false;
-    case 'maghrib': return settings.playMaghribAdhan !== false;
-    case 'isha': return settings.playIshaAdhan !== false;
+    case 'fajr': return soundSettings.playFajrAdhan !== false;
+    case 'dhuhr': return soundSettings.playDhuhrAdhan !== false;
+    case 'asr': return soundSettings.playAsrAdhan !== false;
+    case 'maghrib': return soundSettings.playMaghribAdhan !== false;
+    case 'isha': return soundSettings.playIshaAdhan !== false;
     default: return false;
   }
 }
@@ -125,3 +121,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
   setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
 });
+
