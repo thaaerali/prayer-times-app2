@@ -387,10 +387,46 @@ function calculateAndDisplayPrayerTimes() {
     console.error('Error calculating prayer times:', error);
     prayerTimesContainer.innerHTML = '<div class="text-center py-4 text-danger">حدث خطأ في حساب أوقات الصلاة</div>';
   }
+// دالة لتحديد الصلاة الحالية
+function highlightCurrentPrayer(times) {
+  document.querySelectorAll('.prayer-item').forEach(item => {
+    item.classList.remove('highlight');
+  });
+
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  
+  const prayerTimes = [
+    { name: 'fajr', time: convertTimeToMinutes(times.fajr) },
+    { name: 'sunrise', time: convertTimeToMinutes(times.sunrise) },
+    { name: 'dhuhr', time: convertTimeToMinutes(times.dhuhr) },
+    { name: 'asr', time: convertTimeToMinutes(times.asr) },
+    { name: 'sunset', time: convertTimeToMinutes(times.sunset) },
+    { name: 'maghrib', time: convertTimeToMinutes(times.maghrib) },
+    { name: 'isha', time: convertTimeToMinutes(times.isha) }
+  ].filter(prayer => prayer.time > 0);
+
+  if (prayerTimes.length === 0) return;
+
+  let currentPrayer = null;
+  for (let i = 0; i < prayerTimes.length - 1; i++) {
+    if (currentTime >= prayerTimes[i].time && currentTime < prayerTimes[i + 1].time) {
+      currentPrayer = prayerTimes[i].name;
+      break;
+    }
+  }
+  
+  if (!currentPrayer && (currentTime >= prayerTimes[prayerTimes.length - 1].time || currentTime < prayerTimes[0].time)) {
+    currentPrayer = prayerTimes[prayerTimes.length - 1].name;
+  }
+
+  if (currentPrayer) {
+    const currentElement = document.querySelector(`.prayer-item[data-prayer="${currentPrayer}"]`);
+    if (currentElement) {
+      currentElement.classList.add('highlight');
+    }
+  }
 }
-
-
-
 // دالة لتحميل المظهر
 function loadTheme() {
   const appearanceSettings = JSON.parse(localStorage.getItem('appearanceSettings')) || {};
@@ -559,6 +595,7 @@ displayDate();
     cityNameElement.textContent = currentLocation.city;
   }
 }
+
 
 
 
