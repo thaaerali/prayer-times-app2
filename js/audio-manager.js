@@ -1,92 +1,74 @@
-// إدارة الأصوات والتشغيل التلقائي
+// إدارة الأصوات والتشغيل التلقائي - النسخة المحسنة
 const adhanSounds = {
-  'aba dhari alhulwaji': 'audio/aba dhari alhulwaji.mp3',
-  'shibr maealih': 'audio/shibr maealih.mp3',
-  'mustafaa alsaraaf': 'audio/mustafaa alsaraaf.mp3',
-  'muhamad altawakhiy': 'audio/muhamad altawakhiy.mp3'
+  'aba dhari alhulwaji': 'audio/aba-dhari-alhulwaji.mp3',
+  'shibr maealih': 'audio/shibr-maealih.mp3',
+  'mustafaa alsaraaf': 'audio/mustafaa-alsaraaf.mp3',
+  'muhamad altawakhiy': 'audio/muhamad-altawakhiy.mp3'
 };
+
+// دالة مساعدة للتحقق من وقت الصلاة (إذا كانت مفقودة)
+function isPrayerTime(prayerTime, currentTime) {
+  if (!prayerTime) return false;
+  
+  const [prayerHours, prayerMinutes] = prayerTime.split(':').map(Number);
+  const [currentHours, currentMinutes] = currentTime.split(':').map(Number);
+  
+  const prayerTotalMinutes = prayerHours * 60 + prayerMinutes;
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+  
+  // التحقق إذا كان الوقت الحالي ضمن دقيقتين من وقت الصلاة
+  return Math.abs(currentTotalMinutes - prayerTotalMinutes) <= 2;
+}
 
 async function playAdhanSound(soundId) {
   const soundUrl = adhanSounds[soundId];
   const adhanPlayer = document.getElementById('adhan-player');
+
+  if (!adhanPlayer) {
+    console.error('عنصر المشغل الصوتي غير موجود في DOM');
+    return;
+  }
 
   if (!soundUrl) {
     showError('لم يتم العثور على ملف الصوت المحدد');
     return;
   }
 
-  // استخدام مستوى صوت ثابت (70%) بدلاً من العنصر المحذوف
-  const volumeLevel = 0.7; // يمكن تغيير هذه القيمة كما تريد
-
-  // التحقق من وجود الملف أولاً
-  const fileExists = await checkFileExists(soundUrl);
-
-  if (!fileExists) {
-    showError(`ملف الصوت غير موجود: ${soundUrl}. يرجى التأكد من وجود الملف في المجلد المحدد.`);
-    return;
-  }
-
-  // تشغيل الصوت
-  adhanPlayer.src = soundUrl;
-  adhanPlayer.volume = volumeLevel;
+  const volumeLevel = 0.7;
 
   try {
-    const promise = adhanPlayer.play();
+    // إيقاف أي تشغيل سابق
+    adhanPlayer.pause();
+    adhanPlayer.currentTime = 0;
 
-    if (promise !== undefined) {
-      promise.then(() => {
-        showNotification('جاري تشغيل الأذان');
-      }).catch(error => {
-        showError('تعذر تشغيل الأذان.');
-        console.error('Error playing adhan:', error);
-      });
-    }
+    // تعيين المصدر والحجم
+    adhanPlayer.src = soundUrl;
+    adhanPlayer.volume = volumeLevel;
+
+    // محاولة التشغيل
+    await adhanPlayer.play();
+    showNotification('جاري تشغيل الأذان');
+    
+    // تسجيل التشغيل الناجح
+    console.log('تم تشغيل الأذان بنجاح:', soundId);
+    
   } catch (error) {
-    console.error('Error playing adhan:', error);
-    showNotification('تعذر تشغيل صوت الأذان. يرجى تفعيل الصوت.');
+    console.error('خطأ في تشغيل الأذان:', error);
+    showError('تعذر تشغيل الأذان. يرجى تفعيل الصوت.');
   }
 }
 
-// دالة للتحقق من وجود الملف (إذا كانت موجودة)
-async function checkFileExists(url) {
-  try {
-    const response = await fetch(url, { method: 'HEAD' });
-    return response.ok;
-  } catch (error) {
-    console.error('Error checking file:', error);
-    return false;
-  }
-}
-
-// دالة للتحقق من أذونات الصوت
-function checkAudioPermissions() {
-  try {
-    const testAudio = new Audio();
-    testAudio.src = 'data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAAC';
-
-    testAudio.play().then(() => {
-      console.log('إذن الصوت مُمنوح');
-      testAudio.pause();
-      localStorage.setItem('audioPermission', 'granted');
-    }).catch(error => {
-      console.log('لم يتم منح إذن الصوت:', error);
-      localStorage.setItem('audioPermission', 'denied');
-    });
-  } catch (error) {
-    console.error('خطأ في التحقق من أذونات الصوت:', error);
-  }
-}
-
-// دالة للتحقق من أوقات الصلاة وتشغيل الأذان
+// دالة محسنة للتحقق من أوقات الصلاة
 function checkPrayerTimes() {
   const now = new Date();
   const currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-  
-  // قراءة إعدادات الصوت من المكان الصحيح
+
+  console.log('التحقق من أوقات الصلاة:', currentTime);
+
   const soundSettings = JSON.parse(localStorage.getItem('soundSettings')) || {};
   const prayerSettings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
 
-  // الحصول على أوقات الصلاة الحالية
+  // الحصول على أوقات الصلاة
   const times = getPrayerTimes(
     currentLocation.latitude || 31.9539, 
     currentLocation.longitude || 44.3736, 
@@ -94,32 +76,47 @@ function checkPrayerTimes() {
     prayerSettings.calculationMethod || 'MWL'
   );
 
-  // التحقق من كل صلاة إذا حان وقتها
+  console.log('أوقات الصلاة اليوم:', times);
+
   const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
   prayers.forEach(prayer => {
     if (shouldPlayAdhan(prayer, soundSettings) && isPrayerTime(times[prayer], currentTime)) {
-      // استخدام الصوت المحدد من إعدادات الصوت
+      console.log(`حان وقت ${prayer} - تشغيل الأذان`);
       playAdhanSound(soundSettings.selectedSound || 'aba dhari alhulwaji');
     }
   });
 }
 
-// دالة للتحقق إذا كان التشغيل التلقائي مفعل للصلاة
-function shouldPlayAdhan(prayer, soundSettings) {
-  switch(prayer) {
-    case 'fajr': return soundSettings.playFajrAdhan !== false;
-    case 'dhuhr': return soundSettings.playDhuhrAdhan !== false;
-    case 'asr': return soundSettings.playAsrAdhan !== false;
-    case 'maghrib': return soundSettings.playMaghribAdhan !== false;
-    case 'isha': return soundSettings.playIshaAdhan !== false;
-    default: return false;
-  }
+// إضافة تصحيح الأخطاء
+function debugAudioSystem() {
+  console.log('فحص نظام الصوت:');
+  console.log('المستخدم:', navigator.userAgent);
+  console.log('إعدادات الصوت:', JSON.parse(localStorage.getItem('soundSettings')));
+  console.log('إعدادات الصلاة:', JSON.parse(localStorage.getItem('prayerSettings')));
+  
+  // اختبار تشغيل صوت مباشر
+  const testAudio = new Audio();
+  testAudio.volume = 0.1;
+  testAudio.play().then(() => {
+    console.log('نظام الصوت يعمل بشكل طبيعي');
+    testAudio.pause();
+  }).catch(error => {
+    console.error('مشكلة في نظام الصوت:', error);
+  });
 }
 
-// بدء المراقبة مباشرة
+// تحسين التهيئة
 document.addEventListener("DOMContentLoaded", () => {
-  setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
-  setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
+  console.log('تهيئة نظام الأذان...');
+  
+  // فحص النظام
+  debugAudioSystem();
+  
+  // بدء المراقبة
+  setInterval(checkPrayerTimes, 60000);
+  
+  // فحص أولي فوري
+  checkPrayerTimes();
+  
+  console.log('نظام الأذان جاهز للمراقبة');
 });
-
-
