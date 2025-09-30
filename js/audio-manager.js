@@ -1,9 +1,9 @@
 // إدارة الأصوات والتشغيل التلقائي
 const adhanSounds = {
-  'abdul-basit': 'audio/abdul-basit.mp3',
-  'mishary-rashid': 'audio/mishary-rashid.mp3',
-  'saud-al-shuraim': 'audio/saud-al-shuraim.mp3',
-  'yasser-al-dosari': 'audio/yasser-al-dosari.mp3'
+  'aba dhari alhulwaji': 'audio/aba dhari alhulwaji.mp3',
+  'shibr maealih': 'audio/shibr maealih.mp3',
+  'mustafaa alsaraaf': 'audio/mustafaa alsaraaf.mp3',
+  'muhamad altawakhiy': 'audio/muhamad altawakhiy.mp3'
 };
 
 async function playAdhanSound(soundId) {
@@ -99,7 +99,7 @@ function checkPrayerTimes() {
   prayers.forEach(prayer => {
     if (shouldPlayAdhan(prayer, soundSettings) && isPrayerTime(times[prayer], currentTime)) {
       // استخدام الصوت المحدد من إعدادات الصوت
-      playAdhanSound(soundSettings.selectedSound || 'abdul-basit');
+      playAdhanSound(soundSettings.selectedSound || 'aba dhari alhulwaji');
     }
   });
 }
@@ -121,4 +121,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
   setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
 });
+
 
