@@ -1,11 +1,24 @@
-// إدارة الأصوات والتشغيل التلقائي
+// ---------------- إدارة الأصوات ----------------
 const adhanSounds = {
-  'abdul-basit': 'audio/abdul-basit.mp3',
-  'mishary-rashid': 'audio/mishary-rashid.mp3',
-  'saud-al-shuraim': 'audio/saud-al-shuraim.mp3',
-  'yasser-al-dosari': 'audio/yasser-al-dosari.mp3'
+  'aba dhari alhulwaji': 'audio/aba dhari alhulwaji.mp3',
+  'shibr maealih': 'audio/shibr maealih.mp3',
+  'mustafaa alsaraaf': 'audio/mustafaa alsaraaf.mp3',
+  'muhamad altawakhiy': 'audio/muhamad altawakhiy.mp3'
 };
 
+// دالة للتحقق إذا كان التشغيل التلقائي مفعل للصلاة
+function shouldPlayAdhan(prayer, settings) {
+  switch(prayer) {
+    case 'fajr': return settings.playFajrAdhan !== false;
+    case 'dhuhr': return settings.playDhuhrAdhan !== false;
+    case 'asr': return settings.playAsrAdhan !== false;
+    case 'maghrib': return settings.playMaghribAdhan !== false;
+    case 'isha': return settings.playIshaAdhan !== false;
+    default: return false;
+  }
+}
+
+// ---------------- تشغيل الصوت ----------------
 async function playAdhanSound(soundId) {
   const soundUrl = adhanSounds[soundId];
   const adhanPlayer = document.getElementById('adhan-player');
@@ -15,24 +28,19 @@ async function playAdhanSound(soundId) {
     return;
   }
 
-  // استخدام مستوى صوت ثابت (70%) بدلاً من العنصر المحذوف
-  const volumeLevel = 0.7; // يمكن تغيير هذه القيمة كما تريد
-
-  // التحقق من وجود الملف أولاً
+  const volumeLevel = 0.7; 
   const fileExists = await checkFileExists(soundUrl);
 
   if (!fileExists) {
-    showError(`ملف الصوت غير موجود: ${soundUrl}. يرجى التأكد من وجود الملف في المجلد المحدد.`);
+    showError(`ملف الصوت غير موجود: ${soundUrl}`);
     return;
   }
 
-  // تشغيل الصوت
   adhanPlayer.src = soundUrl;
   adhanPlayer.volume = volumeLevel;
 
   try {
     const promise = adhanPlayer.play();
-
     if (promise !== undefined) {
       promise.then(() => {
         showNotification('جاري تشغيل الأذان');
@@ -47,7 +55,7 @@ async function playAdhanSound(soundId) {
   }
 }
 
-// دالة للتحقق من وجود الملف (إذا كانت موجودة)
+// ---------------- التحقق من الملف ----------------
 async function checkFileExists(url) {
   try {
     const response = await fetch(url, { method: 'HEAD' });
@@ -58,7 +66,7 @@ async function checkFileExists(url) {
   }
 }
 
-// دالة للتحقق من أذونات الصوت
+// ---------------- أذونات الصوت ----------------
 function checkAudioPermissions() {
   try {
     const testAudio = new Audio();
@@ -77,13 +85,13 @@ function checkAudioPermissions() {
   }
 }
 
-// دالة للتحقق من أوقات الصلاة وتشغيل الأذان
+// ---------------- التحقق من أوقات الصلاة ----------------
 function checkPrayerTimes() {
   const now = new Date();
   const currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
   const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
 
-  // الحصول على أوقات الصلاة الحالية
+  // الحصول على أوقات الصلاة
   const times = getPrayerTimes(
     currentLocation.latitude || 31.9539, 
     currentLocation.longitude || 44.3736, 
@@ -91,37 +99,33 @@ function checkPrayerTimes() {
     settings.calculationMethod || 'MWL'
   );
 
-  // التحقق من كل صلاة إذا حان وقتها
   const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
   prayers.forEach(prayer => {
     if (shouldPlayAdhan(prayer, settings) && isPrayerTime(times[prayer], currentTime)) {
-      playAdhanSound(settings.selectedSound || 'abdul-basit');
+      playAdhanSound(settings.selectedSound || 'aba dhari alhulwaji');
     }
   });
 }
 
-// دالة مساعدة للتحقق إذا حان وقت الصلاة
+// ---------------- التحقق من الوقت ----------------
+// يسمح بفارق حتى دقيقة واحدة
 function isPrayerTime(prayerTime, currentTime) {
   const [prayerHours, prayerMinutes] = prayerTime.split(':').map(Number);
   const [currentHours, currentMinutes] = currentTime.split(':').map(Number);
 
-  return prayerHours === currentHours && prayerMinutes === currentMinutes;
+  const prayerTotal = prayerHours * 60 + prayerMinutes;
+  const currentTotal = currentHours * 60 + currentMinutes;
+
+  return Math.abs(prayerTotal - currentTotal) <= 1;
 }
 
-// دالة للتحقق إذا كان التشغيل التلقائي مفعل للصلاة
-function shouldPlayAdhan(prayer, settings) {
-  switch(prayer) {
-    case 'fajr': return settings.playFajrAdhan !== false;
-    case 'dhuhr': return settings.playDhuhrAdhan !== false;
-    case 'asr': return settings.playAsrAdhan !== false;
-    case 'maghrib': return settings.playMaghribAdhan !== false;
-    case 'isha': return settings.playIshaAdhan !== false;
-    default: return false;
-  }
-}
-
-// بدء المراقبة مباشرة
+// ---------------- بدء التشغيل ----------------
 document.addEventListener("DOMContentLoaded", () => {
+  checkAudioPermissions();
   setInterval(checkPrayerTimes, 60000); // فحص كل دقيقة
-  setTimeout(checkPrayerTimes, 2000);   // فحص أولي بعد ثانيتين
+  setTimeout(checkPrayerTimes, 3000);   // فحص أولي بعد 3 ثوانٍ
 });
+
+// ---------------- دوال إشعار وهمية (بدلًا من أخطاء) ----------------
+function showError(msg) { console.error(msg); }
+function showNotification(msg) { console.log(msg); }
