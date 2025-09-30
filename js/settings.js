@@ -94,7 +94,7 @@ function loadSettings() {
   if (soundSettings.selectedSound) {
     selectSound(soundSettings.selectedSound);
   } else {
-    selectSound('abdul-basit'); // قيمة افتراضية
+    selectSound('aba dhari alhulwaji'); // قيمة افتراضية
   }
 
   // تعيين القيم الافتراضية للتشغيل التلقائي
@@ -623,4 +623,5 @@ function applyAppearance(appearance) {
     showNotification(`تم تطبيق الوضع ${darkMode ? 'الليلي' : 'النهاري'}`);
   }
 }
+
 
