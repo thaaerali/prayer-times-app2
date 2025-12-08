@@ -1,6 +1,6 @@
 class NahjAlBalagha {
   constructor() {
-    this.baseURL = 'https://raw.githubusercontent.com/yourusername/nahj-al-balagha-data/main';
+    this.baseURL = 'https://github.com/thaaerali/nahj-data/raw/refs/heads/main/data.json';
     this.currentPage = 1;
     this.itemsPerPage = 10;
     this.currentCategory = 'all';
@@ -109,4 +109,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nahj-button')?.addEventListener('click', () => {
     nahjAlBalagha.showNahjPage();
   });
+
 });
