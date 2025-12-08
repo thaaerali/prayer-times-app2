@@ -467,3 +467,67 @@ header .d-flex .location-marker {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
+/* أنماط صفحة نهج البلاغة */
+.nahj-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  min-height: 500px;
+}
+
+.nahj-item {
+  border-right: 4px solid #0d6efd;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.nahj-item:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.nahj-title {
+  color: #0d6efd;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.nahj-text {
+  line-height: 1.8;
+  text-align: justify;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.nahj-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 15px;
+  border-top: 1px dashed #dee2e6;
+  padding-top: 10px;
+}
+
+.nahj-category {
+  display: inline-block;
+  background-color: #0d6efd;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+/* زر نهج البلاغة في الهيدر */
+#nahj-button {
+  transition: all 0.3s ease;
+}
+
+#nahj-button:hover {
+  background-color: rgba(255,255,255,0.1);
+}
