@@ -5,18 +5,27 @@ let currentLocation = {
   city: 'النجف'
 };
 
-// دالة للتنقل بين الصفحات - بدون تغيير الأيقونة
-function togglePages() {
+// إضافة متغير لإدارة صفحة نهج البلاغة
+let nahjAlBalaghaInstance = null;
+
+// دالة للتنقل بين الصفحات
+function togglePages(pageName = null) {
     const homePage = document.getElementById('home-page');
     const settingsPage = document.getElementById('settings-page');
+    const nahjPage = document.getElementById('nahj-page');
 
-    console.log('تبديل الصفحات');
+    console.log('تبديل الصفحات إلى:', pageName || 'toggle');
 
-    if (homePage && settingsPage) {
-        if (homePage.classList.contains('active')) {
-            // الانتقال إلى صفحة الإعدادات
-            homePage.classList.remove('active');
+    // إخفاء كل الصفحات أولاً
+    if (homePage) homePage.classList.remove('active');
+    if (settingsPage) settingsPage.classList.remove('active');
+    if (nahjPage) nahjPage.classList.remove('active');
+
+    if (pageName === 'settings' || (!pageName && homePage && homePage.classList.contains('active'))) {
+        // الانتقال إلى صفحة الإعدادات
+        if (settingsPage) {
             settingsPage.classList.add('active');
+            console.log('تم التبديل إلى صفحة الإعدادات');
 
             // تهيئة أحداث الإعدادات
             setTimeout(() => {
@@ -27,34 +36,81 @@ function togglePages() {
                     loadSettings();
                 }
             }, 100);
-        } else {
-            // الانتقال إلى الصفحة الرئيسية
-            settingsPage.classList.remove('active');
+        }
+    } 
+    else if (pageName === 'nahj') {
+        // الانتقال إلى صفحة نهج البلاغة
+        if (nahjPage) {
+            nahjPage.classList.add('active');
+            console.log('تم التبديل إلى صفحة نهج البلاغة');
+            
+            // تحميل محتوى نهج البلاغة إذا لم يكن محملاً
+            if (nahjAlBalaghaInstance && typeof nahjAlBalaghaInstance.loadContent === 'function') {
+                nahjAlBalaghaInstance.loadContent();
+            }
+        }
+    }
+    else {
+        // الانتقال إلى الصفحة الرئيسية
+        if (homePage) {
             homePage.classList.add('active');
+            console.log('تم التبديل إلى الصفحة الرئيسية');
 
             // إعادة حساب الأوقات
             calculateAndDisplayPrayerTimes();
         }
-    } else {
-        console.error('لم يتم العثور على الصفحات المطلوبة');
     }
+}
+
+// دالة لعرض صفحة نهج البلاغة
+function showNahjPage() {
+    togglePages('nahj');
+}
+
+// دالة للعودة من صفحة نهج البلاغة
+function backFromNahjPage() {
+    togglePages('home');
 }
 
 // تهيئة التنقل
 function initNavigation() {
     const settingsButton = document.querySelector('.settings-button');
-    console.log('تهيئة التنقل - زر الإعدادات:', settingsButton);
+    const nahjButton = document.getElementById('nahj-button');
+    const nahjBackButton = document.getElementById('nahj-back-button');
+    const settingsBackButton = document.getElementById('back-button');
     
+    console.log('تهيئة التنقل...');
+    
+    // زر الإعدادات
     if (settingsButton) {
         // إزالة أي event listeners سابقة
-        settingsButton.onclick = null;
+        const newButton = settingsButton.cloneNode(true);
+        settingsButton.parentNode.replaceChild(newButton, settingsButton);
         
         // إضافة الوظيفة الجديدة
-        settingsButton.addEventListener('click', togglePages);
-        
+        newButton.addEventListener('click', () => togglePages('settings'));
         console.log('تم تعيين وظيفة التنقل لزر الإعدادات');
     }
+    
+    // زر نهج البلاغة
+    if (nahjButton) {
+        nahjButton.addEventListener('click', showNahjPage);
+        console.log('تم تعيين وظيفة التنقل لزر نهج البلاغة');
+    }
+    
+    // زر العودة من صفحة نهج البلاغة
+    if (nahjBackButton) {
+        nahjBackButton.addEventListener('click', backFromNahjPage);
+        console.log('تم تعيين وظيفة التنقل لزر العودة من نهج البلاغة');
+    }
+    
+    // زر العودة من الإعدادات
+    if (settingsBackButton) {
+        settingsBackButton.addEventListener('click', () => togglePages('home'));
+        console.log('تم تعيين وظيفة التنقل لزر العودة من الإعدادات');
+    }
 }
+
 // دالة لعرض التاريخ الميلادي والهجري
 function displayDate() {
   try {
@@ -127,6 +183,7 @@ function calculateHijriDate(gregorianDate) {
   
   return `${day} ${hijriMonths[monthIndex]} ${hijriYear} هـ`;
 }
+
 // دالة لتحديث حالة الموقع
 function updateLocationStatus(message, isError = false) {
     const statusElement = document.getElementById('location-status');
@@ -436,8 +493,6 @@ function highlightCurrentPrayer(times) {
   }
 }
 
-
-
 // دالة لتحميل المظهر
 function loadTheme() {
   const appearanceSettings = JSON.parse(localStorage.getItem('appearanceSettings')) || {};
@@ -494,6 +549,24 @@ function playAdhanSound(soundId) {
   }
 }
 
+// تهيئة نهج البلاغة
+function initNahjAlBalagha() {
+  // تحقق من وجود الصفحة أولاً
+  const nahjPage = document.getElementById('nahj-page');
+  if (!nahjPage) {
+    console.warn('صفحة نهج البلاغة غير موجودة');
+    return;
+  }
+  
+  // تأكد من أن الصفحة غير نشطة عند البدء
+  nahjPage.classList.remove('active');
+  
+  console.log('تهيئة نهج البلاغة...');
+  
+  // يمكنك هنا تهيئة أي دوال إضافية لنهج البلاغة
+  // أو تحميل البيانات من GitHub
+}
+
 // تهيئة التطبيق
 function initApp() {
   console.log('تهيئة التطبيق...');
@@ -533,6 +606,9 @@ function initApp() {
 
   // تهيئة نظام التنقل
   initNavigation();
+  
+  // تهيئة نهج البلاغة
+  initNahjAlBalagha();
 
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
@@ -544,35 +620,28 @@ function initApp() {
   setInterval(calculateAndDisplayPrayerTimes, 3600000);
 }
 
-// أحداث النقر على الأزرار
+// دالة لتحديث الصفحة الرئيسية عند تغيير الإعدادات
+function updateHomePageFromSettings() {
+  console.log('تحديث الصفحة الرئيسية من الإعدادات...');
+  
+  // تحديث المظهر
+  loadTheme();
+  // عرض التاريخ الحالي
+  displayDate();
+  // تحديث أوقات الصلاة
+  calculateAndDisplayPrayerTimes();
+  
+  // تحديث اسم المدينة
+  const cityNameElement = document.getElementById('city-name');
+  if (cityNameElement && currentLocation.city) {
+    cityNameElement.textContent = currentLocation.city;
+  }
+}
+
+// إضافة event listeners عند تحميل DOM
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM محمّل');
   
-  // إزالة الأحداث القديمة لزر الإعدادات
-  const oldSettingsButton = document.getElementById('settings-button');
-  if (oldSettingsButton) {
-    oldSettingsButton.onclick = null;
-  }
-
-  // تهيئة التطبيق عند تحميل الصفحة
-  initApp();
-});
-// إضافة event listener لزر العودة في صفحة الإعدادات
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM محمّل');
-  
-  // إزالة الأحداث القديمة لزر الإعدادات
-  const oldSettingsButton = document.getElementById('settings-button');
-  if (oldSettingsButton) {
-    oldSettingsButton.onclick = null;
-  }
-
-  // إضافة event listener لزر العودة
-  const backButton = document.getElementById('back-button');
-  if (backButton) {
-    backButton.addEventListener('click', togglePages);
-  }
-
   // إضافة event listener لزر حفظ الموقع اليدوي
   const saveManualLocationBtn = document.getElementById('save-manual-location');
   if (saveManualLocationBtn) {
@@ -585,25 +654,16 @@ document.addEventListener('DOMContentLoaded', function() {
     locationButton.addEventListener('click', getCurrentLocation);
   }
 
+  // إضافة event listener لزر إدارة المواقع
+  const locationListButton = document.getElementById('location-list-button');
+  if (locationListButton) {
+    locationListButton.addEventListener('click', function() {
+      // افتح نافذة المواقع المحفوظة
+      const locationModal = new bootstrap.Modal(document.getElementById('location-list-modal'));
+      locationModal.show();
+    });
+  }
+
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
-
-// دالة لتحديث الصفحة الرئيسية عند تغيير الإعدادات
-function updateHomePageFromSettings() {
-  console.log('تحديث الصفحة الرئيسية من الإعدادات...');
-  
-  // تحديث المظهر
-  loadTheme();
-  // عرض التاريخ الحالي
-displayDate();
-  // تحديث أوقات الصلاة
-  calculateAndDisplayPrayerTimes();
-  
-  // تحديث اسم المدينة
-  const cityNameElement = document.getElementById('city-name');
-  if (cityNameElement && currentLocation.city) {
-    cityNameElement.textContent = currentLocation.city;
-  }
-}
-
