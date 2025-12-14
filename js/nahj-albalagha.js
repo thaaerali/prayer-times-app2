@@ -1,6 +1,6 @@
 class NahjAlBalagha {
   constructor() {
-    this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/data.json';
+    this.baseURL = 'https://github.com/thaaerali/nahj-data/raw/refs/heads/main/data.json';
     this.currentPage = 1;
     this.itemsPerPage = 10;
     this.currentCategory = 'all';
