@@ -7,79 +7,139 @@ class NahjAlBalagha {
     this.currentSearch = '';
     this.data = [];
     this.pageLoaded = false;
-    this.elements = null;
     
-    console.log('تهيئة نهج البلاغة...');
-    
-    // تأجيل init حتى يتم تحميل DOM
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.init());
-    } else {
-      this.init();
-    }
+    // تهيئة عند تحميل الصفحة
+    this.init();
   }
 
   async init() {
-    console.log('بدء init...');
-    
-    try {
-      // تحميل الصفحة
-      await this.ensurePageLoaded();
-      
-      // تحميل البيانات
-      await this.loadData();
-      
-      // عرض المحتوى
-      this.renderContent();
-      
-      console.log('تهيئة نهج البلاغة مكتملة');
-    } catch (error) {
-      console.error('خطأ في تهيئة نهج البلاغة:', error);
-    }
+    // تحميل الصفحة عند الحاجة فقط
+    await this.ensurePageLoaded();
+    await this.loadData();
+    this.renderContent();
   }
 
   async ensurePageLoaded() {
+    // إذا كانت الصفحة محملة بالفعل، لا تحملها مجدداً
     if (this.pageLoaded) return;
-    
-    console.log('تأكد من تحميل الصفحة...');
-    
-    // أولاً، تحقق مما إذا كانت الصفحة موجودة بالفعل في DOM
-    let nahjPage = document.getElementById('nahj-page');
-    
-    if (!nahjPage) {
-      console.log('الصفحة غير موجودة، جاري إنشاؤها...');
-      // إنشاء الصفحة ديناميكياً
-      nahjPage = this.createPage();
+
+    try {
+      console.log('جاري تحميل صفحة نهج البلاغة...');
+      
+      // تحميل صفحة نهج البلاغة من ملف منفصل
+      const response = await fetch('nahj-page.html');
+      
+      if (!response.ok) {
+        throw new Error(`فشل تحميل الصفحة: ${response.status}`);
+      }
+      
+      const html = await response.text();
+      
+      // إنشاء عنصر مؤقت وإضافة الصفحة إليه
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const nahjPage = tempDiv.firstElementChild;
+      
+      // إضافة الصفحة إلى body
       document.body.appendChild(nahjPage);
+      
+      // حفظ العناصر
+      this.elements = {
+        nahjPage: document.getElementById('nahj-page'),
+        nahjContent: document.getElementById('nahj-content'),
+        nahjSearch: document.getElementById('nahj-search'),
+        nahjSearchBtn: document.getElementById('nahj-search-btn'),
+        nahjCategory: document.getElementById('nahj-category'),
+        nahjPagination: document.getElementById('nahj-pagination'),
+        nahjBackButton: document.getElementById('nahj-back-button')
+      };
+      
+      // إضافة الأنماط إذا لم تكن موجودة
+      this.addStyles();
+      
+      // إضافة الأحداث
+      this.addEventListeners();
+      
+      this.pageLoaded = true;
+      console.log('تم تحميل صفحة نهج البلاغة بنجاح');
+      
+    } catch (error) {
+      console.error('خطأ في تحميل صفحة نهج البلاغة:', error);
+      this.showFallbackPage();
     }
-    
-    // حفظ العناصر
-    this.elements = {
-      nahjPage: document.getElementById('nahj-page'),
-      nahjContent: document.getElementById('nahj-content'),
-      nahjSearch: document.getElementById('nahj-search'),
-      nahjSearchBtn: document.getElementById('nahj-search-btn'),
-      nahjCategory: document.getElementById('nahj-category'),
-      nahjPagination: document.getElementById('nahj-pagination'),
-      nahjBackButton: document.getElementById('nahj-back-button')
-    };
-    
-    console.log('العناصر المحفوظة:', this.elements);
-    
-    // إضافة الأحداث
-    this.addEventListeners();
-    
-    this.pageLoaded = true;
   }
 
-  createPage() {
-    console.log('إنشاء صفحة نهج البلاغة ديناميكياً...');
-    
-    const page = document.createElement('div');
-    page.id = 'nahj-page';
-    page.className = 'page';
-    page.innerHTML = `
-      <!-- رأس صفحة نهج البلاغة -->
+  addStyles() {
+    // إضافة الأنماط ديناميكياً إذا لم تكن موجودة
+    if (!document.querySelector('#nahj-styles')) {
+      const style = document.createElement('style');
+      style.id = 'nahj-styles';
+      style.textContent = `
+        .nahj-content {
+          background-color: #fff;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          min-height: 400px;
+        }
+        
+        .nahj-item {
+          border-right: 4px solid #0d6efd;
+          padding: 15px;
+          margin-bottom: 15px;
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+        
+        .nahj-item:hover {
+          background-color: #e9ecef;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .nahj-title {
+          color: #0d6efd;
+          font-weight: bold;
+          margin-bottom: 10px;
+          font-size: 1.1rem;
+        }
+        
+        .nahj-text {
+          line-height: 1.8;
+          text-align: justify;
+          color: #333;
+          font-size: 1rem;
+        }
+        
+        .nahj-meta {
+          font-size: 0.85rem;
+          color: #6c757d;
+          margin-top: 10px;
+          border-top: 1px dashed #dee2e6;
+          padding-top: 8px;
+        }
+        
+        .nahj-category {
+          display: inline-block;
+          background-color: #0d6efd;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          margin-left: 8px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  showFallbackPage() {
+    // إنشاء صفحة احتياطية إذا فشل التحميل
+    const fallbackPage = document.createElement('div');
+    fallbackPage.id = 'nahj-page';
+    fallbackPage.className = 'page';
+    fallbackPage.innerHTML = `
       <header class="bg-primary text-white text-center p-3 shadow-sm d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-3">
           <button id="nahj-back-button" class="btn btn-light">
@@ -88,58 +148,31 @@ class NahjAlBalagha {
           <h1 class="h4 mb-0">نهج البلاغة</h1>
         </div>
       </header>
-
-      <!-- محتوى نهج البلاغة -->
       <div class="container my-4">
-        <!-- فلتر البحث -->
-        <div class="row mb-4">
-          <div class="col-md-6">
-            <div class="input-group">
-              <input type="text" id="nahj-search" class="form-control" placeholder="ابحث في نهج البلاغة...">
-              <button class="btn btn-outline-primary" type="button" id="nahj-search-btn">
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <select id="nahj-category" class="form-select">
-              <option value="all">جميع الأقسام</option>
-              <option value="sermons">الخطب</option>
-              <option value="letters">الرسائل</option>
-              <option value="wisdom">الحكم</option>
-            </select>
-          </div>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          تعذر تحميل صفحة نهج البلاغة. يرجى التحقق من اتصال الإنترنت.
         </div>
-
-        <!-- عرض المحتوى -->
-        <div id="nahj-content" class="nahj-content">
-          <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">جاري التحميل...</span>
-            </div>
-            <p class="mt-3">جاري تحميل محتويات نهج البلاغة...</p>
-          </div>
-        </div>
-
-        <!-- الترقيم -->
-        <nav aria-label="تصفح نهج البلاغة" class="mt-4">
-          <ul class="pagination justify-content-center" id="nahj-pagination"></ul>
-        </nav>
       </div>
     `;
     
-    return page;
+    document.body.appendChild(fallbackPage);
+    
+    this.elements = {
+      nahjPage: fallbackPage,
+      nahjBackButton: document.getElementById('nahj-back-button')
+    };
+    
+    this.pageLoaded = true;
+    this.addEventListeners();
   }
 
   addEventListeners() {
-    console.log('إضافة الأحداث...');
-    
     // العودة من صفحة نهج البلاغة
     if (this.elements.nahjBackButton) {
       this.elements.nahjBackButton.addEventListener('click', () => {
         this.showHomePage();
       });
-      console.log('تمت إضافة حدث العودة');
     }
 
     // البحث
@@ -168,78 +201,66 @@ class NahjAlBalagha {
   }
 
   async loadData() {
-    console.log('جاري تحميل البيانات...');
-    
     try {
-      const url = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/data.json';
-      console.log('الرابط:', url);
+      console.log('جاري تحميل بيانات نهج البلاغة من GitHub...');
       
-      const response = await fetch(url);
+      // إضافة timestamp لمنع التخزين المؤقت
+      const timestamp = new Date().getTime();
+      const url = `${this.baseURL}?t=${timestamp}`;
+      
+      const response = await fetch(url, {
+        cache: 'no-cache',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
-        throw new Error(`فشل HTTP: ${response.status} ${response.statusText}`);
+        throw new Error(`خطأ في الخادم: ${response.status}`);
       }
       
-      const text = await response.text();
-      console.log('البيانات الخام (أول 500 حرف):', text.substring(0, 500));
+      this.data = await response.json();
       
-      // محاولة تحليل JSON
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseError) {
-        console.error('خطأ في تحليل JSON:', parseError);
-        throw new Error('تنسيق JSON غير صالح في الملف');
+      if (!Array.isArray(this.data)) {
+        throw new Error('تنسيق البيانات غير صحيح');
       }
       
-      if (!Array.isArray(data)) {
-        throw new Error('البيانات يجب أن تكون مصفوفة');
-      }
-      
-      this.data = data;
-      console.log(`تم تحميل ${data.length} عنصر بنجاح`);
+      console.log(`تم تحميل ${this.data.length} عنصر من نهج البلاغة`);
       
     } catch (error) {
-      console.error('خطأ في تحميل البيانات من GitHub:', error);
+      console.error('خطأ في تحميل بيانات نهج البلاغة:', error);
       
-      // استخدام بيانات تجريبية
-      this.loadSampleData();
+      // بيانات تجريبية للاختبار
+      this.data = [
+        {
+          "id": 1,
+          "title": "خطبة في ذم الدنيا",
+          "content": "أما بعد، فإن الدنيا قد ولَّت مدبرة، والآخرة قد أقبلت تذكرة، ولكل واحدة منهما بنون...",
+          "category": "sermons",
+          "source": "الخطبة 1"
+        },
+        {
+          "id": 2,
+          "title": "رسالة إلى مالك الأشتر",
+          "content": "هذا ما أمر به عبد الله علي أمير المؤمنين مالك بن الحارث الأشتر...",
+          "category": "letters",
+          "source": "الرسالة 53"
+        }
+      ];
+      
+      if (this.elements.nahjContent) {
+        this.elements.nahjContent.innerHTML = `
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            تم تحميل بيانات تجريبية. ${error.message}
+          </div>
+        `;
+      }
     }
   }
 
-  loadSampleData() {
-    console.log('جاري تحميل بيانات تجريبية...');
-    
-    this.data = [
-      {
-        "id": 1,
-        "title": "خطبة في ذم الدنيا",
-        "content": "أما بعد، فإن الدنيا قد ولَّت مدبرة، والآخرة قد أقبلت تذكرة، ولكل واحدة منهما بنون، فكونوا من أبناء الآخرة ولا تكونوا من أبناء الدنيا، فإن اليوم عمل ولا حساب، وغداً حساب ولا عمل.",
-        "category": "sermons",
-        "source": "الخطبة 1"
-      },
-      {
-        "id": 2,
-        "title": "رسالة إلى مالك الأشتر",
-        "content": "هذا ما أمر به عبد الله علي أمير المؤمنين مالك بن الحارث الأشتر في عهده إليه حين ولاه مصر: جباية خراجها، وجهاد عدوها، واستصلاح أهلها، وعمارة بلادها.",
-        "category": "letters",
-        "source": "الرسالة 53"
-      },
-      {
-        "id": 3,
-        "title": "من حكم الإمام علي",
-        "content": "قيمة كل امرئ ما يحسنه، والعلم مقرون بالعمل، فمن علم عمل، والعلم يهتف بالعمل، فإن أجابه وإلا ارتحل.",
-        "category": "wisdom",
-        "source": "الحكمة 81"
-      }
-    ];
-    
-    console.log('تم تحميل بيانات تجريبية');
-  }
-
   searchContent() {
-    console.log('بحث عن:', this.currentSearch);
-    
     if (this.elements.nahjSearch) {
       this.currentSearch = this.elements.nahjSearch.value.trim();
       this.currentPage = 1;
@@ -270,12 +291,7 @@ class NahjAlBalagha {
   }
 
   renderContent() {
-    console.log('عرض المحتوى...');
-    
-    if (!this.elements.nahjContent) {
-      console.error('عنصر nahj-content غير موجود');
-      return;
-    }
+    if (!this.elements.nahjContent) return;
 
     const filteredData = this.getFilteredData();
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -283,8 +299,6 @@ class NahjAlBalagha {
     const pageData = filteredData.slice(startIndex, endIndex);
     const totalPages = Math.ceil(filteredData.length / this.itemsPerPage);
 
-    console.log(`عرض ${pageData.length} عنصر من أصل ${filteredData.length}`);
-    
     // عرض المحتوى
     if (pageData.length === 0) {
       this.elements.nahjContent.innerHTML = `
@@ -312,7 +326,6 @@ class NahjAlBalagha {
   }
 
   escapeHtml(text) {
-    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -320,10 +333,12 @@ class NahjAlBalagha {
 
   renderPagination(totalPages) {
     if (!this.elements.nahjPagination) return;
-    
-    this.elements.nahjPagination.innerHTML = '';
+    if (totalPages <= 1) {
+      this.elements.nahjPagination.innerHTML = '';
+      return;
+    }
 
-    if (totalPages <= 1) return;
+    this.elements.nahjPagination.innerHTML = '';
 
     // زر السابق
     const prevLi = document.createElement('li');
@@ -385,44 +400,28 @@ class NahjAlBalagha {
   }
 
   showNahjPage() {
-    console.log('عرض صفحة نهج البلاغة...');
-    
-    if (!this.pageLoaded) {
-      console.log('الصفحة غير محملة، جاري التحميل...');
-      this.init().then(() => {
-        this.switchToNahjPage();
+    // تأكد من تحميل الصفحة أولاً
+    this.ensurePageLoaded().then(() => {
+      // إخفاء كل الصفحات
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
       });
-    } else {
-      this.switchToNahjPage();
-    }
-  }
-
-  switchToNahjPage() {
-    // إخفاء كل الصفحات
-    document.querySelectorAll('.page').forEach(page => {
-      page.classList.remove('active');
+      
+      // إظهار صفحة نهج البلاغة
+      if (this.elements.nahjPage) {
+        this.elements.nahjPage.classList.add('active');
+      }
+    }).catch(error => {
+      console.error('خطأ في عرض صفحة نهج البلاغة:', error);
+      alert('تعذر تحميل صفحة نهج البلاغة. يرجى المحاولة مرة أخرى.');
     });
-    
-    // إظهار صفحة نهج البلاغة
-    if (this.elements.nahjPage) {
-      this.elements.nahjPage.classList.add('active');
-      console.log('تم عرض صفحة نهج البلاغة');
-    } else {
-      console.error('صفحة نهج البلاغة غير موجودة');
-    }
   }
 
   showHomePage() {
-    console.log('العودة للصفحة الرئيسية...');
-    
     document.querySelectorAll('.page').forEach(page => {
       page.classList.remove('active');
     });
-    
-    const homePage = document.getElementById('home-page');
-    if (homePage) {
-      homePage.classList.add('active');
-    }
+    document.getElementById('home-page').classList.add('active');
   }
 }
 
@@ -430,8 +429,6 @@ class NahjAlBalagha {
 let nahjAlBalaghaInstance;
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM محمّل، جاري تهيئة نهج البلاغة...');
-  
   // إنشاء كائن نهج البلاغة
   nahjAlBalaghaInstance = new NahjAlBalagha();
   
@@ -439,17 +436,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const nahjButton = document.getElementById('nahj-button');
   if (nahjButton) {
     nahjButton.addEventListener('click', () => {
-      console.log('تم النقر على زر نهج البلاغة');
       if (nahjAlBalaghaInstance) {
         nahjAlBalaghaInstance.showNahjPage();
       }
     });
-    console.log('تمت إضافة حدث لزر نهج البلاغة');
-  } else {
-    console.warn('زر نهج البلاغة غير موجود في الهيدر');
   }
 });
 
 // جعل الكائن متاحاً عالمياً
 window.NahjAlBalagha = NahjAlBalagha;
-window.nahjAlBalaghaInstance = nahjAlBalaghaInstance;
