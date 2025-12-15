@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 const BASE_URL =
-  "https://raw.githubusercontent.com/USERNAME/nahj-al-balagha-json/main/";
+  "https://raw.githubusercontent.com/thaaerali/nahj-al-balagha-json/main/";
 
 const content = document.getElementById("nahj-content");
 const tabs = document.querySelectorAll("#nahj-tabs .nav-link");
