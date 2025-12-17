@@ -36,7 +36,7 @@ class NahjAlBalagha {
         try {
             // تحميل ملف JSON الرئيسي
             // تغيير الرابط ليشير إلى ملفك على GitHub
-            const response = await fetch(this.baseURL + 'nahj-al-balagha.json');
+           const response = await fetch(this.baseURL);
             
             if (!response.ok) {
                 throw new Error(`خطأ في تحميل البيانات: ${response.status}`);
