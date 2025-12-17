@@ -1,7 +1,7 @@
 // nahj-albalagha.js - ملف نهائي باستخدام JSON من GitHub
 class NahjAlBalagha {
     constructor() {
-        this.baseURL = 'https://raw.githubusercontent.com/your-username/your-repo/main/';
+        this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-al-balagha-json/refs/heads/main/nahj-al-balagha.json';
         this.data = null;
         this.currentPage = 1;
         this.itemsPerPage = 5;
