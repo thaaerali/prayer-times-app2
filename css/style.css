@@ -531,3 +531,159 @@ header .d-flex .location-marker {
 #nahj-button:hover {
   background-color: rgba(255,255,255,0.1);
 }
+
+/* أنماط نهج البلاغة المحسنة */
+.nahj-sermon {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.nahj-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--bg-primary);
+    transition: all 0.3s ease;
+}
+
+.nahj-section:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.sermon-header {
+    border-bottom: 2px solid var(--bg-primary);
+}
+
+.section-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+.section-text .footnote-ref {
+    color: var(--bg-primary);
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0 2px;
+    transition: all 0.2s ease;
+}
+
+.section-text .footnote-ref:hover {
+    background-color: var(--bg-primary);
+    color: white;
+    border-radius: 3px;
+    padding: 0 4px;
+}
+
+.footnote-item {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-left: 3px solid var(--bg-primary);
+    transition: all 0.3s ease;
+}
+
+.footnote-item:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: translateX(5px);
+}
+
+.footnote-number {
+    font-family: monospace;
+    font-size: 0.9rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.footnote-content {
+    flex: 1;
+}
+
+/* أنماط البحث */
+.search-results .result-item {
+    background-color: var(--card-bg);
+    border-left: 4px solid var(--bg-primary);
+    transition: all 0.3s ease;
+}
+
+.search-results .result-item:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.search-results mark {
+    background-color: #ffc107;
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+/* زر التبديل */
+.toggle-footnotes {
+    transition: all 0.3s ease;
+}
+
+.toggle-footnotes:hover {
+    transform: translateY(-2px);
+}
+
+/* أنماط التحميل */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* تحسينات للوضع الداكن */
+.dark-mode .nahj-section {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .sermon-header {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
+.dark-mode .section-text .footnote-ref:hover {
+    background-color: var(--bg-primary);
+    color: white;
+}
+
+.dark-mode .footnote-item {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
+.dark-mode .search-results .result-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .search-results mark {
+    background-color: #d4a017;
+    color: #333;
+}
+
+/* الرسوم المتحركة */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تحسينات للجوال */
+@media (max-width: 768px) {
+    .nahj-section {
+        padding: 1rem;
+    }
+    
+    .section-text {
+        font-size: 1rem;
+    }
+    
+    .footnote-item {
+        padding: 0.75rem;
+    }
+}
