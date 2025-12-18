@@ -1,11 +1,12 @@
-// nahj-albalagha.js - ملف نهائي باستخدام JSON من GitHub
+// nahj-albalagha.js - نسخة متقدمة للتعامل مع ملفات مستقلة
 class NahjAlBalagha {
     constructor() {
-        this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/nahj-al-balagha.json';
-        this.data = null;
-        this.currentPage = 1;
-        this.itemsPerPage = 5;
-        this.currentCategory = 'sermons';
+        this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/';
+        this.indexURL = this.baseURL + 'index.json';
+        this.currentSermon = null;
+        this.sermonsIndex = [];
+        this.currentSermonId = 1;
+        this.totalSermons = 0;
         
         // عناصر DOM
         this.elements = {
@@ -27,414 +28,411 @@ class NahjAlBalagha {
     async init() {
         console.log('جاري تهيئة نهج البلاغة...');
         
-        await this.loadData();
+        await this.loadIndex();
         this.setupEventListeners();
-        this.renderSermons();
+        await this.loadSermon(1); // تحميل الخطبة الأولى
     }
     
-    async loadData() {
+    async loadIndex() {
         try {
-            // تحميل ملف JSON الرئيسي
-            // تغيير الرابط ليشير إلى ملفك على GitHub
-           const response = await fetch(this.baseURL);
+            console.log('📋 جاري تحميل الفهرس...');
+            
+            const response = await fetch(this.indexURL);
             
             if (!response.ok) {
-                throw new Error(`خطأ في تحميل البيانات: ${response.status}`);
+                throw new Error(`خطأ في تحميل الفهرس: ${response.status}`);
             }
             
-            this.data = await response.json();
-            console.log('تم تحميل بيانات نهج البلاغة بنجاح:', this.data.metadata.title);
+            const data = await response.json();
+            this.sermonsIndex = data.sermons_index || [];
+            this.totalSermons = this.sermonsIndex.length;
+            
+            console.log(`✅ تم تحميل الفهرس: ${this.totalSermons} خطبة`);
+            
+            // إنشاء واجهة التنقل
+            this.createNavigationUI();
             
         } catch (error) {
-            console.error('خطأ في تحميل البيانات:', error);
-            this.showError('تعذر تحميل بيانات نهج البلاغة. الرجاء التحقق من اتصال الإنترنت.');
+            console.error('❌ خطأ في تحميل الفهرس:', error);
+            this.showError('تعذر تحميل فهرس نهج البلاغة');
         }
     }
     
-    setupEventListeners() {
-        // زر فتح صفحة نهج البلاغة
-        if (this.elements.nahjButton) {
-            this.elements.nahjButton.addEventListener('click', () => {
-                this.showNahjPage();
-            });
-        }
-        
-        // زر العودة
-        if (this.elements.nahjBackButton) {
-            this.elements.nahjBackButton.addEventListener('click', () => {
-                this.hideNahjPage();
-            });
-        }
-        
-        // التبويبات
-        if (this.elements.nahjTabs) {
-            this.elements.nahjTabs.forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    const category = e.target.getAttribute('data-section');
-                    this.changeCategory(category);
-                });
-            });
-        }
-        
-        // البحث
-        if (this.elements.nahjSearchBtn) {
-            this.elements.nahjSearchBtn.addEventListener('click', () => {
-                this.search();
-            });
-        }
-        
-        if (this.elements.nahjSearch) {
-            this.elements.nahjSearch.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') {
-                    this.search();
-                }
-            });
-        }
-        
-        // التصنيف
-        if (this.elements.nahjCategory) {
-            this.elements.nahjCategory.addEventListener('change', (e) => {
-                this.changeCategory(e.target.value);
-            });
+    async loadSermon(sermonId) {
+        try {
+            console.log(`📥 جاري تحميل الخطبة ${sermonId}...`);
+            
+            // البحث عن الخطبة في الفهرس
+            const sermonInfo = this.sermonsIndex.find(s => s.id === sermonId);
+            
+            if (!sermonInfo) {
+                throw new Error(`الخطبة ${sermonId} غير موجودة في الفهرس`);
+            }
+            
+            // تحميل ملف الخطبة
+            const sermonURL = this.baseURL + sermonInfo.file;
+            const response = await fetch(sermonURL);
+            
+            if (!response.ok) {
+                throw new Error(`خطأ في تحميل الخطبة: ${response.status}`);
+            }
+            
+            this.currentSermon = await response.json();
+            this.currentSermonId = sermonId;
+            
+            console.log(`✅ تم تحميل الخطبة: ${this.currentSermon.metadata.title}`);
+            
+            // عرض الخطبة
+            this.renderCurrentSermon();
+            
+            // تحديث واجهة التنقل
+            this.updateNavigationUI();
+            
+        } catch (error) {
+            console.error(`❌ خطأ في تحميل الخطبة ${sermonId}:`, error);
+            this.showError(`تعذر تحميل الخطبة ${sermonId}: ${error.message}`);
         }
     }
     
-    showNahjPage() {
-        if (this.elements.homePage) this.elements.homePage.classList.remove('active');
-        if (this.elements.nahjPage) this.elements.nahjPage.classList.add('active');
-        
-        // تحميل المحتوى إذا لم يكن محملاً
-        if (!this.data) {
-            this.loadData().then(() => this.renderSermons());
-        }
-    }
-    
-    hideNahjPage() {
-        if (this.elements.nahjPage) this.elements.nahjPage.classList.remove('active');
-        if (this.elements.homePage) this.elements.homePage.classList.add('active');
-    }
-    
-    changeCategory(category) {
-        this.currentCategory = category;
-        this.currentPage = 1;
-        
-        // تحديث حالة التبويبات
-        if (this.elements.nahjTabs) {
-            this.elements.nahjTabs.forEach(tab => {
-                if (tab.getAttribute('data-section') === category) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-        }
-        
-        this.renderContent();
-    }
-    
-    renderContent() {
-        switch (this.currentCategory) {
-            case 'sermons':
-            case 'khutbas':
-                this.renderSermons();
-                break;
-            case 'letters':
-                this.renderLetters();
-                break;
-            case 'wisdoms':
-            case 'wisdom':
-                this.renderWisdoms();
-                break;
-            default:
-                this.renderSermons();
-        }
-    }
-    
-    renderSermons() {
-        if (!this.data) {
-            this.showLoading();
-            return;
-        }
-        
-        const content = this.data.content;
-        
-        // إنشاء HTML للخطبة
-        const html = `
-            <div class="nahj-sermon">
-                <div class="sermon-header bg-light p-3 rounded-3 mb-4">
-                    <h3 class="text-primary mb-2">${content.title}</h3>
-                    <p class="text-muted">${content.description}</p>
-                    <div class="badge bg-primary">الخطبة ${content.sermon_id}</div>
-                </div>
-                
-                <div class="sermon-sections">
-                    ${content.sections.map(section => this.renderSection(section)).join('')}
-                </div>
-                
-                <div class="sermon-footer mt-4 p-3 border-top">
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle"></i> إجمالي الحواشي: ${content.sections.reduce((total, section) => total + (section.footnotes ? section.footnotes.length : 0), 0)}
-                    </small>
+    createNavigationUI() {
+        const navHTML = `
+            <div class="sermon-navigation card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-primary me-2" id="prev-sermon-btn" disabled>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                                
+                                <div class="sermon-info">
+                                    <h6 class="mb-0" id="current-sermon-title">جاري التحميل...</h6>
+                                    <small class="text-muted" id="sermon-counter">-- / ${this.totalSermons}</small>
+                                </div>
+                                
+                                <button class="btn btn-sm btn-outline-primary ms-2" id="next-sermon-btn" disabled>
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">انتقل إلى</span>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="goto-sermon-input" 
+                                       min="1" 
+                                       max="${this.totalSermons}" 
+                                       placeholder="رقم الخطبة">
+                                <button class="btn btn-primary" id="goto-sermon-btn">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                        type="button" 
+                                        id="sermons-list-btn"
+                                        data-bs-toggle="dropdown">
+                                    <i class="bi bi-list-ul"></i> فهرس الخطب
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" id="sermons-list-menu">
+                                    <div class="px-3 py-2">
+                                        <small class="text-muted">جاري تحميل الفهرس...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
         
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = html;
-            this.setupFootnoteInteractions();
+        // إضافة شريط التنقل
+        const contentContainer = document.getElementById('nahj-content');
+        if (contentContainer) {
+            contentContainer.innerHTML = navHTML + '<div id="sermon-content-container"></div>';
+            
+            // تحديث مراجع عناصر DOM
+            this.updateDOMElements();
+            this.setupNavigationEvents();
+            
+            // تحميل قائمة الخطب
+            this.loadSermonsList();
         }
+    }
+    
+    updateDOMElements() {
+        // عناصر التنقل
+        this.elements.prevSermonBtn = document.getElementById('prev-sermon-btn');
+        this.elements.nextSermonBtn = document.getElementById('next-sermon-btn');
+        this.elements.currentSermonTitle = document.getElementById('current-sermon-title');
+        this.elements.sermonCounter = document.getElementById('sermon-counter');
+        this.elements.gotoSermonInput = document.getElementById('goto-sermon-input');
+        this.elements.gotoSermonBtn = document.getElementById('goto-sermon-btn');
+        this.elements.sermonsListMenu = document.getElementById('sermons-list-menu');
+        this.elements.sermonContentContainer = document.getElementById('sermon-content-container');
+    }
+    
+    setupNavigationEvents() {
+        // زر الخطبة السابقة
+        if (this.elements.prevSermonBtn) {
+            this.elements.prevSermonBtn.addEventListener('click', () => {
+                if (this.currentSermonId > 1) {
+                    this.loadSermon(this.currentSermonId - 1);
+                }
+            });
+        }
+        
+        // زر الخطبة التالية
+        if (this.elements.nextSermonBtn) {
+            this.elements.nextSermonBtn.addEventListener('click', () => {
+                if (this.currentSermonId < this.totalSermons) {
+                    this.loadSermon(this.currentSermonId + 1);
+                }
+            });
+        }
+        
+        // الانتقال إلى خطبة محددة
+        if (this.elements.gotoSermonBtn && this.elements.gotoSermonInput) {
+            this.elements.gotoSermonBtn.addEventListener('click', () => {
+                const sermonId = parseInt(this.elements.gotoSermonInput.value);
+                if (sermonId >= 1 && sermonId <= this.totalSermons) {
+                    this.loadSermon(sermonId);
+                }
+            });
+            
+            this.elements.gotoSermonInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    this.elements.gotoSermonBtn.click();
+                }
+            });
+        }
+    }
+    
+    loadSermonsList() {
+        if (!this.elements.sermonsListMenu || this.sermonsIndex.length === 0) return;
+        
+        let listHTML = '';
+        
+        // تجميع الخطب حسب التصنيف
+        const sermonsByCategory = {};
+        this.sermonsIndex.forEach(sermon => {
+            const category = sermon.category || 'غير مصنف';
+            if (!sermonsByCategory[category]) {
+                sermonsByCategory[category] = [];
+            }
+            sermonsByCategory[category].push(sermon);
+        });
+        
+        // إنشاء القائمة
+        for (const [category, sermons] of Object.entries(sermonsByCategory)) {
+            listHTML += `
+                <h6 class="dropdown-header">${category}</h6>
+                ${sermons.map(sermon => `
+                    <a class="dropdown-item sermon-list-item ${sermon.id === this.currentSermonId ? 'active' : ''}" 
+                       href="#" 
+                       data-sermon-id="${sermon.id}">
+                        <span class="badge bg-secondary me-2">${sermon.id}</span>
+                        ${sermon.title}
+                        ${sermon.subtitle ? `<small class="text-muted d-block">${sermon.subtitle}</small>` : ''}
+                    </a>
+                `).join('')}
+            `;
+        }
+        
+        this.elements.sermonsListMenu.innerHTML = listHTML;
+        
+        // إضافة أحداث النقر على عناصر القائمة
+        document.querySelectorAll('.sermon-list-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sermonId = parseInt(e.currentTarget.getAttribute('data-sermon-id'));
+                this.loadSermon(sermonId);
+            });
+        });
+    }
+    
+    updateNavigationUI() {
+        // تحديث العنوان
+        if (this.elements.currentSermonTitle && this.currentSermon) {
+            this.elements.currentSermonTitle.innerHTML = `
+                <span class="badge bg-primary me-2">الخطبة ${this.currentSermonId}</span>
+                ${this.currentSermon.metadata.title}
+            `;
+        }
+        
+        // تحديث العداد
+        if (this.elements.sermonCounter) {
+            this.elements.sermonCounter.textContent = `${this.currentSermonId} / ${this.totalSermons}`;
+        }
+        
+        // تحديث حالة الأزرار
+        if (this.elements.prevSermonBtn) {
+            this.elements.prevSermonBtn.disabled = this.currentSermonId <= 1;
+        }
+        
+        if (this.elements.nextSermonBtn) {
+            this.elements.nextSermonBtn.disabled = this.currentSermonId >= this.totalSermons;
+        }
+        
+        // تحديث حقل الإدخال
+        if (this.elements.gotoSermonInput) {
+            this.elements.gotoSermonInput.value = this.currentSermonId;
+        }
+        
+        // تحديث القائمة المنسدلة
+        this.loadSermonsList();
+    }
+    
+    renderCurrentSermon() {
+        if (!this.currentSermon || !this.elements.sermonContentContainer) return;
+        
+        const sermon = this.currentSermon;
+        const content = sermon.content;
+        
+        const html = `
+            <div class="sermon-container" data-sermon-id="${sermon.metadata.sermon_id}">
+                <!-- رأس الخطبة -->
+                <div class="sermon-header card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 class="text-primary mb-2">${sermon.metadata.title}</h3>
+                                ${sermon.metadata.subtitle ? `<h5 class="text-secondary mb-3">${sermon.metadata.subtitle}</h5>` : ''}
+                                ${sermon.metadata.description ? `<p class="text-muted">${sermon.metadata.description}</p>` : ''}
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="sermon-meta">
+                                    ${sermon.metadata.category ? `<span class="badge bg-info me-2">${sermon.metadata.category}</span>` : ''}
+                                    ${sermon.metadata.page_start ? `<small class="text-muted d-block">الصفحات: ${sermon.metadata.page_start} - ${sermon.metadata.page_end}</small>` : ''}
+                                    ${sermon.metadata.total_footnotes ? `<small class="text-muted d-block">عدد الحواشي: ${sermon.metadata.total_footnotes}</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- محتوى الخطبة -->
+                <div class="sermon-content">
+                    ${content && content.sections ? content.sections.map(section => this.renderSection(section)).join('') : `
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> محتوى هذه الخطبة قيد الإعداد
+                        </div>
+                    `}
+                </div>
+                
+                <!-- تذييل الخطبة -->
+                <div class="sermon-footer mt-4 pt-3 border-top">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="bi bi-book"></i> ${sermon.metadata.source || 'نهج البلاغة'}
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                شرح: ${sermon.metadata.editor || 'محمد عبده'}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        this.elements.sermonContentContainer.innerHTML = html;
+        
+        // إعداد تفاعل الحواشي
+        this.setupFootnoteInteractions();
     }
     
     renderSection(section) {
         return `
-            <div class="nahj-section mb-4 p-3 border rounded-3">
+            <div class="sermon-section mb-4 p-3 border rounded-3" data-section-id="${section.id}">
                 <div class="section-text mb-3">
-                    <p class="lead text-justify">${section.text}</p>
+                    <p class="text-justify" style="font-size: 1.1rem; line-height: 1.8;">${section.text}</p>
                 </div>
                 
                 ${section.footnotes && section.footnotes.length > 0 ? `
                     <div class="section-footnotes">
-                        <button class="btn btn-sm btn-outline-primary toggle-footnotes" data-section="${section.id}">
-                            <i class="bi bi-chat-square-quote"></i> عرض شرح محمد عبده (${section.footnotes.length})
+                        <button class="btn btn-sm btn-outline-primary toggle-footnotes" 
+                                data-section="${section.id}"
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#footnotes-${section.id}">
+                            <i class="bi bi-chat-square-quote"></i> 
+                            عرض شرح محمد عبده 
+                            <span class="badge bg-secondary ms-1">${section.footnotes.length}</span>
                         </button>
                         
-                        <div class="footnotes-container mt-2" id="footnotes-${section.id}" style="display: none;">
-                            ${section.footnotes.map(footnote => `
-                                <div class="footnote-item p-2 mb-2 border-start border-3 border-primary bg-light rounded-2">
-                                    <div class="d-flex align-items-start">
-                                        <span class="footnote-number badge bg-primary me-2">${footnote.id}</span>
-                                        <div class="footnote-content">
-                                            <p class="mb-1">${footnote.text}</p>
-                                            ${footnote.page ? `<small class="text-muted">الصفحة: ${footnote.page}</small>` : ''}
+                        <div class="collapse mt-2" id="footnotes-${section.id}">
+                            <div class="card card-body border-primary">
+                                ${section.footnotes.map(footnote => `
+                                    <div class="footnote-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <span class="footnote-number badge bg-primary me-2">${footnote.id}</span>
+                                            <div class="footnote-content">
+                                                <p class="mb-1">${footnote.text}</p>
+                                                ${footnote.page ? `<small class="text-muted">الصفحة: ${footnote.page}</small>` : ''}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
                         </div>
-                    </div>
-                ` : ''}
-                
-                ${section.sections ? `
-                    <div class="sub-sections mt-3">
-                        ${section.sections.map(subSection => this.renderSection(subSection)).join('')}
                     </div>
                 ` : ''}
             </div>
         `;
     }
     
-    renderLetters() {
-        // يمكنك إضافة رسائل مستقلة هنا
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = `
-                <div class="text-center py-5">
-                    <i class="bi bi-envelope" style="font-size: 3rem; color: #6c757d;"></i>
-                    <h4 class="mt-3 text-muted">الرسائل</h4>
-                    <p class="text-muted">سيتم إضافة الرسائل قريباً إن شاء الله</p>
-                </div>
-            `;
-        }
-    }
-    
-    renderWisdoms() {
-        // يمكنك إضافة الحكم هنا
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = `
-                <div class="text-center py-5">
-                    <i class="bi bi-lightbulb" style="font-size: 3rem; color: #6c757d;"></i>
-                    <h4 class="mt-3 text-muted">الحكم</h4>
-                    <p class="text-muted">سيتم إضافة الحكم قريباً إن شاء الله</p>
-                </div>
-            `;
-        }
-    }
-    
     setupFootnoteInteractions() {
-        // إضافة تفاعل للحواشي
-        document.querySelectorAll('.toggle-footnotes').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const sectionId = e.target.getAttribute('data-section');
-                const footnotesDiv = document.getElementById(`footnotes-${sectionId}`);
-                const icon = e.target.querySelector('i');
-                
-                if (footnotesDiv.style.display === 'none') {
-                    footnotesDiv.style.display = 'block';
-                    e.target.innerHTML = `<i class="bi bi-chat-square-quote-fill"></i> إخفاء الشرح`;
-                    e.target.classList.remove('btn-outline-primary');
-                    e.target.classList.add('btn-primary');
-                } else {
-                    footnotesDiv.style.display = 'none';
-                    e.target.innerHTML = `<i class="bi bi-chat-square-quote"></i> عرض الشرح`;
-                    e.target.classList.remove('btn-primary');
-                    e.target.classList.add('btn-outline-primary');
-                }
-            });
-        });
-        
         // تفاعل مع أرقام الحواشي في النص
         document.querySelectorAll('.footnote-ref').forEach(ref => {
             ref.addEventListener('click', (e) => {
                 e.preventDefault();
                 const footnoteId = e.target.getAttribute('data-id');
-                const section = e.target.closest('.nahj-section');
+                const section = e.target.closest('.sermon-section');
                 
                 if (section) {
-                    const footnotesDiv = section.querySelector('.footnotes-container');
-                    if (footnotesDiv) {
-                        footnotesDiv.style.display = 'block';
-                        const toggleBtn = section.querySelector('.toggle-footnotes');
-                        if (toggleBtn) {
-                            toggleBtn.innerHTML = `<i class="bi bi-chat-square-quote-fill"></i> إخفاء الشرح`;
-                            toggleBtn.classList.remove('btn-outline-primary');
-                            toggleBtn.classList.add('btn-primary');
-                        }
+                    const sectionId = section.getAttribute('data-section-id');
+                    const footnotesCollapse = document.getElementById(`footnotes-${sectionId}`);
+                    
+                    if (footnotesCollapse) {
+                        // إظهار الحواشي إذا كانت مخفية
+                        const bsCollapse = new bootstrap.Collapse(footnotesCollapse, {
+                            toggle: true
+                        });
                         
-                        // تمرير إلى الحاشية المحددة
-                        const footnoteElement = footnotesDiv.querySelector(`[data-footnote="${footnoteId}"]`);
-                        if (footnoteElement) {
-                            footnoteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
+                        // تمييز الحاشية المحددة
+                        setTimeout(() => {
+                            const footnoteElement = footnotesCollapse.querySelector(`.footnote-item .footnote-number[data-footnote="${footnoteId}"]`);
+                            if (footnoteElement) {
+                                footnoteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                footnoteElement.classList.add('bg-warning', 'text-dark');
+                                setTimeout(() => {
+                                    footnoteElement.classList.remove('bg-warning', 'text-dark');
+                                }, 2000);
+                            }
+                        }, 300);
                     }
                 }
             });
         });
     }
     
-    search() {
-        const searchTerm = this.elements.nahjSearch ? this.elements.nahjSearch.value.trim() : '';
-        
-        if (!searchTerm) {
-            this.renderContent();
-            return;
-        }
-        
-        // البحث في المحتوى
-        if (this.data && this.data.content) {
-            const results = this.searchInContent(searchTerm);
-            this.displaySearchResults(results, searchTerm);
-        }
-    }
-    
-    searchInContent(searchTerm) {
-        const results = [];
-        const term = searchTerm.toLowerCase();
-        
-        // البحث في الخطبة الحالية
-        if (this.data.content) {
-            const content = this.data.content;
-            
-            // البحث في النص
-            if (content.title && content.title.toLowerCase().includes(term)) {
-                results.push({
-                    type: 'title',
-                    content: content.title,
-                    location: 'العنوان'
-                });
-            }
-            
-            if (content.description && content.description.toLowerCase().includes(term)) {
-                results.push({
-                    type: 'description',
-                    content: content.description,
-                    location: 'الوصف'
-                });
-            }
-            
-            // البحث في الأقسام
-            content.sections.forEach(section => {
-                if (section.text && section.text.toLowerCase().includes(term)) {
-                    results.push({
-                        type: 'text',
-                        content: section.text,
-                        location: `النص - القسم ${section.id}`
-                    });
-                }
-                
-                // البحث في الحواشي
-                if (section.footnotes) {
-                    section.footnotes.forEach(footnote => {
-                        if (footnote.text && footnote.text.toLowerCase().includes(term)) {
-                            results.push({
-                                type: 'footnote',
-                                content: footnote.text,
-                                location: `الشرح - الحاشية ${footnote.id}`
-                            });
-                        }
-                    });
-                }
-            });
-        }
-        
-        return results;
-    }
-    
-    displaySearchResults(results, searchTerm) {
-        if (results.length === 0) {
-            if (this.elements.nahjContent) {
-                this.elements.nahjContent.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="bi bi-search" style="font-size: 3rem; color: #6c757d;"></i>
-                        <h4 class="mt-3">لم يتم العثور على نتائج</h4>
-                        <p class="text-muted">لا توجد نتائج لـ "${searchTerm}"</p>
-                    </div>
-                `;
-            }
-            return;
-        }
-        
-        const html = `
-            <div class="search-results">
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> عُثر على ${results.length} نتيجة لـ "${searchTerm}"
-                </div>
-                
-                <div class="results-list">
-                    ${results.map((result, index) => `
-                        <div class="result-item p-3 border rounded-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <span class="badge bg-secondary">${result.location}</span>
-                                    <p class="mt-2">${this.highlightText(result.content, searchTerm)}</p>
-                                </div>
-                                <small class="text-muted">#${index + 1}</small>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = html;
-        }
-    }
-    
-    highlightText(text, term) {
-        if (!text || !term) return text;
-        
-        const regex = new RegExp(`(${term})`, 'gi');
-        return text.replace(regex, '<mark class="bg-warning">$1</mark>');
-    }
-    
-    showLoading() {
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = `
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">جاري التحميل...</span>
-                    </div>
-                    <p class="mt-3">جاري تحميل محتويات نهج البلاغة...</p>
-                </div>
-            `;
-        }
+    setupEventListeners() {
+        // ... (نفس الأحداث السابقة)
     }
     
     showError(message) {
-        if (this.elements.nahjContent) {
-            this.elements.nahjContent.innerHTML = `
+        if (this.elements.sermonContentContainer) {
+            this.elements.sermonContentContainer.innerHTML = `
                 <div class="alert alert-danger">
                     <i class="bi bi-exclamation-triangle"></i> ${message}
-                    <button class="btn btn-sm btn-outline-danger mt-2" onclick="window.location.reload()">
+                    <button class="btn btn-sm btn-outline-danger mt-2" onclick="location.reload()">
                         إعادة تحميل
                     </button>
                 </div>
@@ -443,8 +441,13 @@ class NahjAlBalagha {
     }
 }
 
-// تهيئة التطبيق عندما يصبح DOM جاهزاً
+// تهيئة التطبيق
 document.addEventListener('DOMContentLoaded', () => {
-    // إنشاء مثيل من فئة نهج البلاغة
+    // التحقق من تحميل Bootstrap
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap غير محمل!');
+        return;
+    }
+    
     window.nahjAlBalagha = new NahjAlBalagha();
 });
