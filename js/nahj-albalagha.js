@@ -1,7 +1,7 @@
 // nahj-albalagha.js - نسخة متقدمة للتعامل مع ملفات مستقلة
 class NahjAlBalagha {
     constructor() {
-        this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/sermons';
+        this.baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/';
         this.indexURL = this.baseURL + 'index.json';
         this.currentSermon = null;
         this.sermonsIndex = [];
