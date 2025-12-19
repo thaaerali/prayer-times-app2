@@ -456,4 +456,16 @@ class NahjSermons {
 // تصدير الكلاس للاستخدام
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = NahjSermons;
+
 }
+// nahj-sermons.js - أضف في النهاية:
+// تصدير الكلاس للاستخدام العالمي
+window.NahjSermons = NahjSermons;
+
+// أو يمكنك تحميله تلقائياً
+document.addEventListener('DOMContentLoaded', () => {
+    // يمكنك هنا تجربة تحميل خطبة بسيطة
+    if (document.getElementById('nahj-button')) {
+        console.log('✅ نهج البلاغة جاهز للاستخدام');
+    }
+});
