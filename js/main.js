@@ -1,4 +1,4 @@
-// main.js - النسخة المعدلة مع إضافة قسم الحكم
+// main.js - النسخة المعدلة مع تصحيح الخطأ
 class NahjAlBalaghaApp {
     constructor() {
         console.log('🔍 التحقق من توفر الكلاسات:');
@@ -30,7 +30,10 @@ class NahjAlBalaghaApp {
     
     async init() {
         try {
-            if (this.isInitialized) return;
+            if (this.isInitialized) {
+                console.log('⚠️ التطبيق مهيئ بالفعل');
+                return;
+            }
             
             console.log('🔄 جاري تهيئة نهج البلاغة...');
             
@@ -150,7 +153,7 @@ class NahjAlBalaghaApp {
                                         <div class="card-body">
                                             <h5 class="card-title">الرسالة الأولى</h5>
                                             <p class="card-text">رسالة إلى أهل الكوفة عند مسيره من المدينة إلى البصرة</p>
-                                            <button class="btn btn-primary" onclick="nahjApp.loadLetter(1)">
+                                            <button class="btn btn-primary" onclick="loadLetter(1)">
                                                 قراءة الرسالة
                                             </button>
                                         </div>
@@ -159,12 +162,12 @@ class NahjAlBalaghaApp {
                                         <div class="card-body">
                                             <h5 class="card-title">العهد إلى مالك الأشتر</h5>
                                             <p class="card-text">أشهر عهد في التاريخ الإسلامي عند توليته مصر</p>
-                                            <button class="btn btn-primary" onclick="nahjApp.loadLetter(4)">
+                                            <button class="btn btn-primary" onclick="loadLetter(4)">
                                                 قراءة العهد
                                             </button>
                                         </div>
                                     </div>
-                                    <button class="btn btn-outline-primary w-100 mt-3" onclick="nahjApp.showLettersList()">
+                                    <button class="btn btn-outline-primary w-100 mt-3" onclick="showLettersList()">
                                         <i class="bi bi-list-ul"></i> عرض جميع الرسائل
                                     </button>
                                 </div>
@@ -214,10 +217,10 @@ class NahjAlBalaghaApp {
                             
                             <!-- أزرار الإجراءات -->
                             <div class="d-grid gap-2 d-md-block">
-                                <button class="btn btn-success me-md-2 mb-2" onclick="nahjApp.loadRandomWisdom()">
+                                <button class="btn btn-success me-md-2 mb-2" onclick="loadRandomWisdom()">
                                     <i class="bi bi-shuffle"></i> حكمة عشوائية
                                 </button>
-                                <button class="btn btn-outline-success mb-2" onclick="nahjApp.loadWisdom(1)">
+                                <button class="btn btn-outline-success mb-2" onclick="loadWisdom(1)">
                                     <i class="bi bi-arrow-right"></i> بدء القراءة
                                 </button>
                             </div>
@@ -249,7 +252,7 @@ class NahjAlBalaghaApp {
                 document.getElementById('nahj-content').innerHTML = `
                     <div class="letter-full-view">
                         <!-- زر العودة للقائمة -->
-                        <button class="btn btn-outline-secondary mb-3" onclick="nahjApp.showView('letters')">
+                        <button class="btn btn-outline-secondary mb-3" onclick="window._nahjAppInstance.showView('letters')">
                             <i class="bi bi-arrow-right"></i> العودة للقائمة
                         </button>
                         
@@ -305,7 +308,7 @@ class NahjAlBalaghaApp {
         
         let html = `
             <div class="letters-list">
-                <button class="btn btn-outline-secondary mb-3" onclick="nahjApp.showView('letters')">
+                <button class="btn btn-outline-secondary mb-3" onclick="window._nahjAppInstance.showView('letters')">
                     <i class="bi bi-arrow-right"></i> العودة
                 </button>
                 
@@ -334,7 +337,7 @@ class NahjAlBalaghaApp {
                                 </h5>
                                 ${letter.subtitle ? `<p class="card-text text-muted small">${letter.subtitle}</p>` : ''}
                                 ${letter.category ? `<span class="badge bg-info mb-2">${letter.category}</span>` : ''}
-                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="nahjApp.loadLetter(${letter.id})">
+                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="window._nahjAppInstance.loadLetter(${letter.id})">
                                     قراءة الرسالة
                                 </button>
                             </div>
@@ -367,7 +370,7 @@ class NahjAlBalaghaApp {
                     <h4 class="text-secondary">القسم غير متوفر</h4>
                     <p class="text-muted">قسم ${sectionNames[section]} غير متاح حالياً</p>
                     <p class="small text-muted">تأكد من تحميل ملف ${sectionNames[section]}.js</p>
-                    <button class="btn btn-primary mt-3" onclick="nahjApp.showView('sermons')">
+                    <button class="btn btn-primary mt-3" onclick="window._nahjAppInstance.showView('sermons')">
                         العودة للخطب
                     </button>
                 </div>
@@ -385,6 +388,35 @@ class NahjAlBalaghaApp {
             `;
         }
     }
+}
+
+// الدوال المساعدة للاستخدام من HTML
+function loadLetter(letterId) {
+    if (window._nahjAppInstance && window._nahjAppInstance.loadLetter) {
+        return window._nahjAppInstance.loadLetter(letterId);
+    }
+    alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+}
+
+function loadWisdom(wisdomId) {
+    if (window._nahjAppInstance && window._nahjAppInstance.loadWisdom) {
+        return window._nahjAppInstance.loadWisdom(wisdomId);
+    }
+    alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+}
+
+function loadRandomWisdom() {
+    if (window._nahjAppInstance && window._nahjAppInstance.loadRandomWisdom) {
+        return window._nahjAppInstance.loadRandomWisdom();
+    }
+    alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+}
+
+function showLettersList() {
+    if (window._nahjAppInstance && window._nahjAppInstance.showLettersList) {
+        return window._nahjAppInstance.showLettersList();
+    }
+    alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
 }
 
 // بدء التطبيق بعد تحميل DOM
@@ -407,13 +439,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Bootstrap غير محمل!');
             }
             
-            // إنشاء التطبيق إذا لم يكن موجوداً
-            if (!window.nahjApp) {
-                window.nahjApp = new NahjAlBalaghaApp();
+            // حذف النسخة القديمة إن وجدت
+            if (window._nahjAppInstance) {
+                console.log('🔄 إعادة تهيئة التطبيق...');
             }
             
+            // إنشاء نسخة جديدة من التطبيق
+            const app = new NahjAlBalaghaApp();
+            
+            // حفظ النسخة في متغير مختلف لتجنب التعارض
+            window._nahjAppInstance = app;
+            
             // تهيئة التطبيق
-            await window.nahjApp.init();
+            await app.init();
             
             // تبديل الصفحات
             document.getElementById('home-page').classList.remove('active');
@@ -462,36 +500,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// جعل الدوال متاحة عالمياً للاستخدام من HTML
+// الاحتفاظ بالكائن العالمي للتوافق مع الكود القديم
 window.nahjApp = {
     loadLetter: function(letterId) {
-        if (window.nahjApp && window.nahjApp.loadLetter) {
-            return window.nahjApp.loadLetter(letterId);
+        if (window._nahjAppInstance && window._nahjAppInstance.loadLetter) {
+            return window._nahjAppInstance.loadLetter(letterId);
         }
-        alert('تطبيق نهج البلاغة غير مهيئ بعد');
+        alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+        return Promise.resolve();
     },
     loadWisdom: function(wisdomId) {
-        if (window.nahjApp && window.nahjApp.loadWisdom) {
-            return window.nahjApp.loadWisdom(wisdomId);
+        if (window._nahjAppInstance && window._nahjAppInstance.loadWisdom) {
+            return window._nahjAppInstance.loadWisdom(wisdomId);
         }
-        alert('تطبيق نهج البلاغة غير مهيئ بعد');
+        alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+        return Promise.resolve();
     },
     loadRandomWisdom: function() {
-        if (window.nahjApp && window.nahjApp.loadRandomWisdom) {
-            return window.nahjApp.loadRandomWisdom();
+        if (window._nahjAppInstance && window._nahjAppInstance.loadRandomWisdom) {
+            return window._nahjAppInstance.loadRandomWisdom();
         }
-        alert('تطبيق نهج البلاغة غير مهيئ بعد');
+        alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+        return Promise.resolve();
     },
     showView: function(viewType) {
-        if (window.nahjApp && window.nahjApp.showView) {
-            return window.nahjApp.showView(viewType);
+        if (window._nahjAppInstance && window._nahjAppInstance.showView) {
+            return window._nahjAppInstance.showView(viewType);
         }
-        alert('تطبيق نهج البلاغة غير مهيئ بعد');
+        alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
+        return Promise.resolve();
     },
     showLettersList: function() {
-        if (window.nahjApp && window.nahjApp.showLettersList) {
-            return window.nahjApp.showLettersList();
+        if (window._nahjAppInstance && window._nahjAppInstance.showLettersList) {
+            return window._nahjAppInstance.showLettersList();
         }
-        alert('تطبيق نهج البلاغة غير مهيئ بعد');
+        alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
