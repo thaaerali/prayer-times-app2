@@ -118,4 +118,18 @@ class NahjLetters {
 // تصدير الكلاس
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = NahjLetters;
+
 }
+
+
+// تصدير الكلاس للاستخدام العالمي
+if (typeof window !== 'undefined') {
+    window.NahjLetters = NahjLetters;
+    console.log('✅ NahjLetters جاهز للاستخدام');
+}
+
+// أو إذا أردت تشغيل اختبار سريع
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📜 nahj-letters.js تم تحميله');
+    console.log('NahjLetters موجود؟', typeof window.NahjLetters);
+});
