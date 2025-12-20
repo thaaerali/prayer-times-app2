@@ -2,7 +2,7 @@
 class NahjWisdom {
     constructor(baseURL = 'https://raw.githubusercontent.com/thaaerali/nahj-data/main/') {
         this.baseURL = baseURL;
-        this.wisdomIndexURL = this.baseURL + 'wisdom/wisdom-index.json';
+        this.wisdomIndexURL = this.baseURL + 'wisdoms/wisdom-index.json';
         this.currentWisdom = null;
         this.wisdomIndex = [];
         this.currentWisdomId = 1;
@@ -775,4 +775,5 @@ class NahjWisdom {
 if (typeof window !== 'undefined') {
     window.NahjWisdom = NahjWisdom;
     console.log('✅ NahjWisdom جاهز للاستخدام');
+
 }
