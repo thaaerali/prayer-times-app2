@@ -777,3 +777,4 @@ if (typeof window !== 'undefined') {
     console.log('✅ NahjWisdom جاهز للاستخدام');
 
 }
+
