@@ -62,7 +62,7 @@ class NahjWisdom {
             }
             
             const data = await response.json();
-            this.wisdomIndex = data.wisdom_index || [];
+           this.wisdomIndex = data.wisdoms || data.wisdom_index || [];
             this.totalWisdom = this.wisdomIndex.length;
             
             console.log(`✅ تم تحميل فهرس الحكم: ${this.totalWisdom} حكمة`);
@@ -112,47 +112,58 @@ class NahjWisdom {
     }
     
     async loadWisdom(wisdomId) {
-        try {
-            console.log(`📥 جاري تحميل الحكمة ${wisdomId}...`);
-            
-            // البحث عن الحكمة في الفهرس
-            const wisdomInfo = this.wisdomIndex.find(w => w.id === wisdomId);
-            if (!wisdomInfo) {
-                throw new Error(`الحكمة ${wisdomId} غير موجودة في الفهرس`);
-            }
-            
-            // تحميل ملف الحكمة
-            const wisdomURL = this.baseURL + wisdomInfo.file;
-            const response = await fetch(wisdomURL);
-            
-            if (!response.ok) {
-                // إذا لم يكن الملف موجوداً، أنشئ محتوى افتراضياً
-                console.log(`⚠️ ملف الحكمة ${wisdomId} غير موجود، إنشاء محتوى افتراضي...`);
-                this.createDefaultWisdom(wisdomId, wisdomInfo);
-            } else {
-                this.currentWisdom = await response.json();
-            }
-            
-            this.currentWisdomId = wisdomId;
-            
-            console.log(`✅ تم تحميل الحكمة: ${this.currentWisdom.metadata.title}`);
-            
-            // عرض الحكمة
-            this.renderCurrentWisdom();
-            
-            // تحديث واجهة التنقل
-            this.updateNavigationUI();
-            
-            return this.currentWisdom;
-            
-        } catch (error) {
-            console.error(`❌ خطأ في تحميل الحكمة ${wisdomId}:`, error);
-            this.createDefaultWisdom(wisdomId);
-            this.renderCurrentWisdom();
-            this.updateNavigationUI();
-            return this.currentWisdom;
+    try {
+        console.log(`📥 جاري تحميل الحكمة ${wisdomId}...`);
+        
+        // البحث عن الحكمة في الفهرس
+        const wisdomInfo = this.wisdomIndex.find(w => 
+            w.id === wisdomId || 
+            w.id === parseInt(wisdomId) ||
+            (typeof w.id === 'string' && parseInt(w.id) === wisdomId)
+        );
+        
+        // ⚠️ **هذا هو التعديل المهم**: لا ترمي خطأ إذا لم تجد الحكمة
+        if (!wisdomInfo) {
+            console.warn(`⚠️ الحكمة ${wisdomId} غير موجودة في الفهرس، إنشاء معلومات افتراضية`);
+            const defaultInfo = {
+                id: wisdomId,
+                file: `wisdoms/wisdom-${wisdomId.toString().padStart(3, '0')}.json`,
+                title: `الحكمة ${wisdomId}`,
+                category: this.getRandomCategory(),
+                keywords: ['حكمة', 'موعظة'],
+                has_content: false
+            };
+            return await this.loadWisdomFromURL(this.baseURL + defaultInfo.file, wisdomId, defaultInfo);
         }
+        
+        // تحميل ملف الحكمة
+        const wisdomURL = this.baseURL + wisdomInfo.file;
+        const response = await fetch(wisdomURL);
+        
+        if (!response.ok) {
+            console.log(`⚠️ ملف الحكمة ${wisdomId} غير موجود، إنشاء محتوى افتراضي...`);
+            this.createDefaultWisdom(wisdomId, wisdomInfo);
+        } else {
+            const wisdomData = await response.json();
+            // تحويل البنية من sections إلى content
+            this.currentWisdom = this.normalizeWisdomStructure(wisdomData, wisdomId, wisdomInfo);
+        }
+        
+        this.currentWisdomId = wisdomId;
+        console.log(`✅ تم تحميل الحكمة: ${this.currentWisdom.metadata.title}`);
+        
+        this.renderCurrentWisdom();
+        this.updateNavigationUI();
+        return this.currentWisdom;
+        
+    } catch (error) {
+        console.error(`❌ خطأ في تحميل الحكمة ${wisdomId}:`, error);
+        this.createDefaultWisdom(wisdomId);
+        this.renderCurrentWisdom();
+        this.updateNavigationUI();
+        return this.currentWisdom;
     }
+}
     
     createDefaultWisdom(wisdomId, wisdomInfo = null) {
         // إنشاء حكمة افتراضية
@@ -198,7 +209,32 @@ class NahjWisdom {
             }
         };
     }
+    // أضف هذه الدالة بعد createDefaultWisdom()
+normalizeWisdomStructure(wisdomData, wisdomId, wisdomInfo = null) {
+    // إذا كانت البنية الجديدة (مع sections)
+    if (wisdomData.content && Array.isArray(wisdomData.content.sections)) {
+        const firstSection = wisdomData.content.sections[0];
+        return {
+            metadata: wisdomData.metadata || {
+                title: wisdomInfo?.title || `الحكمة ${wisdomId}`,
+                category: wisdomInfo?.category || 'الأخلاق والآداب',
+                source: 'نهج البلاغة',
+                editor: 'الشيخ محمد عبده'
+            },
+            content: {
+                wisdom_id: wisdomId,
+                title: wisdomData.metadata?.work || `الحكمة ${wisdomId}`,
+                text: firstSection.text || '',
+                footnotes: firstSection.footnotes || [],
+                keywords: wisdomData.metadata?.categories || wisdomInfo?.keywords || [],
+                section: 'حكم متنوعة'
+            }
+        };
+    }
     
+    // إذا كانت البنية القديمة (مباشرة)
+    return wisdomData;
+}
     setupContainer(containerId) {
         const container = document.getElementById(containerId);
         if (!container) {
@@ -777,4 +813,5 @@ if (typeof window !== 'undefined') {
     console.log('✅ NahjWisdom جاهز للاستخدام');
 
 }
+
 
