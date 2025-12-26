@@ -23,31 +23,6 @@ body {
     margin: 0;
     padding: 0;
 }
-/* تحسينات الهيدر */
-header .btn-outline-light {
-  border-width: 1px;
-  font-size: 0.875rem; /* نفس حجم خط h5 تقريباً */
-  padding: 0.25rem 0.75rem;
-}
-
-/* تنسيق العناوين */
-h1.h5 {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-/* تحسين التباعد في الهيدر */
-header .d-flex > div {
-  flex: 1;
-}
-
-header .d-flex > div:first-child {
-  text-align: right;
-}
-
-header .d-flex > div:last-child {
-  text-align: left;
-}
 
 .card {
     background-color: var(--card-bg);
@@ -712,5 +687,6 @@ header .d-flex .location-marker {
         padding: 0.75rem;
     }
 }
+
 
 
