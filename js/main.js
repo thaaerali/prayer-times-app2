@@ -257,7 +257,7 @@ class NahjAlBalaghaApp {
                         </button>
                         
                         <!-- عرض الرسالة -->
-                        ${this.letters.renderLetter(letter)}
+                        ${this.renderLetterDirectly(letter)}
                     </div>
                 `;
             }
@@ -537,3 +537,4 @@ window.nahjApp = {
         alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
+
