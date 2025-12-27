@@ -1,6 +1,6 @@
 class NahjLetters {
     // استبدل رابط Netlify بالرابط الفعلي لموقعك
-    constructor(baseURL = 'https://ornate-daifuku-81b21d.netlify.app/nahj-data/') {
+    constructor(baseURL = 'https://shimmering-conkies-412365.netlify.app/nahj-data/') {
         this.baseURL = baseURL;
         this.lettersIndexURL = this.baseURL + 'letters/letters-index.json';
         this.currentLetter = null;
@@ -113,3 +113,4 @@ if (typeof window !== 'undefined') {
     window.NahjLetters = NahjLetters;
     console.log('✅ NahjLetters جاهز للاستخدام مع Netlify');
 }
+
