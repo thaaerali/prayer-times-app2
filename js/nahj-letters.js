@@ -1,6 +1,6 @@
 class NahjLetters {
     // استبدل رابط Netlify بالرابط الفعلي لموقعك
-    constructor(baseURL = 'https://thpryer.netlify.app/nahj-data/') {
+    constructor(baseURL = 'https://thpryermahjp.netlify.app/nahj-data/') {
         this.baseURL = baseURL;
         this.lettersIndexURL = this.baseURL + 'letters/letters-index.json';
         this.currentLetter = null;
@@ -113,5 +113,6 @@ if (typeof window !== 'undefined') {
     window.NahjLetters = NahjLetters;
     console.log('✅ NahjLetters جاهز للاستخدام مع Netlify');
 }
+
 
 
