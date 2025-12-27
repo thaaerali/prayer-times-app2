@@ -240,32 +240,31 @@ class NahjAlBalaghaApp {
         }
     }
     
-    async loadLetter(letterId) {
-        try {
-            if (!this.letters) {
-                throw new Error('قسم الرسائل غير متوفر');
-            }
-            
-            const letter = await this.letters.loadLetter(letterId);
-            if (letter) {
-                // إنشاء واجهة عرض الرسالة
-                document.getElementById('nahj-content').innerHTML = `
-                    <div class="letter-full-view">
-                        <!-- زر العودة للقائمة -->
-                        <button class="btn btn-outline-secondary mb-3" onclick="window._nahjAppInstance.showView('letters')">
-                            <i class="bi bi-arrow-right"></i> العودة للقائمة
-                        </button>
-                        
-                        <!-- عرض الرسالة -->
-                        ${this.renderLetterDirectly(letter)}
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('❌ خطأ في تحميل الرسالة:', error);
-            this.showError('تعذر تحميل الرسالة: ' + error.message);
+   async loadLetter(letterId) {
+    try {
+        if (!this.letters) {
+            throw new Error('قسم الرسائل غير متوفر');
         }
+
+        // تحميل الرسالة
+        await this.letters.loadLetter(letterId);
+
+        // التأكد من وجود الحاوية
+        const contentDiv = document.getElementById('nahj-content');
+        if (!contentDiv) return;
+
+        // إنشاء واجهة الرسائل (إن لم تكن موجودة)
+        this.letters.setupContainer('nahj-content');
+
+        // عرض الرسالة الحالية
+        await this.letters.renderCurrentLetter();
+
+    } catch (error) {
+        console.error('❌ خطأ في تحميل الرسالة:', error);
+        this.showError('تعذر تحميل الرسالة: ' + error.message);
     }
+}
+
     
     async loadWisdom(wisdomId) {
         try {
@@ -537,4 +536,5 @@ window.nahjApp = {
         alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
+
 
