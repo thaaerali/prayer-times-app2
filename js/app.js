@@ -66,46 +66,7 @@ function togglePages(pageName = null) {
         }
     }
 }
-// دالة لجعل العنوان يعمل كزر للعودة
-function makeHeaderClickable() {
-  const settingsHeader = document.getElementById('settings-header');
-  if (settingsHeader) {
-    // جعل العنوان يقبل النقر
-    settingsHeader.style.cursor = 'pointer';
-    
-    // إضافة حدث النقر
-    settingsHeader.addEventListener('click', function(e) {
-      // التأكد أننا ننقر على العنوان وليس على الزر
-      if (e.target.id === 'settings-header' || 
-          e.target.tagName === 'H1' || 
-          e.target.classList.contains('h4') ||
-          e.target.textContent === 'أوقات الصلاة') {
-        
-        console.log('تم النقر على العنوان للعودة للصفحة الرئيسية');
-        togglePages('home');
-      }
-    });
-  }
-}
 
-// وتعديل دالة initSettingsPageEvents:
-function initSettingsPageEvents() {
-  console.log('تهيئة أحداث صفحة الإعدادات...');
-  
-  const settingsPage = document.getElementById('settings-page');
-  if (!settingsPage || !settingsPage.classList.contains('active')) {
-    console.log('صفحة الإعدادات غير نشطة، تأجيل تهيئة الأحداث');
-    return;
-  }
-
-  loadSettings();
-  
-  setTimeout(() => {
-    initAutoSaveEvents();
-    // جعل العنوان قابلاً للنقر
-    makeHeaderClickable();
-  }, 100);
-}
 // دالة لعرض صفحة نهج البلاغة
 function showNahjPage() {
     togglePages('nahj');
@@ -801,4 +762,5 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
