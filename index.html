@@ -280,7 +280,29 @@
                     </div>
                   </div>
                 </div>
-
+<div class="mb-4">
+  <label class="form-label fw-bold">ضبط التاريخ الهجري:</label>
+  <div class="hijri-adjustment-buttons d-flex flex-wrap gap-2">
+    <button class="btn btn-outline-primary btn-sm" onclick="adjustHijriDate(1)">
+      <i class="bi bi-plus-circle"></i> زيادة يوم
+    </button>
+    <button class="btn btn-outline-primary btn-sm" onclick="adjustHijriDate(2)">
+      <i class="bi bi-plus-circle"></i> زيادة يومين
+    </button>
+    <button class="btn btn-outline-warning btn-sm" onclick="adjustHijriDate(-1)">
+      <i class="bi bi-dash-circle"></i> تنقيص يوم
+    </button>
+    <button class="btn btn-outline-warning btn-sm" onclick="adjustHijriDate(-2)">
+      <i class="bi bi-dash-circle"></i> تنقيص يومين
+    </button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="resetHijriAdjustment()">
+      <i class="bi bi-arrow-counterclockwise"></i> إعادة الضبط
+    </button>
+  </div>
+  <div id="hijri-adjustment-status" class="mt-2 small text-muted">
+    الضبط الحالي: <span id="current-adjustment">0</span> يوم
+  </div>
+</div>
                 <!-- تحديد الموقع -->
                 <div class="tab-pane fade" id="v-pills-location" role="tabpanel" aria-labelledby="v-pills-location-tab">
                   <div class="d-flex gap-2 mb-3">
@@ -498,6 +520,7 @@
  
 </body>
 </html>
+
 
 
 
