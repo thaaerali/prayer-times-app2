@@ -162,7 +162,7 @@ class NahjAlBalaghaApp {
                                         <div class="card-body">
                                             <h5 class="card-title">العهد إلى مالك الأشتر</h5>
                                             <p class="card-text">أشهر عهد في التاريخ الإسلامي عند توليته مصر</p>
-                                            <button class="btn btn-primary" onclick="loadLetter(4)">
+                                            <button class="btn btn-primary" onclick="loadLetter(53)">
                                                 قراءة العهد
                                             </button>
                                         </div>
@@ -536,5 +536,6 @@ window.nahjApp = {
         alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
+
 
 
