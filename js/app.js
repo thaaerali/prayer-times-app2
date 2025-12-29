@@ -211,15 +211,7 @@ function displayDate() {
       };
       hijriDate = adjustedDate.toLocaleDateString('ar-IQ', hijriOptions);
       
-      // إضافة مؤشر الضبط إذا كان هناك ضبط
-      if (hijriDateAdjustment !== 0) {
-        const adjustmentSign = hijriDateAdjustment > 0 ? '+' : '';
-        hijriDate += ` (مضبوط ${adjustmentSign}${hijriDateAdjustment})`;
-      }
-    } catch (error) {
-      // إذا فشل استخدام التقويم الهجري، استخدم حساب تقريبي
-      hijriDate = calculateHijriDate(now);
-    }
+     
     
     console.log('التاريخ الميلادي:', gregorianDate);
     console.log('التاريخ الهجري:', hijriDate);
@@ -762,5 +754,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
