@@ -17,20 +17,22 @@ const prayerOrder = ['imsak','fajr', 'sunrise', 'dhuhr', 'asr', 'sunset', 'maghr
 // دالة مساعدة لإرجاع أوقات الصلاة الافتراضية
 function getDefaultPrayerTimes() {
     return {
+        imsak: '4:30',
         fajr: '5:00',
         sunrise: '6:00',
         dhuhr: '12:00',
         asr: '15:00',
         sunset: '18:00',
         maghrib: '18:05',
-        isha: '19:00'
+        isha: '19:00',
+        midnight: '23:30'
     };
 }
 
 // دالة حساب أوقات الصلاة المعدلة
 function getPrayerTimes(lat, lng, date, method) {
     if (typeof PrayTimes === 'undefined') {
-        showError('مكتبة الحساب غير متوفرة');
+        console.error('مكتبة الحساب غير متوفرة');
         return getDefaultPrayerTimes();
     }
 
@@ -50,7 +52,7 @@ function getPrayerTimes(lat, lng, date, method) {
         }
 
         const coordinates = [lat, lng, 0];
-        const times = prayTimes.getTimes(date, coordinates);
+        const times = prayTimes.getTimes(date, coordinates, 3, 'auto', '24h');
 
         // تأكد من أن المغرب بعد الغروب
         if (times.maghrib === times.sunset) {
@@ -67,17 +69,22 @@ function getPrayerTimes(lat, lng, date, method) {
             times.maghrib = `${newHours}:${newMinutes.toString().padStart(2, '0')}`;
         }
 
-        return {
-            imsak: times.imsak,
-            fajr: times.fajr,
-            sunrise: times.sunrise,
-            dhuhr: times.dhuhr,
-            asr: times.asr,
-            sunset: times.sunset,
-            maghrib: times.maghrib,
-            isha: times.isha,
-            midnight: times.midnight
+        // التأكد من أن جميع الأوقات موجودة
+        const result = {
+            imsak: times.imsak || getDefaultPrayerTimes().imsak,
+            fajr: times.fajr || getDefaultPrayerTimes().fajr,
+            sunrise: times.sunrise || getDefaultPrayerTimes().sunrise,
+            dhuhr: times.dhuhr || getDefaultPrayerTimes().dhuhr,
+            asr: times.asr || getDefaultPrayerTimes().asr,
+            sunset: times.sunset || getDefaultPrayerTimes().sunset,
+            maghrib: times.maghrib || getDefaultPrayerTimes().maghrib,
+            isha: times.isha || getDefaultPrayerTimes().isha,
+            midnight: times.midnight || getDefaultPrayerTimes().midnight
         };
+        
+        console.log('أوقات الصلاة المحسوبة:', result);
+        return result;
+        
     } catch (error) {
         console.error('Error calculating prayer times:', error);
         return getDefaultPrayerTimes();
@@ -91,7 +98,32 @@ function convertTimeToMinutes(timeString) {
   return hours * 60 + minutes;
 }
 
+// دالة لتنسيق الوقت (للتوافق)
+function formatTime(time, format) {
+  if (!time || time === '--:--') return '--:--';
+  
+  try {
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    if (format === '24h') {
+      return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
+    }
+    
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    
+    return `${hours}:${minutes.toString().padStart(2,'0')} ${period}`;
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return '--:--';
+  }
+}
 
-
-
-
+// جعل الدوال متاحة عالمياً
+if (typeof window !== 'undefined') {
+  window.getPrayerTimes = getPrayerTimes;
+  window.calculatePrayerTimes = getPrayerTimes;
+  window.convertTimeToMinutes = convertTimeToMinutes;
+  window.formatTime = formatTime;
+  window.prayerNames = prayerNames;
+}
