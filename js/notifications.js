@@ -204,48 +204,45 @@ class NotificationManager {
         }, 300);
     }
     
-    updateSaveStatus() {
-        const statusEl = document.getElementById('auto-save-status');
-        if (!statusEl) return;
-        
-        if (this.isSaving) {
-            statusEl.innerHTML = '<i class="bi bi-hourglass-split text-warning me-2"></i><span class="small">جاري الحفظ...</span>';
-            statusEl.className = 'text-center mt-4 p-3 bg-warning bg-opacity-10 rounded text-warning';
-        } else {
-            statusEl.innerHTML = '<i class="bi bi-check-circle text-success me-2"></i><span class="small">يتم حفظ التغييرات تلقائياً</span>';
-            statusEl.className = 'text-center mt-4 p-3 bg-light rounded';
-        }
+   updateSaveStatus() {
+    const statusEl = document.getElementById('auto-save-status');
+    if (!statusEl) return;
+    
+    if (this.isSaving) {
+        statusEl.innerHTML = '<i class="bi bi-hourglass-split text-warning me-1"></i>';
+        statusEl.className = 'text-center mt-4 small text-warning';
+    } else {
+        statusEl.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>';
+        statusEl.className = 'text-center mt-4 small text-muted';
+    }
+}
+
+showSaveStatus(message, type = 'success') {
+    const statusEl = document.getElementById('auto-save-status');
+    if (!statusEl) return;
+    
+    let icon = 'bi-check-circle';
+    let textClass = 'text-success';
+    
+    if (type === 'error') {
+        icon = 'bi-exclamation-circle';
+        textClass = 'text-danger';
+    } else if (type === 'warning') {
+        icon = 'bi-exclamation-triangle';
+        textClass = 'text-warning';
+    } else if (type === 'info') {
+        icon = 'bi-info-circle';
+        textClass = 'text-info';
     }
     
-    showSaveStatus(message, type = 'success') {
-        const statusEl = document.getElementById('auto-save-status');
-        if (!statusEl) return;
-        
-        let icon = 'bi-check-circle';
-        let bgClass = 'bg-light';
-        let textClass = '';
-        
-        if (type === 'error') {
-            icon = 'bi-exclamation-circle';
-            bgClass = 'bg-danger bg-opacity-10';
-            textClass = 'text-danger';
-        } else if (type === 'warning') {
-            icon = 'bi-exclamation-triangle';
-            bgClass = 'bg-warning bg-opacity-10';
-            textClass = 'text-warning';
-        } else if (type === 'success') {
-            icon = 'bi-check-circle';
-            bgClass = 'bg-success bg-opacity-10';
-            textClass = 'text-success';
-        }
-        
-        statusEl.innerHTML = `<i class="bi ${icon} ${textClass} me-2"></i><span class="small ${textClass}">${message}</span>`;
-        statusEl.className = `text-center mt-4 p-3 ${bgClass} rounded ${textClass}`;
-        
-        setTimeout(() => {
-            this.updateSaveStatus();
-        }, 2000);
-    }
+    statusEl.innerHTML = `<i class="bi ${icon} ${textClass} me-1"></i>`;
+    statusEl.className = `text-center mt-4 small ${textClass}`;
+    
+    // العودة للحالة العادية بعد 2 ثانية
+    setTimeout(() => {
+        this.updateSaveStatus();
+    }, 2000);
+}
     
     updateUI() {
         // Update alert checkbox
@@ -554,3 +551,4 @@ window.isPrayerTime = isPrayerTime;
 window.NotificationManager = NotificationManager;
 
 export default notificationManager;
+
