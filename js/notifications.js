@@ -550,5 +550,6 @@ window.startNotificationChecker = startNotificationChecker;
 window.isPrayerTime = isPrayerTime;
 window.NotificationManager = NotificationManager;
 
-export default notificationManager;
+
+
 
