@@ -104,7 +104,8 @@ function isPrayerTime(prayerTime, currentTime) {
 // فئة إدارة الإشعارات المحدثة
 class NotificationManager {
     constructor() {
-        this.notifications = {
+        // القيم الافتراضية
+        this.defaultSettings = {
             alertAtPrayerTime: true,
             notifyBeforeMinutes: 10,
             selectedPrayers: {
@@ -116,59 +117,123 @@ class NotificationManager {
             }
         };
         
+        this.notifications = JSON.parse(JSON.stringify(this.defaultSettings)); // نسخة عميقة
         this.timers = {};
         this.saveTimeout = null;
         this.isSaving = false;
-        this.init();
+        this.isInitialized = false;
+        
+        console.log('NotificationManager: تم إنشاء مثيل جديد');
     }
     
     init() {
+        if (this.isInitialized) return;
+        
+        console.log('NotificationManager: بدء التهيئة');
         this.loadSettings();
         this.bindEvents();
         this.setupAutoSave();
         this.scheduleAllNotifications();
+        
+        this.isInitialized = true;
+        console.log('NotificationManager: التهيئة اكتملت');
     }
     
     loadSettings() {
-        const saved = localStorage.getItem('notificationSettings');
-        if (saved) {
-            try {
-                this.notifications = JSON.parse(saved);
+        try {
+            const saved = localStorage.getItem('notificationSettings');
+            console.log('NotificationManager: تحميل الإعدادات من localStorage:', saved);
+            
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                // دمج الإعدادات المحفوظة مع القيم الافتراضية
+                this.notifications.alertAtPrayerTime = parsed.alertAtPrayerTime !== undefined 
+                    ? Boolean(parsed.alertAtPrayerTime) 
+                    : this.defaultSettings.alertAtPrayerTime;
+                
+                this.notifications.notifyBeforeMinutes = parsed.notifyBeforeMinutes || this.defaultSettings.notifyBeforeMinutes;
+                
+                // دمج selectedPrayers بشكل صحيح
+                if (parsed.selectedPrayers) {
+                    for (const prayer in this.defaultSettings.selectedPrayers) {
+                        this.notifications.selectedPrayers[prayer] = 
+                            parsed.selectedPrayers[prayer] !== undefined 
+                            ? Boolean(parsed.selectedPrayers[prayer])
+                            : this.defaultSettings.selectedPrayers[prayer];
+                    }
+                }
+                
+                console.log('NotificationManager: الإعدادات بعد التحميل:', this.notifications);
+                
+                // تأخير تحديث الواجهة للتأكد من تحميل DOM
+                setTimeout(() => {
+                    this.updateUI();
+                }, 300);
+                
+            } else {
+                console.log('NotificationManager: لا توجد إعدادات محفوظة، استخدام القيم الافتراضية');
                 this.updateUI();
-            } catch (e) {
-                console.error('Error loading notification settings:', e);
             }
+        } catch (e) {
+            console.error('NotificationManager: خطأ في تحميل إعدادات الإشعارات:', e);
+            this.notifications = JSON.parse(JSON.stringify(this.defaultSettings));
+            this.updateUI();
         }
     }
     
     bindEvents() {
-        // Show alert at each prayer time
-        document.getElementById('show-alert-prayer-time')?.addEventListener('change', (e) => {
-            this.notifications.alertAtPrayerTime = e.target.checked;
-            this.autoSave();
-            this.scheduleAlerts();
-        });
+        console.log('NotificationManager: ربط الأحداث');
         
-        // Notification time options dropdown
-        document.getElementById('notification-before-time-select')?.addEventListener('change', (e) => {
-            this.notifications.notifyBeforeMinutes = parseInt(e.target.value);
-            this.autoSave();
-            this.scheduleBeforeNotifications();
-        });
+        // ربط حدث show-alert-prayer-time
+        const alertCheckbox = document.getElementById('show-alert-prayer-time');
+        if (alertCheckbox) {
+            alertCheckbox.addEventListener('change', (e) => {
+                console.log('تغيير في show-alert-prayer-time:', e.target.checked);
+                this.notifications.alertAtPrayerTime = e.target.checked;
+                this.autoSave();
+                this.scheduleAllNotifications();
+            });
+        } else {
+            console.error('NotificationManager: لم يتم العثور على عنصر show-alert-prayer-time');
+        }
         
-        // Prayer selection checkboxes
+        // ربط حدث notification-before-time-select
+        const timeSelect = document.getElementById('notification-before-time-select');
+        if (timeSelect) {
+            timeSelect.addEventListener('change', (e) => {
+                console.log('تغيير في notification-before-time-select:', e.target.value);
+                this.notifications.notifyBeforeMinutes = parseInt(e.target.value) || 10;
+                this.autoSave();
+                this.scheduleAllNotifications();
+            });
+        }
+        
+        // ربط أحداث prayer-notification-check
         document.querySelectorAll('.prayer-notification-check').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 const prayer = e.target.id.replace('-notification', '');
+                console.log(`تغيير في ${prayer}-notification:`, e.target.checked);
                 this.notifications.selectedPrayers[prayer] = e.target.checked;
                 this.autoSave();
                 this.scheduleAllNotifications();
             });
         });
+        
+        // تحديث الواجهة عند فتح تبويب الإشعارات
+        const notificationsTab = document.getElementById('v-pills-notifications-tab');
+        if (notificationsTab) {
+            notificationsTab.addEventListener('shown.bs.tab', () => {
+                console.log('فتح تبويب الإشعارات، تحديث الواجهة');
+                setTimeout(() => {
+                    this.updateUI();
+                }, 100);
+            });
+        }
     }
     
     setupAutoSave() {
-        // Update save status every second
+        // تحديث حالة الحفظ كل ثانية
         setInterval(() => {
             this.updateSaveStatus();
         }, 1000);
@@ -188,10 +253,24 @@ class NotificationManager {
         this.isSaving = true;
         
         try {
-            localStorage.setItem('notificationSettings', JSON.stringify(this.notifications));
+            // تنظيف البيانات قبل الحفظ
+            const settingsToSave = {
+                alertAtPrayerTime: Boolean(this.notifications.alertAtPrayerTime),
+                notifyBeforeMinutes: parseInt(this.notifications.notifyBeforeMinutes) || 10,
+                selectedPrayers: {}
+            };
+            
+            // تأكد من أن كل صلاة هي boolean
+            for (const prayer in this.notifications.selectedPrayers) {
+                settingsToSave.selectedPrayers[prayer] = Boolean(this.notifications.selectedPrayers[prayer]);
+            }
+            
+            localStorage.setItem('notificationSettings', JSON.stringify(settingsToSave));
+            console.log('NotificationManager: تم حفظ الإعدادات:', settingsToSave);
+            
             this.showSaveStatus('تم الحفظ', 'success');
         } catch (e) {
-            console.error('Error saving settings:', e);
+            console.error('NotificationManager: خطأ في حفظ الإعدادات:', e);
             this.showSaveStatus('خطأ في الحفظ', 'error');
         }
         
@@ -200,69 +279,84 @@ class NotificationManager {
         }, 300);
     }
     
-   updateSaveStatus() {
-    const statusEl = document.getElementById('auto-save-status');
-    if (!statusEl) return;
-    
-    if (this.isSaving) {
-        statusEl.innerHTML = '<i class="bi bi-hourglass-split text-warning me-1"></i>';
-        statusEl.className = 'text-center mt-4 small text-warning';
-    } else {
-        statusEl.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>';
-        statusEl.className = 'text-center mt-4 small text-muted';
-    }
-}
-
-showSaveStatus(message, type = 'success') {
-    const statusEl = document.getElementById('auto-save-status');
-    if (!statusEl) return;
-    
-    let icon = 'bi-check-circle';
-    let textClass = 'text-success';
-    
-    if (type === 'error') {
-        icon = 'bi-exclamation-circle';
-        textClass = 'text-danger';
-    } else if (type === 'warning') {
-        icon = 'bi-exclamation-triangle';
-        textClass = 'text-warning';
-    } else if (type === 'info') {
-        icon = 'bi-info-circle';
-        textClass = 'text-info';
+    updateSaveStatus() {
+        const statusEl = document.getElementById('auto-save-status');
+        if (!statusEl) return;
+        
+        if (this.isSaving) {
+            statusEl.innerHTML = '<i class="bi bi-hourglass-split text-warning me-1"></i>';
+            statusEl.className = 'text-center mt-4 small text-warning';
+        } else {
+            statusEl.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>';
+            statusEl.className = 'text-center mt-4 small text-muted';
+        }
     }
     
-    statusEl.innerHTML = `<i class="bi ${icon} ${textClass} me-1"></i>`;
-    statusEl.className = `text-center mt-4 small ${textClass}`;
-    
-    // العودة للحالة العادية بعد 2 ثانية
-    setTimeout(() => {
-        this.updateSaveStatus();
-    }, 2000);
-}
+    showSaveStatus(message, type = 'success') {
+        const statusEl = document.getElementById('auto-save-status');
+        if (!statusEl) return;
+        
+        let icon = 'bi-check-circle';
+        let textClass = 'text-success';
+        
+        if (type === 'error') {
+            icon = 'bi-exclamation-circle';
+            textClass = 'text-danger';
+        } else if (type === 'warning') {
+            icon = 'bi-exclamation-triangle';
+            textClass = 'text-warning';
+        }
+        
+        statusEl.innerHTML = `<i class="bi ${icon} ${textClass} me-1"></i>`;
+        statusEl.className = `text-center mt-4 small ${textClass}`;
+        
+        // العودة للحالة العادية بعد 2 ثانية
+        setTimeout(() => {
+            this.updateSaveStatus();
+        }, 2000);
+    }
     
     updateUI() {
-        // Update alert checkbox
-        const alertCheckbox = document.getElementById('show-alert-prayer-time');
-        if (alertCheckbox) alertCheckbox.checked = this.notifications.alertAtPrayerTime;
+        console.log('NotificationManager: تحديث واجهة المستخدم');
         
-        // Update time dropdown
-        const timeSelect = document.getElementById('notification-before-time-select');
-        if (timeSelect) {
-            timeSelect.value = this.notifications.notifyBeforeMinutes.toString();
-        }
-        
-        // Update prayer checkboxes
-        for (const prayer in this.notifications.selectedPrayers) {
-            const checkbox = document.getElementById(`${prayer}-notification`);
-            if (checkbox) checkbox.checked = this.notifications.selectedPrayers[prayer];
-        }
+        // تأخير بسيط للتأكد من تحميل DOM
+        setTimeout(() => {
+            // تحديث زر Show an alert at each prayer time
+            const alertCheckbox = document.getElementById('show-alert-prayer-time');
+            if (alertCheckbox) {
+                const isChecked = Boolean(this.notifications.alertAtPrayerTime);
+                alertCheckbox.checked = isChecked;
+                console.log('تحديث زر التنبيهات:', this.notifications.alertAtPrayerTime, '->', isChecked);
+            }
+            
+            // تحديث قائمة الوقت المنسدلة
+            const timeSelect = document.getElementById('notification-before-time-select');
+            if (timeSelect) {
+                timeSelect.value = this.notifications.notifyBeforeMinutes.toString();
+                console.log('تحديث الوقت:', this.notifications.notifyBeforeMinutes);
+            }
+            
+            // تحديث خيارات الصلوات
+            const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+            prayers.forEach(prayer => {
+                const checkbox = document.getElementById(`${prayer}-notification`);
+                if (checkbox) {
+                    const isChecked = Boolean(this.notifications.selectedPrayers[prayer]);
+                    checkbox.checked = isChecked;
+                    console.log(`تحديث ${prayer}:`, this.notifications.selectedPrayers[prayer], '->', isChecked);
+                }
+            });
+        }, 100);
     }
     
     scheduleAllNotifications() {
+        console.log('NotificationManager: جدولة جميع الإشعارات');
         this.clearAllTimers();
         
         if (this.notifications.alertAtPrayerTime) {
             this.scheduleAlerts();
+        } else {
+            console.log('NotificationManager: إشعارات وقت الصلاة معطلة');
         }
         
         if (this.notifications.notifyBeforeMinutes > 0) {
@@ -276,6 +370,7 @@ showSaveStatus(message, type = 'success') {
     scheduleAlerts() {
         if (!this.notifications.alertAtPrayerTime) return;
         
+        console.log('NotificationManager: جدولة تنبيهات الصلاة');
         const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         
         prayers.forEach(prayer => {
@@ -283,6 +378,8 @@ showSaveStatus(message, type = 'success') {
                 const prayerTime = this.getPrayerTime(prayer);
                 if (prayerTime) {
                     this.scheduleAlert(prayer, prayerTime);
+                } else {
+                    console.log(`NotificationManager: لا يوجد وقت لصلاة ${prayer}`);
                 }
             }
         });
@@ -292,6 +389,7 @@ showSaveStatus(message, type = 'success') {
         const minutesBefore = this.notifications.notifyBeforeMinutes;
         if (minutesBefore <= 0) return;
         
+        console.log('NotificationManager: جدولة إشعارات قبل الصلاة بـ', minutesBefore, 'دقيقة');
         const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         
         prayers.forEach(prayer => {
@@ -306,7 +404,10 @@ showSaveStatus(message, type = 'success') {
     }
     
     getPrayerTime(prayerName) {
-        if (!window.currentPrayerTimes) return null;
+        if (!window.currentPrayerTimes) {
+            console.log('NotificationManager: currentPrayerTimes غير متوفر');
+            return null;
+        }
         
         const prayerTimes = window.currentPrayerTimes;
         const prayerMap = {
@@ -317,7 +418,9 @@ showSaveStatus(message, type = 'success') {
             isha: 'isha'
         };
         
-        return prayerTimes[prayerMap[prayerName]];
+        const time = prayerTimes[prayerMap[prayerName]];
+        console.log(`NotificationManager: وقت صلاة ${prayerName}: ${time}`);
+        return time;
     }
     
     calculateTimeBefore(timeString, minutes) {
@@ -335,7 +438,7 @@ showSaveStatus(message, type = 'success') {
             
             return date;
         } catch (e) {
-            console.error('خطأ في حساب الوقت:', e);
+            console.error('NotificationManager: خطأ في حساب الوقت:', e);
             return null;
         }
     }
@@ -349,6 +452,7 @@ showSaveStatus(message, type = 'success') {
         
         if (timeToAlert > 0 && timeToAlert < 24 * 60 * 60 * 1000) {
             const timerId = setTimeout(() => {
+                console.log(`NotificationManager: تنبيه وقت صلاة ${prayerName}`);
                 this.showBrowserNotification(prayerName, 'alert');
                 // إعادة الجدولة لليوم التالي
                 this.scheduleAlert(prayerName, time);
@@ -357,7 +461,7 @@ showSaveStatus(message, type = 'success') {
             const key = `alert_${prayerName}_${alertTime.getTime()}`;
             this.timers[key] = timerId;
             
-            console.log(`جدولة تنبيه لصلاة ${prayerName}: ${alertTime.toLocaleTimeString()}`);
+            console.log(`NotificationManager: جدولة تنبيه لصلاة ${prayerName}: ${alertTime.toLocaleTimeString()} (${Math.round(timeToAlert/60000)} دقيقة)`);
         }
     }
     
@@ -369,6 +473,7 @@ showSaveStatus(message, type = 'success') {
         
         if (timeToNotify > 0 && timeToNotify < 24 * 60 * 60 * 1000) {
             const timerId = setTimeout(() => {
+                console.log(`NotificationManager: إشعار قبل صلاة ${prayerName}`);
                 this.showBrowserNotification(prayerName, 'before');
                 // إعادة الجدولة لليوم التالي
                 const nextDay = new Date(time);
@@ -379,7 +484,7 @@ showSaveStatus(message, type = 'success') {
             const key = `notification_${prayerName}_${time.getTime()}`;
             this.timers[key] = timerId;
             
-            console.log(`جدولة إشعار لصلاة ${prayerName}: ${time.toLocaleTimeString()}`);
+            console.log(`NotificationManager: جدولة إشعار لصلاة ${prayerName}: ${time.toLocaleTimeString()} (${Math.round(timeToNotify/60000)} دقيقة)`);
         }
     }
     
@@ -397,7 +502,7 @@ showSaveStatus(message, type = 'success') {
             
             return date;
         } catch (e) {
-            console.error('خطأ في تحليل الوقت:', e);
+            console.error('NotificationManager: خطأ في تحليل الوقت:', e);
             return null;
         }
     }
@@ -478,13 +583,14 @@ showSaveStatus(message, type = 'success') {
             clearTimeout(this.timers[timerId]);
         }
         this.timers = {};
+        console.log('NotificationManager: تم مسح جميع المؤقتات');
     }
     
     requestNotificationPermission() {
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
-                    console.log('تم منح الإذن للإشعارات');
+                    console.log('NotificationManager: تم منح الإذن للإشعارات');
                 }
             });
         }
@@ -503,7 +609,7 @@ let prayerNames = {
     isha: 'العشاء'
 };
 
-// دالة مساعدة للحصول على أوقات الصلاة (افتراضية - يجب استبدالها بالدالة الحقيقية)
+// دالة مساعدة للحصول على أوقات الصلاة (افتراضية)
 function getPrayerTimes(lat, lng, date, method) {
     // هذه دالة افتراضية - استبدلها بالدالة الحقيقية من مشروعك
     return window.currentPrayerTimes || {};
@@ -511,8 +617,11 @@ function getPrayerTimes(lat, lng, date, method) {
 
 // تهيئة كل شيء عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: بدء تهيئة نظام الإشعارات');
+    
     // تهيئة مدير الإشعارات الجديد
     notificationManager = new NotificationManager();
+    notificationManager.init();
     
     // طلب الإذن للإشعارات
     if ('Notification' in window) {
@@ -523,15 +632,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // جعل المدير متاحاً عالمياً
     window.notificationManager = notificationManager;
     
     // بدء فحص الإشعارات القديم (للتوافق)
     startNotificationChecker();
+    
+    console.log('DOMContentLoaded: اكتمل تهيئة نظام الإشعارات');
 });
 
 // جدولة الإشعارات عند تحديث أوقات الصلاة
 if (typeof window !== 'undefined') {
     window.addEventListener('prayerTimesUpdated', () => {
+        console.log('حدث prayerTimesUpdated: إعادة جدولة الإشعارات');
         if (notificationManager) {
             setTimeout(() => {
                 notificationManager.scheduleAllNotifications();
@@ -545,8 +658,4 @@ window.showPrayerNotification = showPrayerNotification;
 window.startNotificationChecker = startNotificationChecker;
 window.isPrayerTime = isPrayerTime;
 window.NotificationManager = NotificationManager;
-
-
-
-
-
+window.notificationManager = notificationManager;
