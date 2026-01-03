@@ -10,13 +10,39 @@ function showError(message) {
   }, 5000);
 }
 
-function showNotification(message) {
-  const notificationEl = document.getElementById('notification');
-  if (!notificationEl) return;
+function showNotification(message, type = 'success') {
+  console.log(`إشعار [${type}]: ${message}`);
   
-  notificationEl.querySelector('.toast-body').textContent = message;
-  const toast = new bootstrap.Toast(notificationEl);
-  toast.show();
+  // استخدام toast من Bootstrap إذا كان متاحاً
+  const notificationEl = document.getElementById('notification');
+  if (notificationEl && typeof bootstrap !== 'undefined') {
+    const toastBody = notificationEl.querySelector('.toast-body');
+    if (toastBody) {
+      toastBody.textContent = message;
+      
+      // تغيير لون الخلفية حسب النوع
+      if (type === 'error') {
+        notificationEl.classList.remove('bg-primary');
+        notificationEl.classList.add('bg-danger');
+      } else if (type === 'warning') {
+        notificationEl.classList.remove('bg-primary');
+        notificationEl.classList.add('bg-warning');
+      } else if (type === 'info') {
+        notificationEl.classList.remove('bg-primary');
+        notificationEl.classList.add('bg-info');
+      } else {
+        notificationEl.classList.remove('bg-danger', 'bg-warning', 'bg-info');
+        notificationEl.classList.add('bg-primary');
+      }
+      
+      const toast = new bootstrap.Toast(notificationEl);
+      toast.show();
+      return;
+    }
+  }
+  
+  // fallback بسيط
+  console.log(message);
 }
 
 function updateLocationStatus(message, isError = false) {
@@ -96,11 +122,6 @@ function applyTheme(theme) {
             document.body.classList.add('bg-light');
         }
     }
-    
-    // حفظ التفضيل في localStorage
-    const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-    settings.appearance = theme;
-    localStorage.setItem('prayerSettings', JSON.stringify(settings));
 }
 
 // تحميل التفضيل المحفوظ عند بدء التحميل
@@ -143,35 +164,6 @@ function displayDate() {
     console.error('Error displaying date:', error);
   }
 }
-// دالة محسنة لعرض الإشعارات
-function showNotification(message, type = 'success') {
-  console.log(`إشعار [${type}]: ${message}`);
-  
-  // استخدام toast من Bootstrap إذا كان متاحاً
-  const notificationEl = document.getElementById('notification');
-  if (notificationEl && typeof bootstrap !== 'undefined') {
-    const toastBody = notificationEl.querySelector('.toast-body');
-    if (toastBody) {
-      toastBody.textContent = message;
-      
-      // تغيير لون الخلفية حسب النوع
-      if (type === 'error') {
-        notificationEl.classList.remove('bg-primary');
-        notificationEl.classList.add('bg-danger');
-      } else {
-        notificationEl.classList.remove('bg-danger');
-        notificationEl.classList.add('bg-primary');
-      }
-      
-      const toast = new bootstrap.Toast(notificationEl);
-      toast.show();
-      return;
-    }
-  }
-  
-  // fallback بسيط
-  alert(message);
-}
 
 // دالة محسنة لتحديث حالة الموقع
 function updateLocationStatus(message, isError = false) {
@@ -183,4 +175,48 @@ function updateLocationStatus(message, isError = false) {
     // إظهار العنصر إذا كان مخفياً
     statusElement.style.display = 'block';
   }
+}
+
+// دالة للتحقق من الإذن للإشعارات
+function checkNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission === 'default') {
+      return 'default';
+    } else if (Notification.permission === 'granted') {
+      return 'granted';
+    } else {
+      return 'denied';
+    }
+  }
+  return 'unsupported';
+}
+
+// دالة لطلب إذن الإشعارات
+function requestNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        console.log('نتيجة طلب إذن الإشعارات:', permission);
+        if (permission === 'granted') {
+          showNotification('تم تفعيل الإشعارات بنجاح', 'success');
+        }
+      });
+    }
+  }
+}
+
+// جعل الدوال متاحة عالمياً
+if (typeof window !== 'undefined') {
+  window.showError = showError;
+  window.showNotification = showNotification;
+  window.updateLocationStatus = updateLocationStatus;
+  window.formatTime = formatTime;
+  window.convertTimeToMinutes = convertTimeToMinutes;
+  window.checkFileExists = checkFileExists;
+  window.applyTheme = applyTheme;
+  window.loadTheme = loadTheme;
+  window.watchSystemTheme = watchSystemTheme;
+  window.displayDate = displayDate;
+  window.checkNotificationPermission = checkNotificationPermission;
+  window.requestNotificationPermission = requestNotificationPermission;
 }
