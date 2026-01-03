@@ -1,7 +1,3 @@
-/**
- * ملف إدارة الإشعارات والتنبيهات (محدث)
- */
-
 // إدارة الإشعارات والتنبيهات
 let lastNotifiedPrayer = null;
 let notificationCheckInterval;
@@ -549,6 +545,7 @@ window.showPrayerNotification = showPrayerNotification;
 window.startNotificationChecker = startNotificationChecker;
 window.isPrayerTime = isPrayerTime;
 window.NotificationManager = NotificationManager;
+
 
 
 
