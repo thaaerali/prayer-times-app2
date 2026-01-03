@@ -40,6 +40,13 @@ function togglePages(pageName = null) {
                 }
                 // تحميل ضبط التاريخ الهجري
                 loadHijriAdjustment();
+                
+                // تحميل إعدادات الإشعارات الجديدة
+                if (window.notificationManager && typeof window.notificationManager.loadSettings === 'function') {
+                    setTimeout(() => {
+                        window.notificationManager.loadSettings();
+                    }, 200);
+                }
             }, 100);
         }
     } 
@@ -63,6 +70,13 @@ function togglePages(pageName = null) {
 
             // إعادة حساب الأوقات
             calculateAndDisplayPrayerTimes();
+            
+            // إعادة جدولة الإشعارات عند العودة للصفحة الرئيسية
+            if (window.notificationManager && typeof window.notificationManager.scheduleAllNotifications === 'function') {
+                setTimeout(() => {
+                    window.notificationManager.scheduleAllNotifications();
+                }, 500);
+            }
         }
     }
 }
@@ -473,7 +487,7 @@ function formatTime(time, format) {
   return time;
 }
 
-// دالة لحساب وعرض أوقات الصلاة
+// دالة محسنة لحساب وعرض أوقات الصلاة
 function calculateAndDisplayPrayerTimes() {
   const prayerTimesContainer = document.getElementById('prayer-times');
   
@@ -503,6 +517,9 @@ function calculateAndDisplayPrayerTimes() {
 
     const date = new Date();
     const times = getPrayerTimes(currentLocation.latitude, currentLocation.longitude, date, calculationMethod);
+    
+    // تخزين أوقات الصلاة في متغير عالمي
+    window.currentPrayerTimes = times;
     
     console.log('أوقات الصلاة المحسوبة:', times);
 
@@ -535,6 +552,12 @@ function calculateAndDisplayPrayerTimes() {
     });
 
     highlightCurrentPrayer(times);
+    
+    // إرسال حدث تحديث أوقات الصلاة
+    const prayerTimesEvent = new Event('prayerTimesUpdated');
+    window.dispatchEvent(prayerTimesEvent);
+    
+    console.log('تم إرسال حدث prayerTimesUpdated');
 
   } catch (error) {
     console.error('Error calculating prayer times:', error);
@@ -659,7 +682,7 @@ function initNahjAlBalagha() {
   // أو تحميل البيانات من GitHub
 }
 
-// تهيئة التطبيق
+// تهيئة محسنة للتطبيق
 function initApp() {
   console.log('تهيئة التطبيق...');
   
@@ -707,12 +730,21 @@ function initApp() {
 
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
+  
+  // تهيئة نظام الإشعارات بعد تحميل الأوقات
+  setTimeout(() => {
+    if (window.notificationManager && typeof window.notificationManager.scheduleAllNotifications === 'function') {
+      window.notificationManager.scheduleAllNotifications();
+    }
+  }, 2000);
 
   // تحديث التاريخ كل دقيقة
   setInterval(displayDate, 60000);
 
   // تحديث أوقات الصلاة كل ساعة
   setInterval(calculateAndDisplayPrayerTimes, 3600000);
+  
+  console.log('اكتمل تهيئة التطبيق');
 }
 
 // دالة لتحديث الصفحة الرئيسية عند تغيير الإعدادات
@@ -759,10 +791,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // الاستماع لحدث تحديث أوقات الصلاة
+  window.addEventListener('prayerTimesUpdated', () => {
+    console.log('حدث prayerTimesUpdated: إعادة جدولة الإشعارات');
+    if (window.notificationManager) {
+      setTimeout(() => {
+        window.notificationManager.scheduleAllNotifications();
+      }, 500);
+    }
+  });
+
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
 
-
-
-
+// جعل الدوال متاحة عالمياً
+if (typeof window !== 'undefined') {
+  window.calculateAndDisplayPrayerTimes = calculateAndDisplayPrayerTimes;
+  window.getCurrentLocation = getCurrentLocation;
+  window.saveManualLocation = saveManualLocation;
+  window.adjustHijriDate = adjustHijriDate;
+  window.resetHijriAdjustment = resetHijriAdjustment;
+}
