@@ -11,8 +11,11 @@ let nahjAlBalaghaInstance = null;
 // متغير لتخزين ضبط التاريخ الهجري
 let hijriDateAdjustment = 0;
 
-// استيراد ملف الجدول الشهري
-import './monthly-timetable.js';
+// دالة لتهيئة الجدول الشهري (سيتم استدعاؤها من ملف منفصل)
+function initMonthlyTimetable() {
+    // سيتولى ملف monthly-timetable-mod.js هذا الجزء
+    console.log('الجدول الشهري سيتم تهيئته من ملف منفصل');
+}
 
 // دالة للتنقل بين الصفحات
 function togglePages(pageName = null) {
@@ -304,9 +307,45 @@ function updateLocationStatus(message, isError = false) {
 
 // دالة لعرض الإشعارات
 function showNotification(message, type = 'success') {
-    // تنفيذ بسيط للإشعارات - يمكن تطويره لاحقاً
-    console.log(`${type}: ${message}`);
-    alert(message); // تنفيذ مؤقت
+    try {
+        // استخدام Toast من Bootstrap إذا كان متاحاً
+        const toastEl = document.getElementById('notification');
+        if (toastEl && typeof bootstrap !== 'undefined') {
+            const toast = new bootstrap.Toast(toastEl);
+            const toastBody = toastEl.querySelector('.toast-body');
+            if (toastBody) {
+                toastBody.textContent = message;
+                
+                // تغيير اللون حسب النوع
+                if (type === 'error') {
+                    toastEl.classList.remove('bg-primary');
+                    toastEl.classList.add('bg-danger');
+                } else if (type === 'warning') {
+                    toastEl.classList.remove('bg-primary');
+                    toastEl.classList.add('bg-warning');
+                    toastEl.classList.add('text-dark');
+                } else {
+                    toastEl.classList.remove('bg-danger', 'bg-warning', 'text-dark');
+                    toastEl.classList.add('bg-primary');
+                }
+                
+                toast.show();
+                return;
+            }
+        }
+        
+        // إذا فشل Toast، استخدم console.log
+        console.log(`${type}: ${message}`);
+        
+        // تجنب استخدام alert إذا أمكن
+        if (type === 'error' && confirm(`خطأ: ${message}\n\nاضغط موافق للمتابعة`)) {
+            // المستخدم ضغط موافق
+        }
+        
+    } catch (error) {
+        console.error('خطأ في عرض الإشعار:', error);
+        console.log(`${type}: ${message}`);
+    }
 }
 
 // دالة لعرض الأخطاء
@@ -810,9 +849,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // جعل الدوال متاحة عالمياً
 if (typeof window !== 'undefined') {
+  window.currentLocation = currentLocation;
   window.calculateAndDisplayPrayerTimes = calculateAndDisplayPrayerTimes;
   window.getCurrentLocation = getCurrentLocation;
   window.saveManualLocation = saveManualLocation;
   window.adjustHijriDate = adjustHijriDate;
   window.resetHijriAdjustment = resetHijriAdjustment;
+  window.togglePages = togglePages;
+  window.showNahjPage = showNahjPage;
+  window.backFromNahjPage = backFromNahjPage;
+  window.showNotification = showNotification;
+  window.showError = showError;
 }
