@@ -962,5 +962,149 @@ header .d-flex .location-marker {
     background-color: #3b4b6b;
 }
 
+/* أنماط إضافية للجدول الشهري */
+.monthly-timetable-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.month-controls {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.current-month-display {
+    min-width: 200px;
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+
+.table-success td {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+}
+
+.table-success:hover td {
+    background-color: #c3e6cb !important;
+}
+
+/* تلوين الصلوات */
+td:nth-child(2) { /* الإمساك */
+    color: #5d5d8d;
+    font-weight: 500;
+}
+
+td:nth-child(3) { /* الفجر */
+    color: #1a5fb4;
+    font-weight: 600;
+}
+
+td:nth-child(4) { /* الشروق */
+    color: #e6a700;
+    font-weight: 500;
+}
+
+td:nth-child(5) { /* الظهر */
+    color: #c64600;
+    font-weight: 600;
+}
+
+td:nth-child(6) { /* العصر */
+    color: #26a269;
+    font-weight: 500;
+}
+
+td:nth-child(7) { /* الغروب */
+    color: #ff7800;
+    font-weight: 500;
+}
+
+td:nth-child(8) { /* المغرب */
+    color: #a51d2d;
+    font-weight: 600;
+}
+
+td:nth-child(9) { /* العشاء */
+    color: #613583;
+    font-weight: 500;
+}
+
+td:nth-child(10) { /* منتصف الليل */
+    color: #5e5c64;
+    font-weight: 500;
+}
+
+/* شريط التقدم */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    transition: width 0.3s ease;
+}
+
+/* تلميحات للأعمدة */
+th {
+    position: relative;
+    cursor: help;
+}
+
+th:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* التجاوب مع الأجهزة المحمولة */
+@media (max-width: 768px) {
+    .month-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .current-month-display {
+        min-width: 150px;
+        font-size: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    th, td {
+        padding: 0.3rem !important;
+    }
+}
+
+/* أنماط الوضع الداكن للجدول الشهري */
+[data-theme="dark"] .month-controls {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .current-month-display {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .table-success td {
+    background-color: #22543d !important;
+    border-color: #276749 !important;
+}
+
+[data-theme="dark"] .table-success:hover td {
+    background-color: #276749 !important;
+}
 
 
