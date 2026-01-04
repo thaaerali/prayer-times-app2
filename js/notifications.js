@@ -4,13 +4,7 @@
 let lastNotifiedPrayer = null;
 let notificationCheckInterval;
 
-const prayerNames = {
-    fajr: 'الفجر',
-    dhuhr: 'الظهر',
-    asr: 'العصر',
-    maghrib: 'المغرب',
-    isha: 'العشاء'
-};
+
 
 /*************************************************
  * 2) دوال النظام القديم (Toast + فحص الدقيقة)
@@ -219,3 +213,4 @@ window.addEventListener('prayerTimesUpdated', () => {
  *************************************************/
 window.startNotificationChecker = startNotificationChecker;
 window.showPrayerNotification = showPrayerNotification;
+
