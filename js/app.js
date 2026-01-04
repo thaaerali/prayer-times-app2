@@ -11,6 +11,9 @@ let nahjAlBalaghaInstance = null;
 // متغير لتخزين ضبط التاريخ الهجري
 let hijriDateAdjustment = 0;
 
+// استيراد ملف الجدول الشهري
+import './monthly-timetable.js';
+
 // دالة للتنقل بين الصفحات
 function togglePages(pageName = null) {
     const homePage = document.getElementById('home-page');
@@ -813,3 +816,4 @@ if (typeof window !== 'undefined') {
   window.adjustHijriDate = adjustHijriDate;
   window.resetHijriAdjustment = resetHijriAdjustment;
 }
+
