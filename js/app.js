@@ -816,4 +816,3 @@ if (typeof window !== 'undefined') {
   window.adjustHijriDate = adjustHijriDate;
   window.resetHijriAdjustment = resetHijriAdjustment;
 }
-
