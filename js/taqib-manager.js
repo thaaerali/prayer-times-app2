@@ -6,11 +6,11 @@
     const TaqibManager = {
         // روابط GitHub للملفات
         taqibUrls: {
-            fajr: 'https://raw.githubusercontent.com/AzkaMothol/prayer-times/main/taqib/fajr.txt',
-            dhuhr: 'https://raw.githubusercontent.com/AzkaMothol/prayer-times/main/taqib/dhuhr.txt',
-            asr: 'https://raw.githubusercontent.com/AzkaMothol/prayer-times/main/taqib/asr.txt',
-            maghrib: 'https://raw.githubusercontent.com/AzkaMothol/prayer-times/main/taqib/maghrib.txt',
-            isha: 'https://raw.githubusercontent.com/AzkaMothol/prayer-times/main/taqib/isha.txt'
+            fajr: 'https://raw.githubusercontent.com/thaaerali/taqib/refs/heads/main/taqib/fajr.txt',
+            dhuhr: 'https://raw.githubusercontent.com/thaaerali/taqib/refs/heads/main/taqib/dhuhr.txt',
+            asr: 'https://raw.githubusercontent.com/thaaerali/taqib/refs/heads/main/taqib/asr.txt',
+            maghrib: 'https://raw.githubusercontent.com/thaaerali/taqib/refs/heads/main/taqib/maghrib.txt',
+            isha: 'https://raw.githubusercontent.com/thaaerali/taqib/refs/heads/main/taqib/isha.txt'
         },
         
         // أسماء الصلوات بالعربية
@@ -515,4 +515,5 @@
             console.log('✅ تعقيبات الصلاة جاهزة للاستخدام');
         }, 1000);
     });
+
 })();
