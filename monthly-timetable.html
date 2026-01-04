@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول أوقات الصلاة الشهرية</title>
+    
+    <!-- استيراد نفس مكتبات المشروع الأساسي -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
+    <!-- استيراد أنماط المشروع -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    
+    <!-- مكتبة praytimes.js -->
+    <script src="lib/praytimes.js"></script>
+    
+    <style>
+        /* أنماط خاصة بالجدول الشهري */
+        .monthly-header {
+            background: linear-gradient(135deg, var(--primary-color, #1e3c72) 0%, var(--secondary-color, #2a5298) 100%);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .month-controls {
+            background-color: var(--card-bg, white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .month-nav-btn {
+            background-color: var(--primary-color, #1e3c72);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .month-nav-btn:hover {
+            background-color: var(--secondary-color, #2a5298);
+            transform: scale(1.1);
+        }
+        
+        .current-month-display {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary-color, #1e3c72);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .table-responsive {
+            background-color: var(--card-bg, white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .prayer-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .prayer-table thead {
+            background-color: var(--primary-color, #1e3c72);
+            color: white;
+        }
+        
+        .prayer-table th {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .prayer-table tbody tr {
+            border-bottom: 1px solid var(--border-color, #eee);
+            transition: background-color 0.2s;
+        }
+        
+        .prayer-table tbody tr:nth-child(even) {
+            background-color: var(--table-even-bg, #f8f9fa);
+        }
+        
+        .prayer-table tbody tr:hover {
+            background-color: var(--table-hover-bg, #eef5ff);
+        }
+        
+        .prayer-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border: none;
+        }
+        
+        .day-cell {
+            font-weight: bold;
+            color: var(--primary-color, #1e3c72);
+            background-color: var(--highlight-bg, #f0f5ff);
+        }
+        
+        .today-row {
+            background-color: var(--today-bg, #e8f4ff) !important;
+            position: relative;
+        }
+        
+        .today-row::before {
+            content: "اليوم";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: var(--accent-color, #ffcc00);
+            color: var(--primary-color, #1e3c72);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        /* ألوان الصلوات */
+        .fajr-time { color: var(--fajr-color, #1a5fb4); }
+        .sunrise-time { color: var(--sunrise-color, #e6a700); }
+        .dhuhr-time { color: var(--dhuhr-color, #c64600); }
+        .asr-time { color: var(--asr-color, #26a269); }
+        .sunset-time { color: var(--sunset-color, #ff7800); }
+        .maghrib-time { color: var(--maghrib-color, #a51d2d); }
+        .isha-time { color: var(--isha-color, #613583); }
+        .midnight-time { color: var(--midnight-color, #5e5c64); }
+        .imsak-time { color: var(--imsak-color, #5d5d8d); }
+        
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--primary-color, #1e3c72);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: 2px solid var(--accent-color, #ffcc00);
+            display: none;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--secondary-color, #2a5298);
+            transform: translateY(-5px);
+        }
+        
+        /* إشعارات */
+        .monthly-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #26a269;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* التجاوب مع الأجهزة المحمولة */
+        @media (max-width: 768px) {
+            .month-controls {
+                padding: 15px;
+            }
+            
+            .current-month-display {
+                font-size: 1.2rem;
+                min-width: 150px;
+            }
+            
+            .prayer-table th,
+            .prayer-table td {
+                padding: 8px 5px;
+                font-size: 0.9rem;
+            }
+            
+            .today-row::before {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .monthly-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .month-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .prayer-table {
+                min-width: 700px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- رأس الصفحة الرئيسي (مطابق لرأس المشروع) -->
+    <header class="monthly-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- زر العودة -->
+                <button id="back-to-main" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-right me-1"></i>العودة
+                </button>
+                
+                <!-- العنوان في المنتصف -->
+                <div class="text-center">
+                    <h1 class="h4 mb-0">جدول أوقات الصلاة الشهرية</h1>
+                    <p class="small mb-0 opacity-75">عرض أوقات الصلاة كاملة للشهر الحالي</p>
+                </div>
+                
+                <!-- زر الإعدادات -->
+                <button id="monthly-settings-button" class="btn btn-light">
+                    <i class="bi bi-gear-fill"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- المحتوى الرئيسي -->
+    <main class="container mb-5">
+        <!-- عناصر التحكم -->
+        <section class="month-controls d-flex flex-wrap justify-content-center align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <button id="prev-month" class="month-nav-btn">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <div id="current-month" class="current-month-display">يناير 2026</div>
+                <button id="next-month" class="month-nav-btn">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <span>المدينة:</span>
+                <select id="city-select" class="form-select form-select-sm" style="width: auto;">
+                    <option value="auto">الموقع الحالي</option>
+                    <option value="Najaf">النجف</option>
+                    <option value="Makkah">مكة المكرمة</option>
+                    <option value="Madinah">المدينة المنورة</option>
+                    <option value="Baghdad">بغداد</option>
+                    <option value="Basra">البصرة</option>
+                    <option value="Karbala">كربلاء</option>
+                    <option value="Cairo">القاهرة</option>
+                </select>
+            </div>
+            
+            <button id="go-to-today" class="btn btn-primary btn-sm">
+                <i class="bi bi-calendar-check me-1"></i>الشهر الحالي
+            </button>
+        </section>
+        
+        <!-- جدول أوقات الصلاة -->
+        <section>
+            <h2 class="h5 text-center mb-3 text-primary" id="month-year-title">يناير 2026</h2>
+            
+            <div class="table-responsive">
+                <table class="prayer-table">
+                    <thead>
+                        <tr>
+                            <th>اليوم</th>
+                            <th>الإمساك</th>
+                            <th>الفجر</th>
+                            <th>الشروق</th>
+                            <th>الظهر</th>
+                            <th>العصر</th>
+                            <th>الغروب</th>
+                            <th>المغرب</th>
+                            <th>العشاء</th>
+                            <th>منتصف الليل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prayer-table-body">
+                        <!-- سيتم ملء الجدول ديناميكياً -->
+                        <tr>
+                            <td colspan="10" class="text-center py-5 text-muted">
+                                جاري تحميل بيانات أوقات الصلاة...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    
+    <!-- تذييل الصفحة -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">جميع الأوقات مذكورة بالتوقيت المحلي</p>
+            <p id="current-location-info" class="small mb-2">الموقع: جاري التحديث...</p>
+            <p class="small text-muted mb-0">
+                ملاحظة: هذه الأوقات تقريبية وقد تختلف قليلاً حسب الموقع الجغرافي والمنهجية المتبعة في الحساب.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- إشعار -->
+    <div id="monthly-notification" class="monthly-notification"></div>
+    
+    <!-- زر العودة للأعلى -->
+    <div class="back-to-top" id="back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ملف JavaScript للجدول الشهري -->
+    <script src="js/monthly-timetable.js"></script>
+    
+    <script>
+        // تهيئة أولية
+        document.addEventListener('DOMContentLoaded', function() {
+            // التعامل مع الزر للعودة إلى الصفحة الرئيسية
+            document.getElementById('back-to-main').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+            
+            // التعامل مع زر الإعدادات
+            document.getElementById('monthly-settings-button').addEventListener('click', function() {
+                // يمكن فتح نافذة إعدادات مبسطة أو التوجه لصفحة الإعدادات الرئيسية
+                window.location.href = 'index.html#settings-page';
+            });
+        });
+    </script>
+</body>
+</html>
