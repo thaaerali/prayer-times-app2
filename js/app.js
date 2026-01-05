@@ -11,12 +11,6 @@ let nahjAlBalaghaInstance = null;
 // متغير لتخزين ضبط التاريخ الهجري
 let hijriDateAdjustment = 0;
 
-// دالة لتهيئة الجدول الشهري (سيتم استدعاؤها من ملف منفصل)
-function initMonthlyTimetable() {
-    // سيتولى ملف monthly-timetable-mod.js هذا الجزء
-    console.log('الجدول الشهري سيتم تهيئته من ملف منفصل');
-}
-
 // دالة للتنقل بين الصفحات
 function togglePages(pageName = null) {
     const homePage = document.getElementById('home-page');
@@ -46,13 +40,6 @@ function togglePages(pageName = null) {
                 }
                 // تحميل ضبط التاريخ الهجري
                 loadHijriAdjustment();
-                
-                // تحميل إعدادات الإشعارات الجديدة
-                if (window.notificationManager && typeof window.notificationManager.loadSettings === 'function') {
-                    setTimeout(() => {
-                        window.notificationManager.loadSettings();
-                    }, 200);
-                }
             }, 100);
         }
     } 
@@ -76,13 +63,6 @@ function togglePages(pageName = null) {
 
             // إعادة حساب الأوقات
             calculateAndDisplayPrayerTimes();
-            
-            // إعادة جدولة الإشعارات عند العودة للصفحة الرئيسية
-            if (window.notificationManager && typeof window.notificationManager.scheduleAllNotifications === 'function') {
-                setTimeout(() => {
-                    window.notificationManager.scheduleAllNotifications();
-                }, 500);
-            }
         }
     }
 }
@@ -307,45 +287,9 @@ function updateLocationStatus(message, isError = false) {
 
 // دالة لعرض الإشعارات
 function showNotification(message, type = 'success') {
-    try {
-        // استخدام Toast من Bootstrap إذا كان متاحاً
-        const toastEl = document.getElementById('notification');
-        if (toastEl && typeof bootstrap !== 'undefined') {
-            const toast = new bootstrap.Toast(toastEl);
-            const toastBody = toastEl.querySelector('.toast-body');
-            if (toastBody) {
-                toastBody.textContent = message;
-                
-                // تغيير اللون حسب النوع
-                if (type === 'error') {
-                    toastEl.classList.remove('bg-primary');
-                    toastEl.classList.add('bg-danger');
-                } else if (type === 'warning') {
-                    toastEl.classList.remove('bg-primary');
-                    toastEl.classList.add('bg-warning');
-                    toastEl.classList.add('text-dark');
-                } else {
-                    toastEl.classList.remove('bg-danger', 'bg-warning', 'text-dark');
-                    toastEl.classList.add('bg-primary');
-                }
-                
-                toast.show();
-                return;
-            }
-        }
-        
-        // إذا فشل Toast، استخدم console.log
-        console.log(`${type}: ${message}`);
-        
-        // تجنب استخدام alert إذا أمكن
-        if (type === 'error' && confirm(`خطأ: ${message}\n\nاضغط موافق للمتابعة`)) {
-            // المستخدم ضغط موافق
-        }
-        
-    } catch (error) {
-        console.error('خطأ في عرض الإشعار:', error);
-        console.log(`${type}: ${message}`);
-    }
+    // تنفيذ بسيط للإشعارات - يمكن تطويره لاحقاً
+    console.log(`${type}: ${message}`);
+    alert(message); // تنفيذ مؤقت
 }
 
 // دالة لعرض الأخطاء
@@ -529,7 +473,7 @@ function formatTime(time, format) {
   return time;
 }
 
-// دالة محسنة لحساب وعرض أوقات الصلاة
+// دالة لحساب وعرض أوقات الصلاة
 function calculateAndDisplayPrayerTimes() {
   const prayerTimesContainer = document.getElementById('prayer-times');
   
@@ -559,9 +503,6 @@ function calculateAndDisplayPrayerTimes() {
 
     const date = new Date();
     const times = getPrayerTimes(currentLocation.latitude, currentLocation.longitude, date, calculationMethod);
-    
-    // تخزين أوقات الصلاة في متغير عالمي
-    window.currentPrayerTimes = times;
     
     console.log('أوقات الصلاة المحسوبة:', times);
 
@@ -594,12 +535,6 @@ function calculateAndDisplayPrayerTimes() {
     });
 
     highlightCurrentPrayer(times);
-    
-    // إرسال حدث تحديث أوقات الصلاة
-    const prayerTimesEvent = new Event('prayerTimesUpdated');
-    window.dispatchEvent(prayerTimesEvent);
-    
-    console.log('تم إرسال حدث prayerTimesUpdated');
 
   } catch (error) {
     console.error('Error calculating prayer times:', error);
@@ -724,7 +659,7 @@ function initNahjAlBalagha() {
   // أو تحميل البيانات من GitHub
 }
 
-// تهيئة محسنة للتطبيق
+// تهيئة التطبيق
 function initApp() {
   console.log('تهيئة التطبيق...');
   
@@ -772,21 +707,12 @@ function initApp() {
 
   // حساب وعرض أوقات الصلاة مباشرة
   calculateAndDisplayPrayerTimes();
-  
-  // تهيئة نظام الإشعارات بعد تحميل الأوقات
-  setTimeout(() => {
-    if (window.notificationManager && typeof window.notificationManager.scheduleAllNotifications === 'function') {
-      window.notificationManager.scheduleAllNotifications();
-    }
-  }, 2000);
 
   // تحديث التاريخ كل دقيقة
   setInterval(displayDate, 60000);
 
   // تحديث أوقات الصلاة كل ساعة
   setInterval(calculateAndDisplayPrayerTimes, 3600000);
-  
-  console.log('اكتمل تهيئة التطبيق');
 }
 
 // دالة لتحديث الصفحة الرئيسية عند تغيير الإعدادات
@@ -833,37 +759,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // الاستماع لحدث تحديث أوقات الصلاة
-  window.addEventListener('prayerTimesUpdated', () => {
-    console.log('حدث prayerTimesUpdated: إعادة جدولة الإشعارات');
-    if (window.notificationManager) {
-      setTimeout(() => {
-        window.notificationManager.scheduleAllNotifications();
-      }, 500);
-    }
-  });
-
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadHijriAdjustment();   // تحميل الضبط أولاً
-  displayDate();           // عرض التاريخ
-});
 
-// جعل الدوال متاحة عالمياً
-if (typeof window !== 'undefined') {
-  window.currentLocation = currentLocation;
-  window.calculateAndDisplayPrayerTimes = calculateAndDisplayPrayerTimes;
-  window.getCurrentLocation = getCurrentLocation;
-  window.saveManualLocation = saveManualLocation;
-  window.adjustHijriDate = adjustHijriDate;
-  window.resetHijriAdjustment = resetHijriAdjustment;
-  window.togglePages = togglePages;
-  window.showNahjPage = showNahjPage;
-  window.backFromNahjPage = backFromNahjPage;
-  window.showNotification = showNotification;
-  window.showError = showError;
-}
+
 
