@@ -28,26 +28,67 @@ body {
     background-color: var(--card-bg);
     border-color: var(--border-color);
     color: var(--text-primary);
-    transition: all 0.3s ease;
 }
 
-.bg-primary { background-color: var(--bg-primary) !important; }
+.bg-primary {
+    background-color: var(--bg-primary) !important;
+}
 
-/* ===== الصفحات ===== */
+/* نظام الصفحات */
 .page {
     display: none;
     min-height: 100vh;
     width: 100%;
-    position: relative;
+    position: absolute;
     top: 0;
     left: 0;
     background-color: var(--body-bg);
-    animation: fadeIn 0.3s ease-in-out;
 }
 
-.page.active { display: block; }
+.page.active {
+    display: block;
+}
 
-/* ===== الهيدر ===== */
+/* إخفاء النافذة المنبثقة للإعدادات */
+#settings-modal {
+    display: none !important;
+}
+
+/* تنسيق زر العودة */
+#back-button {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 1.2rem;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+#back-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* تنسيق زر الإعدادات */
+#settings-button {
+    background-color: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+#settings-button:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transform: scale(1.1);
+}
+
+/* رأس الصفحة ثابت */
 header {
     position: sticky;
     top: 0;
@@ -55,35 +96,45 @@ header {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-#back-button, #settings-button, .location-marker, #nahj-button {
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    cursor: pointer;
+/* تحسينات للعرض على الجوال */
+@media (max-width: 768px) {
+    .page {
+        position: relative;
+    }
+    
+    #settings-button, #back-button {
+        font-size: 1.3rem;
+        padding: 6px;
+    }
 }
 
-#back-button { border: none; background: transparent; color: white; font-size: 1.2rem; padding: 8px; }
-#back-button:hover { background-color: rgba(255,255,255,0.1); transform: scale(1.1); }
-
-#settings-button { background: transparent; border: none; color: white; font-size: 1.5rem; opacity: 0.8; padding: 8px; }
-#settings-button:hover { opacity: 1; background-color: rgba(255,255,255,0.1); transform: scale(1.1); }
-
+/* أنماط علامة الموقع الشفافة */
 .location-marker {
     background: transparent;
     border: none;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255, 255, 255, 0.7);
     padding: 8px;
     margin-left: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
 }
-.location-marker:hover { color: rgba(255,255,255,1); background: rgba(255,255,255,0.1); }
-.location-marker .bi { font-size: 1.2rem; }
 
-/* ===== RecyclerView أوقات الصلاة ===== */
+.location-marker:hover {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.location-marker .bi {
+    font-size: 1.2rem;
+}
+
+/* أنماط RecyclerView لأوقات الصلاة */
 .prayer-recyclerview {
     background-color: var(--card-bg);
     border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 1rem;
 }
 
@@ -97,49 +148,417 @@ header {
     cursor: pointer;
 }
 
-.prayer-item:last-child { border-bottom: none; }
-.prayer-item:hover { background-color: rgba(0,0,0,0.03); }
-.prayer-item.highlight { background-color: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; }
-.dark-mode .prayer-item.highlight { background-color: rgba(255,193,7,0.1); }
+.prayer-item:last-child {
+    border-bottom: none;
+}
 
-.prayer-name { font-weight: 600; font-size: 1.1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
-.prayer-time { font-size: 1.2rem; font-weight: 700; color: var(--bg-primary); }
-.prayer-icon { font-size: 1.2rem; width: 24px; text-align: center; }
+.prayer-item:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
 
-/* ===== البحث ===== */
-.search-results .result-item {
-    background-color: var(--card-bg);
-    border-left: 4px solid var(--bg-primary);
+.prayer-item.highlight {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-left: 4px solid #ffc107;
+}
+
+.dark-mode .prayer-item.highlight {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.prayer-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prayer-time {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--bg-primary);
+}
+
+.prayer-icon {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* تحسينات للعرض على الجوال */
+@media (max-width: 576px) {
+    .prayer-item {
+        padding: 0.75rem;
+    }
+    
+    .prayer-name {
+        font-size: 1rem;
+    }
+    
+    .prayer-time {
+        font-size: 1.1rem;
+    }
+}
+
+/* تأكد من أن الزر يظهر بشكل صحيح في الرأس */
+header .d-flex .location-marker {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+/* التبويبات العمودية */
+.vertical-tabs .nav-link {
+    text-align: right;
+    border-radius: 0.375rem 0 0 0.375rem;
+    margin-bottom: 0.25rem;
+}
+
+.vertical-tabs .nav-link.active {
+    border-right: 3px solid #0d6efd;
+}
+
+@media (max-width: 768px) {
+    .vertical-tabs {
+        flex-direction: row !important;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        margin-bottom: 1rem;
+    }
+    
+    .vertical-tabs .nav-item {
+        flex-shrink: 0;
+    }
+    
+    .vertical-tabs .nav-link {
+        border-radius: 0.375rem 0.375rem 0 0;
+        margin-bottom: 0;
+        margin-right: 0.25rem;
+    }
+    
+    .vertical-tabs .nav-link.active {
+        border-right: none;
+        border-bottom: 3px solid #0d6efd;
+    }
+}
+
+/* أنماط قائمة المواقع */
+.location-item {
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
     transition: all 0.3s ease;
 }
-.search-results .result-item:hover { background-color: rgba(13,110,253,0.05); }
-.search-results mark { background-color: #ffc107; padding: 0 2px; border-radius: 2px; font-weight: bold; }
 
-/* ===== نهج البلاغة ===== */
-.nahj-content {
-    background-color: #fff;
+.location-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(-2px);
+}
+
+.location-item.active {
+    background-color: #e3f2fd;
+    border-left: 4px solid #0d6efd;
+}
+
+.location-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.location-coords {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.location-actions {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.location-item:hover .location-actions {
+    opacity: 1;
+}
+
+.btn-location {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* زر المواقع في الهيدر */
+#location-list-button {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+/* تنسيقات إضافية للواجهة */
+.prayer-card {
+    transition: all 0.3s ease;
+}
+
+.card-title {
+    font-size: 1.2rem;
+}
+
+/* تنسيقات خاصة بقائمة الأصوات */
+.sound-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sound-item:hover {
+    background-color: #f8f9fa;
+}
+
+.sound-item.active {
+    background-color: #e9ecef;
+    border-left: 3px solid #0d6efd;
+}
+
+.play-btn {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.play-btn:hover {
+    opacity: 1;
+}
+
+/* مؤشر التحميل */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* رسائل الخطأ */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+/* تنسيقات التنبيهات */
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* تنسيقات إضافية للإشعارات */
+.prayer-notification {
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.prayer-notification .toast-header {
+    background-color: #0b5ed7;
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.prayer-notification .btn-close {
+    filter: invert(1);
+}
+
+/* أنماط تبويب عن التطبيق */
+.about-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.about-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.about-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
     border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    min-height: 500px;
+}
+
+.about-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.about-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.developer-info {
+    border-left: 4px solid var(--bg-primary);
+}
+
+.about-content .list-unstyled li {
+    padding: 0.25rem 0;
+}
+
+/* تحسينات للوضع الداكن */
+.dark-mode .developer-info {
+    background-color: var(--nav-bg) !important;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-track {
+    background: #2d3748;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-thumb {
+    background: #4a5568;
+}
+
+.dark-mode .about-content::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+/* تحسين زر الإعدادات الحالي للتنقل */
+.settings-button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-button:hover {
+    transform: scale(1.1);
+}
+
+/* تحسينات للوضع الداكن */
+.dark-mode .prayer-recyclerview {
+    background-color: var(--card-bg);
+}
+
+.dark-mode .prayer-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .sound-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .location-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .location-item.active {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* تحسينات للرسوم المتحركة */
+.page {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ضمان أن المحتوى لا يختفي خلف الرأس */
+.container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+/* أنماط صفحة نهج البلاغة */
+.nahj-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  min-height: 500px;
 }
 
 .nahj-item {
-    border-right: 4px solid #0d6efd;
-    padding: 15px;
-    margin-bottom: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+  border-right: 4px solid #0d6efd;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.nahj-item:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.nahj-title {
+  color: #0d6efd;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.nahj-text {
+  line-height: 1.8;
+  text-align: justify;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.nahj-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 15px;
+  border-top: 1px dashed #dee2e6;
+  padding-top: 10px;
+}
+
+.nahj-category {
+  display: inline-block;
+  background-color: #0d6efd;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+/* زر نهج البلاغة في الهيدر */
+#nahj-button {
+  transition: all 0.3s ease;
+}
+
+#nahj-button:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+/* أنماط نهج البلاغة المحسنة */
+.nahj-sermon {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.nahj-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--bg-primary);
     transition: all 0.3s ease;
 }
-.nahj-item:hover { background-color: #e9ecef; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 
-.nahj-title { color: #0d6efd; font-weight: bold; margin-bottom: 10px; font-size: 1.2rem; }
-.nahj-text { line-height: 1.8; text-align: justify; color: #333; font-size: 1.1rem; }
-.nahj-meta { font-size: 0.9rem; color: #6c757d; margin-top: 15px; border-top: 1px dashed #dee2e6; padding-top: 10px; }
-.nahj-category { display: inline-block; background-color: #0d6efd; color: white; padding: 2px 10px; border-radius: 15px; font-size: 0.8rem; margin-left: 10px; }
+.nahj-section:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
 
-/* ===== Footnotes ===== */
+.sermon-header {
+    border-bottom: 2px solid var(--bg-primary);
+}
+
+.section-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+}
+
 .section-text .footnote-ref {
     color: var(--bg-primary);
     font-weight: bold;
@@ -148,67 +567,127 @@ header {
     padding: 0 2px;
     transition: all 0.2s ease;
 }
+
 .section-text .footnote-ref:hover {
     background-color: var(--bg-primary);
     color: white;
     border-radius: 3px;
     padding: 0 4px;
 }
+
 .footnote-item {
-    background-color: rgba(13,110,253,0.05);
+    background-color: rgba(13, 110, 253, 0.05);
     border-left: 3px solid var(--bg-primary);
     transition: all 0.3s ease;
 }
-.footnote-item:hover { background-color: rgba(13,110,253,0.1); transform: translateX(5px); }
-.footnote-number { font-family: monospace; font-size: 0.9rem; min-width: 30px; text-align: center; }
-.footnote-content { flex: 1; }
 
-/* ===== الجدول الشهري ===== */
-.prayer-monthly-table {
-    width: 100%;
-    border-collapse: collapse;
+.footnote-item:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: translateX(5px);
+}
+
+.footnote-number {
+    font-family: monospace;
     font-size: 0.9rem;
+    min-width: 30px;
+    text-align: center;
 }
-.prayer-monthly-table thead { background-color: #4a6baf; color: white; position: sticky; top: 0; z-index: 10; }
-.prayer-monthly-table th, .prayer-monthly-table td { padding: 10px 8px; text-align: center; border: none; }
-.prayer-monthly-table tbody tr { border-bottom: 1px solid #eee; transition: background-color 0.2s; }
-.prayer-monthly-table tbody tr:nth-child(even) { background-color: #f8f9fa; }
-.prayer-monthly-table tbody tr:hover { background-color: #e9ecef; }
-.day-cell-monthly { font-weight: bold; color: #4a6baf; background-color: #eef2ff; }
-.today-row-monthly { background-color: #e3f2fd !important; position: relative; }
-.today-row-monthly::before { content: "اليوم"; position: absolute; top: 5px; left: 5px; background-color: #ffc107; color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 
-/* ===== الألوان حسب الصلاة ===== */
-.fajr-monthly { color: #1a5fb4; } .sunrise-monthly { color: #e6a700; } .dhuhr-monthly { color: #c64600; } .asr-monthly { color: #26a269; } .sunset-monthly { color: #ff7800; } .maghrib-monthly { color: #a51d2d; } .isha-monthly { color: #613583; } .midnight-monthly { color: #5e5c64; } .imsak-monthly { color: #5d5d8d; }
+.footnote-content {
+    flex: 1;
+}
 
-/* ===== شريط التقدم ===== */
-.progress { background-color: #e9ecef; border-radius: 10px; overflow: hidden; }
-.progress-bar { background: linear-gradient(90deg,#3498db,#2ecc71); transition: width 0.3s ease; }
+/* أنماط البحث */
+.search-results .result-item {
+    background-color: var(--card-bg);
+    border-left: 4px solid var(--bg-primary);
+    transition: all 0.3s ease;
+}
 
-/* ===== الرسوم المتحركة ===== */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.search-results .result-item:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
 
-/* ===== التجاوب مع الجوال ===== */
+.search-results mark {
+    background-color: #ffc107;
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+/* زر التبديل */
+.toggle-footnotes {
+    transition: all 0.3s ease;
+}
+
+.toggle-footnotes:hover {
+    transform: translateY(-2px);
+}
+
+/* أنماط التحميل */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* تحسينات للوضع الداكن */
+.dark-mode .nahj-section {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .sermon-header {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
+.dark-mode .section-text .footnote-ref:hover {
+    background-color: var(--bg-primary);
+    color: white;
+}
+
+.dark-mode .footnote-item {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+
+.dark-mode .search-results .result-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .search-results mark {
+    background-color: #d4a017;
+    color: #333;
+}
+
+/* الرسوم المتحركة */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تحسينات للجوال */
 @media (max-width: 768px) {
-    .page { position: relative; }
-    #settings-button, #back-button { font-size: 1.3rem; padding: 6px; }
-    .prayer-item { padding: 0.75rem; } .prayer-name { font-size: 1rem; } .prayer-time { font-size: 1.1rem; }
-    .nahj-section { padding: 1rem; } .section-text { font-size: 1rem; }
-    .footnote-item { padding: 0.75rem; }
-    .month-controls { flex-direction: column; gap: 10px; }
-    .current-month-display { font-size: 1.1rem; min-width: 130px; }
-    .prayer-monthly-table { font-size: 0.8rem; }
-    .prayer-monthly-table th, .prayer-monthly-table td { padding: 8px 4px; }
-    .taqib-buttons .btn { padding: 8px 10px; font-size: 0.9rem; }
-    .taqib-text { font-size: 1rem; line-height: 1.6; }
-    .taqib-display-area { min-height: 250px; }
-    .taqib-footer .row { flex-direction: column; gap: 10px; }
+    .nahj-section {
+        padding: 1rem;
+    }
+    
+    .section-text {
+        font-size: 1rem;
+    }
+    
+    .footnote-item {
+        padding: 0.75rem;
+    }
 }
 
-@media (max-width: 576px) {
-    .prayer-monthly-table { display: block; overflow-x: auto; }
-    .today-row-monthly::before { font-size: 0.6rem; padding: 1px 4px; }
-    .footer .row { flex-direction: column; text-align: center; }
-    .footer .col-md-6 { width: 100%; margin-bottom: 10px; }
-}
+
+
+
