@@ -1,3 +1,4 @@
+حدث هذا الملف دون حذف الدوال حتى لا تتعطل الامور الاخرى
 :root {
     --bg-primary: #0d6efd;
     --text-primary: #212529;
@@ -39,7 +40,7 @@ body {
     display: none;
     min-height: 100vh;
     width: 100%;
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     background-color: var(--body-bg);
@@ -688,6 +689,573 @@ header .d-flex .location-marker {
     }
 }
 
+/* ===== أنماط Footer والجدول الشهري ===== */
 
+/* Footer الرئيسي */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
 
+/* زر الجدول الشهري */
+#monthly-timetable-button {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+#monthly-timetable-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* نافذة الجدول الشهري */
+#monthly-timetable-modal .modal-dialog {
+    max-width: 95%;
+    height: 90vh;
+}
+
+#monthly-timetable-modal .modal-content {
+    height: 100%;
+    border-radius: 15px;
+}
+
+#monthly-timetable-content {
+    height: calc(90vh - 70px);
+    overflow-y: auto;
+}
+
+/* أنماط الجدول الشهري */
+.monthly-timetable-container {
+    padding: 20px;
+}
+
+.monthly-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.month-controls {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.month-nav-btn {
+    background-color: #4a6baf;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.month-nav-btn:hover {
+    background-color: #3a5a9f;
+    transform: scale(1.1);
+}
+
+.current-month-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #4a6baf;
+    min-width: 150px;
+    text-align: center;
+}
+
+/* جدول أوقات الصلاة */
+.prayer-monthly-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.prayer-monthly-table thead {
+    background-color: #4a6baf;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.prayer-monthly-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    border: none;
+}
+
+.prayer-monthly-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.prayer-monthly-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.prayer-monthly-table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+.prayer-monthly-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border: none;
+}
+
+.day-cell-monthly {
+    font-weight: bold;
+    color: #4a6baf;
+    background-color: #eef2ff;
+}
+
+.today-row-monthly {
+    background-color: #e3f2fd !important;
+    position: relative;
+}
+
+.today-row-monthly::before {
+    content: "اليوم";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: #ffc107;
+    color: #000;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* ألوان الصلوات في الجدول */
+.fajr-monthly { color: #1a5fb4; }
+.sunrise-monthly { color: #e6a700; }
+.dhuhr-monthly { color: #c64600; }
+.asr-monthly { color: #26a269; }
+.sunset-monthly { color: #ff7800; }
+.maghrib-monthly { color: #a51d2d; }
+.isha-monthly { color: #613583; }
+.midnight-monthly { color: #5e5c64; }
+.imsak-monthly { color: #5d5d8d; }
+
+/* إشعارات الجدول الشهري */
+.monthly-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #26a269;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* التجاوب مع الأجهزة المحمولة */
+@media (max-width: 768px) {
+    .footer {
+        padding: 10px 0;
+    }
+    
+    #monthly-timetable-button {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    #monthly-timetable-modal .modal-dialog {
+        max-width: 100%;
+        height: 95vh;
+        margin: 10px;
+    }
+    
+    .month-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .current-month-display {
+        font-size: 1.1rem;
+        min-width: 130px;
+    }
+    
+    .prayer-monthly-table {
+        font-size: 0.8rem;
+    }
+    
+    .prayer-monthly-table th,
+    .prayer-monthly-table td {
+        padding: 8px 4px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer .row {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer .col-md-6 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .prayer-monthly-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .today-row-monthly::before {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+    }
+}
+
+/* أنماط الوضع الداكن */
+[data-theme="dark"] .footer {
+    background-color: #2d3748 !important;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .month-controls {
+    background-color: #374151;
+}
+
+[data-theme="dark"] .prayer-monthly-table tbody tr {
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .prayer-monthly-table tbody tr:nth-child(even) {
+    background-color: #374151;
+}
+
+[data-theme="dark"] .prayer-monthly-table tbody tr:hover {
+    background-color: #4b5563;
+}
+
+[data-theme="dark"] .day-cell-monthly {
+    background-color: #3b4b6b;
+}
+
+/* أنماط إضافية للجدول الشهري */
+.monthly-timetable-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.month-controls {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.current-month-display {
+    min-width: 200px;
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+
+.table-success td {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+}
+
+.table-success:hover td {
+    background-color: #c3e6cb !important;
+}
+
+/* تلوين الصلوات */
+td:nth-child(2) { /* الإمساك */
+    color: #5d5d8d;
+    font-weight: 500;
+}
+
+td:nth-child(3) { /* الفجر */
+    color: #1a5fb4;
+    font-weight: 600;
+}
+
+td:nth-child(4) { /* الشروق */
+    color: #e6a700;
+    font-weight: 500;
+}
+
+td:nth-child(5) { /* الظهر */
+    color: #c64600;
+    font-weight: 600;
+}
+
+td:nth-child(6) { /* العصر */
+    color: #26a269;
+    font-weight: 500;
+}
+
+td:nth-child(7) { /* الغروب */
+    color: #ff7800;
+    font-weight: 500;
+}
+
+td:nth-child(8) { /* المغرب */
+    color: #a51d2d;
+    font-weight: 600;
+}
+
+td:nth-child(9) { /* العشاء */
+    color: #613583;
+    font-weight: 500;
+}
+
+td:nth-child(10) { /* منتصف الليل */
+    color: #5e5c64;
+    font-weight: 500;
+}
+
+/* شريط التقدم */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    transition: width 0.3s ease;
+}
+
+/* تلميحات للأعمدة */
+th {
+    position: relative;
+    cursor: help;
+}
+
+th:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* التجاوب مع الأجهزة المحمولة */
+@media (max-width: 768px) {
+    .month-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .current-month-display {
+        min-width: 150px;
+        font-size: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    th, td {
+        padding: 0.3rem !important;
+    }
+}
+
+/* أنماط الوضع الداكن للجدول الشهري */
+[data-theme="dark"] .month-controls {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .current-month-display {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .table-success td {
+    background-color: #22543d !important;
+    border-color: #276749 !important;
+}
+
+[data-theme="dark"] .table-success:hover td {
+    background-color: #276749 !important;
+}
+
+/* أنماط تعقيب الصلاة */
+.taqib-container {
+    font-family: 'Segoe UI', 'Noto Sans Arabic', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.taqib-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.taqib-buttons .btn {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-weight: 500;
+}
+
+.taqib-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.taqib-buttons .btn.active {
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+}
+
+.taqib-display-area {
+    min-height: 300px;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.taqib-display-area:hover {
+    border-color: #28a745;
+}
+
+.taqib-content .card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.taqib-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+    direction: rtl;
+}
+
+.taqib-text strong {
+    font-weight: 600;
+}
+
+.taqib-text .badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    margin: 0 5px;
+}
+
+.taqib-text hr {
+    border-color: #28a745;
+    opacity: 0.3;
+    margin: 20px 0;
+}
+
+.taqib-footer .card {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.taqib-footer .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* تنسيق خاص للنصوص العربية */
+.taqib-text {
+    font-feature-settings: "kern" 1, "liga" 1;
+    letter-spacing: 0;
+}
+
+.taqib-text p {
+    margin-bottom: 1.5rem;
+}
+
+/* تأثيرات للعناوين */
+.taqib-text h4, .taqib-text h5, .taqib-text h6 {
+    color: #28a745;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+    margin: 25px 0 15px;
+}
+
+/* التجاوب مع الأجهزة المحمولة */
+@media (max-width: 768px) {
+    .taqib-buttons .btn {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .taqib-text {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .taqib-display-area {
+        min-height: 250px;
+    }
+    
+    .taqib-footer .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* أنماط الوضع الداكن */
+[data-theme="dark"] .taqib-display-area {
+    background-color: #2d3748 !important;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .taqib-content .card {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] .taqib-text {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .taqib-text strong.text-success {
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] .taqib-text strong.text-primary {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .taqib-text strong.text-danger {
+    color: #f87171 !important;
+}
+
+[data-theme="dark"] .taqib-footer .card {
+    background-color: #374151;
+    border-color: #4b5563;
+}
 
