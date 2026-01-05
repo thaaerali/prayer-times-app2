@@ -536,11 +536,3 @@ window.nahjApp = {
         alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadHijriAdjustment();   // تحميل الضبط أولاً
-  displayDate();           // عرض التاريخ
-});
-
-
-
