@@ -180,73 +180,42 @@ function loadHijriAdjustment() {
   }
 }
 
-// دالة محسنة لعرض التاريخ مع مراعاة الضبط
 function displayDate() {
   try {
     const now = new Date();
-    
+
     // التاريخ الميلادي
-    const gregorianOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      timeZone: 'Asia/Baghdad'
-    };
-    const gregorianDate = now.toLocaleDateString('ar-IQ', gregorianOptions);
-    
-    // التاريخ الهجري - مع مراعاة الضبط
-    let hijriDate;
-    try {
-      // إنشاء تاريخ جديد مع الضبط
-      const adjustedDate = new Date(now);
-      adjustedDate.setDate(adjustedDate.getDate() + (hijriDateAdjustment || 0));
-      
-      const hijriOptions = {
-        year: 'numeric',
-        month: 'long', 
-        day: 'numeric',
-        calendar: 'islamic',
-        timeZone: 'Asia/Baghdad'
-      };
-      hijriDate = adjustedDate.toLocaleDateString('ar-IQ', hijriOptions);
-      
-     // إضافة مؤشر الضبط إذا كان هناك ضبط
-      if (hijriDateAdjustment !== 0) {
-        const adjustmentSign = hijriDateAdjustment > 0 ? '+' : '';
-        hijriDate += ` (مضبوط ${adjustmentSign}${hijriDateAdjustment})`;
-      }
-    } catch (error) {
-      // إذا فشل استخدام التقويم الهجري، استخدم حساب تقريبي
-      hijriDate = calculateHijriDate(now);
-    } 
-    
-    console.log('التاريخ الميلادي:', gregorianDate);
-    console.log('التاريخ الهجري:', hijriDate);
-    console.log('ضبط التاريخ:', hijriDateAdjustment);
-    
-    // تحديث العناصر في الصفحة
-    const gregorianElement = document.getElementById('gregorian-date');
-    const hijriElement = document.getElementById('hijri-date');
-    
-    if (gregorianElement) {
-      gregorianElement.textContent = gregorianDate;
-      console.log('تم تحديث الميلادي');
-    } else {
-      console.error('عنصر gregorian-date غير موجود');
-    }
-    
-    if (hijriElement) {
-      hijriElement.textContent = hijriDate;
-      console.log('تم تحديث الهجري');
-    } else {
-      console.error('عنصر hijri-date غير موجود');
-    }
-    
-  } catch (error) {
-    console.error('خطأ في عرض التاريخ:', error);
+    const gregorianDate = now.toLocaleDateString('ar-IQ', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // التاريخ الهجري مع الضبط
+    const adjustedDate = new Date(now);
+    adjustedDate.setDate(adjustedDate.getDate() + hijriDateAdjustment);
+
+    const hijriDate = new Intl.DateTimeFormat(
+      'ar-SA-u-ca-islamic',
+      { day: 'numeric', month: 'long', year: 'numeric' }
+    ).format(adjustedDate);
+
+    // تحديث العناصر (بدون تدميرها)
+    const gEl = document.getElementById('gregorian-date');
+    const hEl = document.getElementById('hijri-date');
+
+    if (gEl) gEl.textContent = gregorianDate;
+    if (hEl) hEl.textContent = hijriDate;
+
+    console.log('📅 ميلادي:', gregorianDate);
+    console.log('🕌 هجري:', hijriDate);
+
+  } catch (e) {
+    console.error('خطأ عرض التاريخ:', e);
   }
 }
+
 
 // دالة محسنة لحساب التاريخ الهجري تقريبياً مع الضبط
 function calculateHijriDate(gregorianDate) {
@@ -762,6 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
 
