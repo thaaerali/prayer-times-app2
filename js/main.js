@@ -537,5 +537,10 @@ window.nahjApp = {
     }
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+  loadHijriAdjustment();   // تحميل الضبط أولاً
+  displayDate();           // عرض التاريخ
+});
+
 
 
