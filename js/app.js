@@ -847,6 +847,11 @@ document.addEventListener('DOMContentLoaded', function() {
   initApp();
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  loadHijriAdjustment();   // تحميل الضبط أولاً
+  displayDate();           // عرض التاريخ
+});
+
 // جعل الدوال متاحة عالمياً
 if (typeof window !== 'undefined') {
   window.currentLocation = currentLocation;
@@ -861,3 +866,4 @@ if (typeof window !== 'undefined') {
   window.showNotification = showNotification;
   window.showError = showError;
 }
+
