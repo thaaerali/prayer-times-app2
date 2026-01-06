@@ -249,3 +249,67 @@ body.dark-mode .settings-button:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* ============================================
+   تنسيقات خاصة لتعقيب الصلاة في الوضع الداكن
+   ============================================ */
+
+/* تنسيقات تعقيب الصلاة */
+.dark-mode .taqib-primary-dark {
+    color: #4cc9f0 !important;
+    text-shadow: 0 1px 2px rgba(76, 201, 240, 0.3);
+}
+
+.dark-mode .taqib-success-dark {
+    color: #52b788 !important;
+    text-shadow: 0 1px 2px rgba(82, 183, 136, 0.3);
+}
+
+.dark-mode .taqib-divider {
+    border-color: #4a5568 !important;
+    opacity: 0.6;
+}
+
+.dark-mode .taqib-section-alert {
+    background-color: rgba(74, 85, 104, 0.5) !important;
+    border-color: #4a5568 !important;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode .taqib-section-alert strong {
+    color: #ffffff !important;
+}
+
+.dark-mode .taqib-badge {
+    background-color: #4361ee !important;
+    color: #ffffff !important;
+    border: 1px solid #4361ee;
+}
+
+.dark-mode .taqib-supplication {
+    background-color: rgba(82, 183, 136, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+    margin: 0.125rem 0;
+}
+
+.dark-mode .taqib-info-alert {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+    border-color: rgba(40, 167, 69, 0.3) !important;
+    color: #d4edda !important;
+}
+
+.dark-mode .taqib-info-alert .bi-info-circle {
+    color: #52b788 !important;
+}
+
+/* تحسين قابلية القراءة في الوضع الداكن */
+.dark-mode .taqib-text {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+/* تحسين التباين للنصوص المهمة */
+.dark-mode .taqib-text strong {
+    font-weight: 600;
+}
