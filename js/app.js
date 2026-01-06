@@ -341,6 +341,97 @@ function showError(message) {
     showNotification(message, 'error');
 }
 
+// دالة لإضافة الألقاب الخاصة للمدن المقدسة
+function addHonorificTitle(cityName) {
+    if (!cityName || typeof cityName !== 'string') {
+        return cityName || 'موقع غير معروف';
+    }
+    
+    // تنظيف النص
+    const cleanCity = cityName.trim();
+    
+    // إنشاء نسخة للبحث (إزالة التشكيل والفراغات)
+    const searchCity = cleanCity.replace(/[ًٌٍَُِّْ]/g, '').replace(/\s+/g, ' ');
+    
+    // خريطة المدن المقدسة مع ألقابها
+    const holyCitiesMap = [
+        // المدن المقدسة في الإسلام
+        { 
+            names: ['مكة', 'مكه', 'مكـة', 'مكـه', 'مكا', 'مكاه'], 
+            title: 'مكة المكرمة' 
+        },
+        { 
+            names: ['المدينة', 'المدينه', 'المديـنة', 'المديـنه', 'المدينه المنورة', 'المدينة المنورة'], 
+            title: 'المدينة المنورة' 
+        },
+        { 
+            names: ['القدس', 'بيت المقدس', 'القدس الشريف'], 
+            title: 'القدس الشريف' 
+        },
+        
+        // المدن المقدسة عند الشيعة
+        { 
+            names: ['النجف', 'النجـف', 'النجف الاشرف', 'النجف الأشرف'], 
+            title: 'النجف الأشرف' 
+        },
+        { 
+            names: ['كربلاء', 'كربلاء', 'كربـلاء', 'كربـلاء', 'كربلاء المقدسة'], 
+            title: 'كربلاء المقدسة' 
+        },
+        { 
+            names: ['مشهد', 'مشـهد', 'مشهد المقدسة'], 
+            title: 'مشهد المقدسة' 
+        },
+        { 
+            names: ['قم', 'قـم', 'قم المقدسة'], 
+            title: 'قم المقدسة' 
+        },
+        { 
+            names: ['الكاظمية', 'الكاظميه', 'الكاظميـة', 'الكاظميـه', 'الكاظمية المقدسة'], 
+            title: 'الكاظمية المقدسة' 
+        },
+        { 
+            names: ['سامراء', 'سامرا', 'سامـراء', 'سامـرا', 'سامراء المقدسة'], 
+            title: 'سامراء المقدسة' 
+        },
+        { 
+            names: ['الكوفة', 'الكوفه', 'الكوفـة', 'الكوفـه', 'الكوفة المقدسة'], 
+            title: 'الكوفة المقدسة' 
+        }
+    ];
+    
+    // التحقق من الاسم الكامل أولاً (بدون حساسية لحالة الأحرف)
+    const searchCityLower = searchCity.toLowerCase();
+    
+    for (const city of holyCitiesMap) {
+        for (const name of city.names) {
+            const nameLower = name.toLowerCase();
+            
+            // مطابقة دقيقة
+            if (searchCityLower === nameLower) {
+                console.log(`✅ تم إضافة اللقب لمدينة (مطابقة دقيقة): ${cleanCity} → ${city.title}`);
+                return city.title;
+            }
+            
+            // مطابقة جزئية (إذا كان اسم المدينة يبدأ باسم مقدس)
+            if (searchCityLower.startsWith(nameLower) || 
+                searchCityLower.includes(` ${nameLower}`) ||
+                searchCityLower.includes(nameLower + ' ')) {
+                
+                // تجنب التكرار (مثل "مكة المكرمة" لا تحتاج لتغيير)
+                if (!searchCityLower.includes(city.title.toLowerCase())) {
+                    console.log(`✅ تم إضافة اللقب لمدينة (مطابقة جزئية): ${cleanCity} → ${city.title}`);
+                    return city.title;
+                }
+            }
+        }
+    }
+    
+    // إذا لم تكن المدينة في القائمة، أرجع الاسم الأصلي
+    console.log(`ℹ️ المدينة "${cleanCity}" ليست في قائمة المدن المقدسة`);
+    return cleanCity;
+}
+
 // دالة للحصول على الموقع الحالي
 function getCurrentLocation() {
     const cityNameElement = document.getElementById('city-name');
@@ -378,7 +469,13 @@ function getCurrentLocation() {
                 const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=ar`);
                 const data = await response.json();
 
-                currentLocation.city = data.city || data.locality || data.principalSubdivision || "موقع غير معروف";
+                // الحصول على اسم المدينة الأساسي
+                let cityName = data.city || data.locality || data.principalSubdivision || "موقع غير معروف";
+                
+                // إضافة الألقاب الخاصة للمدن المقدسة
+                cityName = addHonorificTitle(cityName);
+                
+                currentLocation.city = cityName;
                 
                 const cityNameElement = document.getElementById('city-name');
                 const coordinatesElement = document.getElementById('coordinates');
@@ -467,12 +564,15 @@ function saveManualLocation() {
     
     const city = manualLocation.value.trim();
     if (city) {
-        currentLocation.city = city;
+        // إضافة اللقب الخاص إذا كانت المدينة مقدسة
+        const cityWithTitle = addHonorificTitle(city);
+        
+        currentLocation.city = cityWithTitle;
         currentLocation.latitude = 31.9539;
         currentLocation.longitude = 44.3736;
 
         if (cityNameElement) {
-            cityNameElement.textContent = city;
+            cityNameElement.textContent = cityWithTitle;
         }
         
         if (coordinatesElement) {
@@ -480,10 +580,10 @@ function saveManualLocation() {
         }
 
         const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-        settings.city = city;
+        settings.city = cityWithTitle;
         settings.latitude = currentLocation.latitude;
         settings.longitude = currentLocation.longitude;
-        settings.cityName = city;
+        settings.cityName = cityWithTitle;
         localStorage.setItem('prayerSettings', JSON.stringify(settings));
 
         showNotification('تم حفظ الموقع اليدوي بنجاح');
@@ -491,6 +591,36 @@ function saveManualLocation() {
     } else {
         showError('يرجى إدخال اسم المدينة');
     }
+}
+
+// دالة لاختبار إضافة الألقاب للمدن
+function testCityTitles() {
+    const testCities = [
+        'مكة',
+        'مكه',
+        'المدينة',
+        'المدينه',
+        'النجف',
+        'كربلاء',
+        'مشهد',
+        'قم',
+        'الكاظمية',
+        'سامراء',
+        'الكوفة',
+        'بغداد', // ليست في القائمة
+        'دمشق',   // ليست في القائمة
+        'مكة المكرمة', // بالفعل كاملة
+        'المدينة المنورة', // بالفعل كاملة
+        'القدس',
+        'النجف الأشرف' // بالفعل كاملة
+    ];
+    
+    console.log('=== اختبار إضافة ألقاب المدن ===');
+    testCities.forEach(city => {
+        const result = addHonorificTitle(city);
+        console.log(`"${city}" → "${result}"`);
+    });
+    console.log('=== نهاية الاختبار ===');
 }
 
 // دالة لتحويل الوقت إلى دقائق
@@ -867,3 +997,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // تصدير الدوال للاستخدام في الكونسول (للتشخيص)
 window.debugHijriAdjustment = debugHijriAdjustment;
+window.testCityTitles = testCityTitles;
+window.addHonorificTitle = addHonorificTitle;
