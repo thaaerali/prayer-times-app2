@@ -1,0 +1,236 @@
+/* ============================================
+   هجري-أدجستمنت.سي إس إس
+   تصميم القائمة المنسدلة لضبط التاريخ الهجري
+   ============================================ */
+
+/* تحسين مظهر القائمة المنسدلة لضبط التاريخ الهجري */
+#hijriAdjustmentDropdown {
+  text-align: right;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+#hijriAdjustmentDropdown:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+#hijriAdjustmentDropdown:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #86b7fe;
+}
+
+/* حالة الضبط الحالي */
+#hijri-adjustment-status {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  background-color: #f8f9fa;
+}
+
+#hijri-adjustment-status:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* تحسين عناصر القائمة المنسدلة */
+.dropdown-menu .dropdown-item {
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  margin: 0.125rem 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #e9ecef;
+  transform: translateX(-2px);
+}
+
+.dropdown-menu .dropdown-item:active {
+  background-color: #dee2e6;
+}
+
+/* تحسين الأيقونات داخل القائمة المنسدلة */
+.dropdown-menu .dropdown-item i {
+  font-size: 1.1em;
+  width: 20px;
+  text-align: center;
+}
+
+/* الألوان الخاصة بكل نوع من الإجراءات */
+.dropdown-item .bi-plus-circle {
+  color: #198754; /* أخضر للزيادة */
+}
+
+.dropdown-item .bi-dash-circle {
+  color: #fd7e14; /* برتقالي للتنقيص */
+}
+
+.dropdown-item .bi-arrow-counterclockwise {
+  color: #6c757d; /* رمادي للإعادة */
+}
+
+/* ترويسة الأقسام داخل القائمة المنسدلة */
+.dropdown-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 1rem;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dropdown-header.text-primary {
+  color: #0d6efd;
+}
+
+.dropdown-header.text-warning {
+  color: #fd7e14;
+}
+
+/* فاصل القائمة */
+.dropdown-divider {
+  margin: 0.25rem 0;
+  border-top: 1px solid #e9ecef;
+}
+
+/* تحسين عرض القائمة المنسدلة */
+.dropdown-menu {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+/* تحسين النص داخل القائمة المنسدلة */
+.dropdown-item {
+  font-size: 0.875rem;
+  color: #212529;
+}
+
+/* تأثيرات خاصة للضبط الموجب */
+.text-success {
+  color: #198754 !important;
+}
+
+/* تأثيرات خاصة للضبط السالب */
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 768px) {
+  #hijriAdjustmentDropdown {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .dropdown-menu {
+    min-width: 180px;
+  }
+  
+  .dropdown-item {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+  
+  #hijri-adjustment-status {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* دعم الوضع الداكن (Dark Mode) */
+.dark-mode #hijriAdjustmentDropdown {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode #hijriAdjustmentDropdown:hover {
+  background-color: #4a5568;
+}
+
+.dark-mode #hijri-adjustment-status {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #cbd5e0;
+}
+
+.dark-mode #hijri-adjustment-status:hover {
+  background-color: #4a5568;
+  border-color: #718096;
+}
+
+.dark-mode .dropdown-menu {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .dropdown-item {
+  color: #e2e8f0;
+}
+
+.dark-mode .dropdown-item:hover {
+  background-color: #4a5568;
+  color: #fff;
+}
+
+.dark-mode .dropdown-header {
+  color: #a0aec0;
+}
+
+.dark-mode .dropdown-divider {
+  border-top-color: #4a5568;
+}
+
+/* تحسينات الوصول (Accessibility) */
+#hijriAdjustmentDropdown:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.dropdown-item:focus {
+  outline: none;
+  background-color: #e9ecef;
+}
+
+.dark-mode .dropdown-item:focus {
+  background-color: #4a5568;
+}
+
+/* رسوم متحركة بسيطة */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu.show {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* تحسينات إضافية للتجربة */
+#hijri-adjustment-status .fw-bold {
+  font-weight: 700 !important;
+}
+
+#current-adjustment {
+  font-size: 1.1em;
+}
+
+/* للشاشات الصغيرة جداً */
+@media (max-width: 576px) {
+  #hijriAdjustmentDropdown .btn {
+    width: 100%;
+  }
+  
+  .hijri-adjustment-section {
+    padding: 0.5rem;
+  }
+}
