@@ -536,3 +536,26 @@ window.nahjApp = {
         alert('تطبيق نهج البلاغة غير مهيئ بعد. اضغط على زر نهج البلاغة أولاً.');
     }
 };
+document.addEventListener('DOMContentLoaded', () => {
+  forceHijriRender();
+});
+
+function forceHijriRender() {
+  const el = document.getElementById('hijri-date');
+  if (!el) {
+    console.error('❌ عنصر hijri-date غير موجود');
+    return;
+  }
+
+  const adj = parseInt(localStorage.getItem('hijriAdjustment') || '0');
+  const d = new Date();
+  d.setDate(d.getDate() + adj);
+
+  el.textContent = d.toLocaleDateString(
+    'ar-SA-u-ca-islamic',
+    { day: 'numeric', month: 'long', year: 'numeric' }
+  );
+
+  console.log('✅ التاريخ الهجري عُرض بنجاح');
+}
+
