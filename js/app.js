@@ -152,14 +152,16 @@ function updateHijriDropdownLabel() {
     }
 }
 
-// دالة لضبط التاريخ الهجري مع تحديث القائمة المنسدلة
+// دالة مصححة لضبط التاريخ الهجري
 function adjustHijriDate(days) {
-    // تحميل الضبط السابق من localStorage
-    const savedAdjustment = localStorage.getItem('hijriDateAdjustment');
-    hijriDateAdjustment = savedAdjustment ? parseInt(savedAdjustment) : 0;
+    console.log(`ضبط التاريخ الهجري بقيمة: ${days}`);
     
-    // تحديث الضبط
+    // لا تحميل من localStorage هنا - استخدم القيمة الحالية
+    // hijriDateAdjustment متغير عام تم تحميله مسبقاً
+    
+    // تحديث الضبط بالقيمة المحددة
     hijriDateAdjustment += days;
+    console.log(`الضبط الجديد: ${hijriDateAdjustment}`);
     
     // حفظ في localStorage
     localStorage.setItem('hijriDateAdjustment', hijriDateAdjustment.toString());
@@ -183,6 +185,7 @@ function adjustHijriDate(days) {
 
 // دالة لإعادة ضبط التاريخ الهجري
 function resetHijriAdjustment() {
+    console.log('إعادة ضبط التاريخ الهجري');
     hijriDateAdjustment = 0;
     localStorage.removeItem('hijriDateAdjustment');
     
@@ -261,6 +264,7 @@ function displayDate() {
 
         console.log('📅 ميلادي:', gregorianDate);
         console.log('🕌 هجري:', hijriDate);
+        console.log('ضبط الهجري الحالي:', hijriDateAdjustment);
 
     } catch (e) {
         console.error('❌ خطأ في عرض التاريخ:', e);
@@ -306,7 +310,6 @@ function updateLocationStatus(message, isError = false) {
 
 // دالة لعرض الإشعارات
 function showNotification(message, type = 'success') {
-    // تنفيذ بسيط للإشعارات - يمكن تطويره لاحقاً
     console.log(`${type}: ${message}`);
     
     // استخدام Bootstrap Toast إذا كان متاحاً
@@ -329,7 +332,7 @@ function showNotification(message, type = 'success') {
             toast.show();
         }
     } else {
-        alert(message); // تنفيذ مؤقت
+        alert(message);
     }
 }
 
@@ -684,45 +687,70 @@ function playAdhanSound(soundId) {
 
 // تهيئة نهج البلاغة
 function initNahjAlBalagha() {
-    // تحقق من وجود الصفحة أولاً
     const nahjPage = document.getElementById('nahj-page');
     if (!nahjPage) {
         console.warn('صفحة نهج البلاغة غير موجودة');
         return;
     }
     
-    // تأكد من أن الصفحة غير نشطة عند البدء
     nahjPage.classList.remove('active');
-    
     console.log('تهيئة نهج البلاغة...');
-    
-    // يمكنك هنا تهيئة أي دوال إضافية لنهج البلاغة
-    // أو تحميل البيانات من GitHub
 }
 
-// تهيئة أحداث ضبط التاريخ الهجري للقائمة المنسدلة
+// دالة مصححة ومبسطة لتهيئة أحداث ضبط التاريخ الهجري
 function initHijriAdjustmentEvents() {
-    // تعيين event listeners لعناصر القائمة المنسدلة
-    const dropdownItems = document.querySelectorAll('#hijriAdjustmentDropdown + .dropdown-menu .dropdown-item');
+    console.log('تهيئة أحداث ضبط التاريخ الهجري...');
+    
+    // طريقة 1: استخدام onclick مباشرة في HTML (الأفضل)
+    // تأكد أن HTML يحتوي على:
+    // <a class="dropdown-item" href="#" onclick="adjustHijriDate(-1); return false;">
+    
+    // طريقة 2: إضافة event listeners ديناميكياً
+    const dropdownItems = document.querySelectorAll('.dropdown-item[data-hijri-adjust]');
+    
     dropdownItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        // إزالة أي event listeners سابقة
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+        
+        // إضافة listener جديدة
+        newItem.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             
-            // استخراج قيمة الضبط من الـ data attribute أو من نص العنصر
-            const text = this.textContent.trim();
-            const icon = this.querySelector('i');
-            
-            if (text.includes('زيادة يوم واحد')) {
-                adjustHijriDate(1);
-            } else if (text.includes('زيادة يومين')) {
-                adjustHijriDate(2);
-            } else if (text.includes('تنقيص يوم واحد')) {
-                adjustHijriDate(-1);
-            } else if (text.includes('تنقيص يومين')) {
-                adjustHijriDate(-2);
-            } else if (text.includes('إعادة الضبط')) {
-                resetHijriAdjustment();
+            const adjustValue = this.getAttribute('data-hijri-adjust');
+            if (adjustValue) {
+                const days = parseInt(adjustValue);
+                console.log(`ضبط الهجري بقيمة: ${days}`);
+                adjustHijriDate(days);
             }
+        });
+    });
+    
+    // طريقة احتياطية: مراقبة جميع النقرات
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('[onclick*="adjustHijriDate"]');
+        if (target) {
+            console.log('تم النقر على زر ضبط الهجري');
+        }
+    });
+}
+
+// دالة تشخيصية
+function debugHijriAdjustment() {
+    console.log('=== تشخيص ضبط الهجري ===');
+    console.log('الضبط الحالي:', hijriDateAdjustment);
+    console.log('القيمة في localStorage:', localStorage.getItem('hijriDateAdjustment'));
+    
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    console.log(`عدد عناصر القائمة: ${dropdownItems.length}`);
+    
+    dropdownItems.forEach((item, index) => {
+        console.log(`العنصر ${index}:`, {
+            text: item.textContent.trim(),
+            onclick: item.getAttribute('onclick'),
+            href: item.getAttribute('href'),
+            'data-hijri-adjust': item.getAttribute('data-hijri-adjust')
         });
     });
 }
@@ -775,6 +803,9 @@ function initApp() {
     
     // تهيئة أحداث ضبط التاريخ الهجري
     initHijriAdjustmentEvents();
+    
+    // تفعيل دالة التشخيص للتحقق
+    console.log('لتفعيل تشخيص ضبط الهجري، اكتب في الكونسول: debugHijriAdjustment()');
 
     // حساب وعرض أوقات الصلاة مباشرة
     calculateAndDisplayPrayerTimes();
@@ -833,3 +864,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // تهيئة التطبيق عند تحميل الصفحة
     initApp();
 });
+
+// تصدير الدوال للاستخدام في الكونسول (للتشخيص)
+window.debugHijriAdjustment = debugHijriAdjustment;
