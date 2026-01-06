@@ -1303,3 +1303,83 @@ body.dark .badge {
     color: #212529 !important; /* لون النص داكن للبادجات */
 }
 
+/* تنسيقات النافذة المنبثقة الكبيرة */
+#taqib-modal .modal-dialog {
+    max-width: 95%;
+    height: 90vh;
+    margin: 5vh auto;
+}
+
+#taqib-modal .modal-content {
+    height: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#taqib-modal .modal-body {
+    overflow-y: auto;
+    max-height: calc(90vh - 60px);
+    padding: 20px;
+}
+
+/* تحسين أزرار الصلوات */
+.taqib-prayer-btn {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.taqib-prayer-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.taqib-prayer-btn.active {
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
+}
+
+/* تحسين نص التعقيب */
+.taqib-text {
+    font-size: 1.2rem !important;
+    line-height: 2 !important;
+    text-align: right !important;
+    white-space: pre-line !important;
+}
+
+.taqib-text strong {
+    color: #0d6efd !important;
+}
+
+/* تحسين التجاوب */
+@media (max-width: 768px) {
+    #taqib-modal .modal-dialog {
+        max-width: 98%;
+        height: 95vh;
+        margin: 2.5vh auto;
+    }
+    
+    .taqib-prayer-btn {
+        padding: 10px !important;
+    }
+    
+    .taqib-text {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* دعم الوضع الداكن */
+[data-theme="dark"] #taqib-modal .modal-content {
+    background-color: #1e1e1e;
+    color: #e9ecef;
+}
+
+[data-theme="dark"] .taqib-display-area {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .taqib-text {
+    color: #e9ecef !important;
+}
+
+[data-theme="dark"] .taqib-text strong {
+    color: #4dabf7 !important;
+}
