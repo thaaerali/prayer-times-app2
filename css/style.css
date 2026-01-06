@@ -1258,4 +1258,48 @@ th:hover::after {
     background-color: #374151;
     border-color: #4b5563;
 }
+/* تحسين قراءة النص في الوضع الداكن */
+[data-theme="dark"] .taqib-text,
+.dark-mode .taqib-text,
+body.dark .taqib-text {
+    color: #e9ecef !important;
+    background-color: transparent !important;
+}
+
+/* ضمان ظهور جميع النصوص في الوضع الداكن */
+[data-theme="dark"] .taqib-display-area,
+.dark-mode .taqib-display-area,
+body.dark .taqib-display-area {
+    background-color: #1a1a1a !important;
+    color: #e9ecef !important;
+}
+
+[data-theme="dark"] .taqib-content .card,
+.dark-mode .taqib-content .card,
+body.dark .taqib-content .card {
+    background-color: #2d2d2d !important;
+    color: #e9ecef !important;
+}
+
+/* تحسين تباين النص */
+[data-theme="dark"] .taqib-text p,
+.dark-mode .taqib-text p,
+body.dark .taqib-text p {
+    color: #e9ecef !important;
+}
+
+/* تحسين ظهور العلامات البارزة */
+[data-theme="dark"] .taqib-highlight,
+.dark-mode .taqib-highlight,
+body.dark .taqib-highlight {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    color: #ffd43b !important;
+}
+
+/* تحسين ظهور البادجات */
+[data-theme="dark"] .badge,
+.dark-mode .badge,
+body.dark .badge {
+    color: #212529 !important; /* لون النص داكن للبادجات */
+}
 
