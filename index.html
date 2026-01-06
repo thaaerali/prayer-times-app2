@@ -261,30 +261,74 @@
                     <small class="text-muted">الفجر، الشروق، الغروب، الظهر والمغرب دائمًا</small>
                   </div>
 
-                    <div class="mb-4">
+                   <div class="mb-4">
   <label class="form-label fw-bold">ضبط التاريخ الهجري:</label>
-  <div class="hijri-adjustment-buttons d-flex flex-wrap gap-2">
-    <button class="btn btn-outline-primary btn-sm" onclick="adjustHijriDate(1)">
-      <i class="bi bi-plus-circle"></i> زيادة يوم
+  
+  <!-- القائمة المنسدلة الرئيسية -->
+  <div class="dropdown">
+    <button class="btn btn-outline-secondary dropdown-toggle w-100" 
+            type="button" 
+            id="hijriAdjustmentDropdown" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+      <span id="dropdown-label">تعديل التاريخ</span>
     </button>
-    <button class="btn btn-outline-primary btn-sm" onclick="adjustHijriDate(2)">
-      <i class="bi bi-plus-circle"></i> زيادة يومين
-    </button>
-    <button class="btn btn-outline-warning btn-sm" onclick="adjustHijriDate(-1)">
-      <i class="bi bi-dash-circle"></i> تنقيص يوم
-    </button>
-    <button class="btn btn-outline-warning btn-sm" onclick="adjustHijriDate(-2)">
-      <i class="bi bi-dash-circle"></i> تنقيص يومين
-    </button>
-    <button class="btn btn-outline-secondary btn-sm" onclick="resetHijriAdjustment()">
-      <i class="bi bi-arrow-counterclockwise"></i> إعادة الضبط
-    </button>
+    
+    <ul class="dropdown-menu w-100" aria-labelledby="hijriAdjustmentDropdown">
+      <!-- زيادة الأيام -->
+      <li>
+        <h6 class="dropdown-header text-primary">زيادة يوم</h6>
+      </li>
+      <li>
+        <a class="dropdown-item" href="#" onclick="adjustHijriDate(1); return false;">
+          <i class="bi bi-plus-circle text-primary me-2"></i>زيادة يوم واحد
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="#" onclick="adjustHijriDate(2); return false;">
+          <i class="bi bi-plus-circle text-primary me-2"></i>زيادة يومين
+        </a>
+      </li>
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      <!-- تنقيص الأيام -->
+      <li>
+        <h6 class="dropdown-header text-warning">تنقيص يوم</h6>
+      </li>
+      <li>
+        <a class="dropdown-item" href="#" onclick="adjustHijriDate(-1); return false;">
+          <i class="bi bi-dash-circle text-warning me-2"></i>تنقيص يوم واحد
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="#" onclick="adjustHijriDate(-2); return false;">
+          <i class="bi bi-dash-circle text-warning me-2"></i>تنقيص يومين
+        </a>
+      </li>
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      <!-- إعادة الضبط -->
+      <li>
+        <a class="dropdown-item" href="#" onclick="resetHijriAdjustment(); return false;">
+          <i class="bi bi-arrow-counterclockwise text-secondary me-2"></i>إعادة الضبط
+        </a>
+      </li>
+    </ul>
   </div>
-  <div id="hijri-adjustment-status" class="mt-2 small text-muted">
-    الضبط الحالي: <span id="current-adjustment">0</span> يوم
+  
+  <!-- حالة الضبط الحالية -->
+  <div id="hijri-adjustment-status" class="mt-3 p-2 bg-light rounded">
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="small text-muted">الضبط الحالي:</span>
+      <span id="current-adjustment" class="fw-bold">0 يوم</span>
+    </div>
+    <div class="mt-1 small text-muted" id="hijri-adjusted-date">
+      <!-- سيتم عرض التاريخ المعدل هنا -->
+    </div>
   </div>
 </div>
-                  </div>
 
                 <!-- تحديد الموقع -->
                 <div class="tab-pane fade" id="v-pills-location" role="tabpanel" aria-labelledby="v-pills-location-tab">
@@ -722,6 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="js/smart-footer.js" defer></script>
 </body>
 </html>
+
 
 
 
