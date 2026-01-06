@@ -184,42 +184,47 @@ function loadHijriAdjustment() {
 }
 
 function displayDate() {
- const gEl = document.getElementById('gregorian-date');
-  const hEl = document.getElementById('hijri-date');
-
-  if (!gEl || !hEl) {
-    console.warn('⚠️ عناصر التاريخ غير جاهزة بعد');
-    return;
-  }
-
-  const now = new Date();
-
-  gEl.textContent = now.toLocaleDateString('ar-IQ', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
-  const adjustedDate = new Date(now);
-  adjustedDate.setDate(adjustedDate.getDate() + hijriDateAdjustment);
-
-  hEl.textContent = new Intl.DateTimeFormat(
-    'ar-SA-u-ca-islamic',
-    { day: 'numeric', month: 'long', year: 'numeric' }
-  ).format(adjustedDate);
-    // تحديث العناصر (بدون تدميرها)
+  try {
     const gEl = document.getElementById('gregorian-date');
     const hEl = document.getElementById('hijri-date');
 
-    if (gEl) gEl.textContent = gregorianDate;
-    if (hEl) hEl.textContent = hijriDate;
+    if (!gEl || !hEl) {
+      console.warn('⚠️ عناصر التاريخ غير موجودة بعد');
+      return;
+    }
+
+    const now = new Date();
+
+    // 📅 التاريخ الميلادي
+    const gregorianDate = now.toLocaleDateString('ar-IQ', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    gEl.textContent = gregorianDate;
+
+    // 🕌 التاريخ الهجري (مع الضبط)
+    const adjustedDate = new Date(now);
+    adjustedDate.setDate(adjustedDate.getDate() + (hijriDateAdjustment || 0));
+
+    const hijriDate = new Intl.DateTimeFormat(
+      'ar-SA-u-ca-islamic',
+      {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }
+    ).format(adjustedDate);
+
+    hEl.textContent = hijriDate;
 
     console.log('📅 ميلادي:', gregorianDate);
     console.log('🕌 هجري:', hijriDate);
 
   } catch (e) {
-    console.error('خطأ عرض التاريخ:', e);
+    console.error('❌ خطأ في عرض التاريخ:', e);
   }
 }
 
@@ -738,6 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
 
