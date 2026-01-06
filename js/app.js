@@ -58,12 +58,15 @@ function togglePages(pageName = null) {
     else {
         // الانتقال إلى الصفحة الرئيسية
         if (homePage) {
-            homePage.classList.add('active');
-            console.log('تم التبديل إلى الصفحة الرئيسية');
+  homePage.classList.add('active');
 
-            // إعادة حساب الأوقات
-            calculateAndDisplayPrayerTimes();
-        }
+  // ⬅️ هنا الحل
+  setTimeout(() => {
+    displayDate();
+    calculateAndDisplayPrayerTimes();
+  }, 50);
+}
+
     }
 }
 
@@ -731,6 +734,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
 
