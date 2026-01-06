@@ -184,26 +184,30 @@ function loadHijriAdjustment() {
 }
 
 function displayDate() {
-  try {
-    const now = new Date();
+ const gEl = document.getElementById('gregorian-date');
+  const hEl = document.getElementById('hijri-date');
 
-    // التاريخ الميلادي
-    const gregorianDate = now.toLocaleDateString('ar-IQ', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  if (!gEl || !hEl) {
+    console.warn('⚠️ عناصر التاريخ غير جاهزة بعد');
+    return;
+  }
 
-    // التاريخ الهجري مع الضبط
-    const adjustedDate = new Date(now);
-    adjustedDate.setDate(adjustedDate.getDate() + hijriDateAdjustment);
+  const now = new Date();
 
-    const hijriDate = new Intl.DateTimeFormat(
-      'ar-SA-u-ca-islamic',
-      { day: 'numeric', month: 'long', year: 'numeric' }
-    ).format(adjustedDate);
+  gEl.textContent = now.toLocaleDateString('ar-IQ', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
+  const adjustedDate = new Date(now);
+  adjustedDate.setDate(adjustedDate.getDate() + hijriDateAdjustment);
+
+  hEl.textContent = new Intl.DateTimeFormat(
+    'ar-SA-u-ca-islamic',
+    { day: 'numeric', month: 'long', year: 'numeric' }
+  ).format(adjustedDate);
     // تحديث العناصر (بدون تدميرها)
     const gEl = document.getElementById('gregorian-date');
     const hEl = document.getElementById('hijri-date');
@@ -734,6 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // تهيئة التطبيق عند تحميل الصفحة
   initApp();
 });
+
 
 
 
