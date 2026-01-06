@@ -1,0 +1,227 @@
+/* ============================================
+   ملف CSS مستقل للفوتر الذكي - Smart Footer
+   يمكن استخدامه في أي مشروع بدون تعديلات
+   إعدادات: AzkaMothol
+   ============================================ */
+
+/* تنسيقات الفوتر الذكي */
+#main-footer {
+    transition: all 0.4s ease-in-out;
+    transform: translateY(100%);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 0;
+}
+
+#main-footer.visible {
+    transform: translateY(0);
+}
+
+#main-footer.hidden {
+    transform: translateY(100%);
+}
+
+/* زر التحكم في ظهور الفوتر */
+.footer-toggle-btn {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #1e3c72; /* لون أساسي */
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.footer-toggle-btn:hover {
+    transform: scale(1.1);
+    background-color: #2a5298; /* لون ثانوي */
+}
+
+.footer-toggle-btn i {
+    transition: transform 0.3s ease;
+}
+
+.footer-toggle-btn.active i {
+    transform: rotate(180deg);
+}
+
+/* منطقة تفعيل الفوتر */
+.footer-activation-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    z-index: 999;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* التأقلم مع الأجهزة المحمولة */
+@media (max-width: 768px) {
+    #main-footer {
+        transform: translateY(100%);
+        padding: 0.75rem 0;
+    }
+    
+    #main-footer.visible {
+        transform: translateY(0);
+    }
+    
+    .footer-toggle-btn {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .footer-activation-area {
+        height: 40px; /* منطقة أكبر للمس */
+    }
+}
+
+/* التأقلم مع التمرير */
+body.footer-active {
+    padding-bottom: 70px; /* مساحة للفوتر */
+}
+
+/* تنسيقات داخل الفوتر */
+#main-footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+#main-footer .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+#main-footer .col-auto {
+    padding: 0 10px;
+}
+
+#main-footer .btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+}
+
+#main-footer .btn-outline-primary {
+    color: #1e3c72;
+    border: 1px solid #1e3c72;
+    background-color: transparent;
+}
+
+#main-footer .btn-outline-primary:hover {
+    color: white;
+    background-color: #1e3c72;
+}
+
+#main-footer .btn-outline-success {
+    color: #198754;
+    border: 1px solid #198754;
+    background-color: transparent;
+}
+
+#main-footer .btn-outline-success:hover {
+    color: white;
+    background-color: #198754;
+}
+
+#main-footer .text-muted {
+    color: #6c757d !important;
+}
+
+/* دعم الوضع الداكن */
+@media (prefers-color-scheme: dark) {
+    #main-footer {
+        background-color: #1a1a1a;
+        border-top-color: #444;
+    }
+    
+    .footer-toggle-btn {
+        background-color: #2a5298;
+    }
+    
+    .footer-toggle-btn:hover {
+        background-color: #3a62a8;
+    }
+    
+    #main-footer .btn-outline-primary {
+        color: #74c0fc;
+        border-color: #74c0fc;
+    }
+    
+    #main-footer .btn-outline-primary:hover {
+        color: #1a1a1a;
+        background-color: #74c0fc;
+    }
+    
+    #main-footer .btn-outline-success {
+        color: #20c997;
+        border-color: #20c997;
+    }
+    
+    #main-footer .btn-outline-success:hover {
+        color: #1a1a1a;
+        background-color: #20c997;
+    }
+    
+    #main-footer .text-muted {
+        color: #adb5bd !important;
+    }
+}
+
+/* دعم IE11 (إذا لزم الأمر) */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    #main-footer {
+        display: block;
+    }
+    
+    .footer-toggle-btn {
+        display: block;
+    }
+    
+    #main-footer .row {
+        display: table;
+        width: 100%;
+    }
+}
+
+/* طباعة */
+@media print {
+    #main-footer,
+    .footer-toggle-btn,
+    .footer-activation-area {
+        display: none !important;
+    }
+    
+    body.footer-active {
+        padding-bottom: 0 !important;
+    }
+}
