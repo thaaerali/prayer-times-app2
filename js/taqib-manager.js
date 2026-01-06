@@ -1,4 +1,4 @@
-// ملف مدير تعقيبات الصلاة
+// ملف مدير تعقيبات الصلاة - معدل لعرض كامل الصفحة
 (function() {
     'use strict';
     
@@ -41,7 +41,7 @@
             }, 500);
         },
         
-        // فتح نافذة تعقيب الصلاة
+        // فتح نافذة تعقيب الصلاة - نافذة كاملة
         openTaqibModal: function() {
             console.log('فتح نافذة تعقيب الصلاة...');
             
@@ -54,18 +54,21 @@
             // تحميل المحتوى
             this.loadTaqibContent();
             
-            // إظهار النافذة باستخدام Bootstrap
-            const modal = new bootstrap.Modal(modalElement);
+            // إظهار النافذة باستخدام Bootstrap - نافذة كاملة
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: true
+            });
             modal.show();
         },
         
-        // تحميل محتوى تعقيب الصلاة
+        // تحميل محتوى تعقيب الصلاة - تصميم كامل الصفحة
         loadTaqibContent: function() {
             const contentDiv = document.getElementById('taqib-content');
             if (!contentDiv) return;
             
             contentDiv.innerHTML = `
-                <div class="taqib-container">
+                <div class="taqib-container" style="min-height: 80vh;">
                     <!-- رأس التعقيبات -->
                     <div class="taqib-header text-center mb-4">
                         <h4 class="text-success mb-2">تعقيب الصلاة</h4>
@@ -77,65 +80,87 @@
                     
                     <!-- أزرار الصلوات -->
                     <div class="taqib-buttons row g-3 mb-4">
-                        <div class="col-6 col-md-4">
-                            <button class="taqib-prayer-btn btn btn-outline-success w-100" data-prayer="fajr">
-                                <i class="bi bi-sunrise me-2"></i>
-                                الفجر
+                        <div class="col-6 col-md-4 col-lg">
+                            <button class="taqib-prayer-btn btn btn-outline-success w-100 py-3" data-prayer="fajr">
+                                <i class="bi bi-sunrise me-2 fs-5"></i>
+                                <div class="d-block">الفجر</div>
+                                <small class="text-muted">صلاة الصبح</small>
                             </button>
                         </div>
-                        <div class="col-6 col-md-4">
-                            <button class="taqib-prayer-btn btn btn-outline-success w-100" data-prayer="dhuhr">
-                                <i class="bi bi-sun me-2"></i>
-                                الظهر
+                        <div class="col-6 col-md-4 col-lg">
+                            <button class="taqib-prayer-btn btn btn-outline-success w-100 py-3" data-prayer="dhuhr">
+                                <i class="bi bi-sun me-2 fs-5"></i>
+                                <div class="d-block">الظهر</div>
+                                <small class="text-muted">صلاة الظهر</small>
                             </button>
                         </div>
-                        <div class="col-6 col-md-4">
-                            <button class="taqib-prayer-btn btn btn-outline-success w-100" data-prayer="asr">
-                                <i class="bi bi-cloud-sun me-2"></i>
-                                العصر
+                        <div class="col-6 col-md-4 col-lg">
+                            <button class="taqib-prayer-btn btn btn-outline-success w-100 py-3" data-prayer="asr">
+                                <i class="bi bi-cloud-sun me-2 fs-5"></i>
+                                <div class="d-block">العصر</div>
+                                <small class="text-muted">صلاة العصر</small>
                             </button>
                         </div>
-                        <div class="col-6 col-md-4">
-                            <button class="taqib-prayer-btn btn btn-outline-success w-100" data-prayer="maghrib">
-                                <i class="bi bi-sunset me-2"></i>
-                                المغرب
+                        <div class="col-6 col-md-6 col-lg">
+                            <button class="taqib-prayer-btn btn btn-outline-success w-100 py-3" data-prayer="maghrib">
+                                <i class="bi bi-sunset me-2 fs-5"></i>
+                                <div class="d-block">المغرب</div>
+                                <small class="text-muted">صلاة المغرب</small>
                             </button>
                         </div>
-                        <div class="col-6 col-md-4">
-                            <button class="taqib-prayer-btn btn btn-outline-success w-100" data-prayer="isha">
-                                <i class="bi bi-moon-stars me-2"></i>
-                                العشاء
+                        <div class="col-12 col-md-6 col-lg">
+                            <button class="taqib-prayer-btn btn btn-outline-success w-100 py-3" data-prayer="isha">
+                                <i class="bi bi-moon-stars me-2 fs-5"></i>
+                                <div class="d-block">العشاء</div>
+                                <small class="text-muted">صلاة العشاء</small>
                             </button>
                         </div>
                     </div>
                     
                     <!-- معلومات -->
-                    <div class="alert alert-info">
+                    <div class="alert alert-info mb-4">
                         <div class="d-flex">
                             <div class="me-3">
                                 <i class="bi bi-lightbulb fs-4"></i>
                             </div>
-                            <div>
+                            <div class="flex-grow-1">
                                 <small>
                                     <strong>معلومة:</strong> التعقيبات من كتاب "مصباح المتهجد" للشيخ الطوسي.
                                     يمكنك حفظ التعقيب أو مشاركته مع الآخرين.
                                 </small>
                             </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-info" onclick="TaqibManager.closeModal()">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- منطقة عرض التعقيب -->
-                    <div id="taqib-display-area" class="taqib-display-area mt-4 p-3 bg-light rounded d-none">
-                        <div class="text-center">
+                    <!-- منطقة عرض التعقيب - مساحة أكبر -->
+                    <div id="taqib-display-area" class="taqib-display-area mt-4 p-4 bg-light rounded" style="min-height: 400px;">
+                        <div class="text-center py-5">
                             <i class="bi bi-book fs-1 text-muted mb-3"></i>
-                            <p class="text-muted">اختر صلاة لعرض تعقيبها</p>
+                            <h4 class="text-muted mb-3">اختر صلاة لعرض تعقيبها</h4>
+                            <p class="text-muted small">انقر على أي من الصلوات أعلاه لعرض تعقيبها الكامل</p>
                         </div>
+                    </div>
+                    
+                    <!-- أزرار الإجراءات العامة -->
+                    <div class="taqib-actions mt-4 d-flex justify-content-end gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="TaqibManager.closeModal()">
+                            <i class="bi bi-x-circle me-1"></i> إغلاق
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" id="print-all-taqib">
+                            <i class="bi bi-printer me-1"></i> طباعة الكل
+                        </button>
                     </div>
                 </div>
             `;
             
             // إعداد أحداث الأزرار
             this.setupTaqibButtons();
+            this.setupActionButtons();
         },
         
         // إعداد أحداث أزرار الصلوات
@@ -144,10 +169,23 @@
                 const prayerButtons = document.querySelectorAll('.taqib-prayer-btn');
                 prayerButtons.forEach(button => {
                     button.addEventListener('click', (e) => {
-                        const prayer = e.target.getAttribute('data-prayer');
+                        const prayer = e.currentTarget.getAttribute('data-prayer');
                         this.loadTaqibForPrayer(prayer);
                     });
                 });
+            }, 100);
+        },
+        
+        // إعداد أحداث أزرار الإجراءات
+        setupActionButtons: function() {
+            setTimeout(() => {
+                // زر طباعة الكل
+                const printAllBtn = document.getElementById('print-all-taqib');
+                if (printAllBtn) {
+                    printAllBtn.addEventListener('click', () => {
+                        this.printAllTaqib();
+                    });
+                }
             }, 100);
         },
         
@@ -157,13 +195,13 @@
             if (!displayArea) return;
             
             // عرض مؤشر التحميل
-            displayArea.classList.remove('d-none');
             displayArea.innerHTML = `
-                <div class="text-center py-4">
-                    <div class="spinner-border spinner-border-sm text-success" role="status">
+                <div class="text-center py-5">
+                    <div class="spinner-border spinner-border-lg text-success" role="status" style="width: 3rem; height: 3rem;">
                         <span class="visually-hidden">جاري التحميل...</span>
                     </div>
-                    <p class="mt-2 text-muted">جاري تحميل تعقيب ${this.prayerNames[prayer]}...</p>
+                    <h5 class="mt-3 text-success">جاري تحميل تعقيب ${this.prayerNames[prayer]}</h5>
+                    <p class="text-muted small">قد يستغرق هذا بضع لحظات...</p>
                 </div>
             `;
             
@@ -192,7 +230,7 @@
             }
         },
         
-        // عرض التعقيب
+        // عرض التعقيب - تصميم كامل الصفحة
         displayTaqib(prayer, content) {
             const displayArea = document.getElementById('taqib-display-area');
             if (!displayArea) return;
@@ -204,72 +242,65 @@
                 <!-- رأس التعقيب -->
                 <div class="taqib-header mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="text-success mb-0">
+                        <h4 class="text-success mb-0">
                             <i class="bi bi-bookmark-heart me-2"></i>
                             ${this.prayerNames[prayer]}
-                        </h5>
-                        <div>
-                            <button class="btn btn-sm btn-outline-success" onclick="copyTaqibToClipboard('${prayer}')">
+                        </h4>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-success" onclick="copyTaqibToClipboard('${prayer}')">
                                 <i class="bi bi-clipboard me-1"></i> نسخ
                             </button>
-                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="shareTaqib('${prayer}')">
+                            <button class="btn btn-outline-primary" onclick="shareTaqib('${prayer}')">
                                 <i class="bi bi-share me-1"></i> مشاركة
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="printCurrentTaqib('${prayer}')">
+                                <i class="bi bi-printer me-1"></i> طباعة
                             </button>
                         </div>
                     </div>
                     
-                    <div class="alert alert-success py-2">
-                        <small>
-                            <i class="bi bi-info-circle me-1"></i>
-                            تعقيب ${this.prayerNames[prayer]} عن مصباح المتهجد
-                        </small>
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle me-2 fs-5"></i>
+                            <div>
+                                <strong>تعقيب ${this.prayerNames[prayer]} عن مصباح المتهجد</strong>
+                                <div class="d-flex gap-3 mt-2 small">
+                                    <span><i class="bi bi-clock me-1"></i> وقت القراءة: ${this.calculateReadingTime(content)} دقيقة</span>
+                                    <span><i class="bi bi-card-text me-1"></i> عدد الكلمات: ${this.countWords(content)} كلمة</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- محتوى التعقيب -->
-                <div class="taqib-content">
-                    <div class="card border-0 bg-white shadow-sm">
-                        <div class="card-body">
-                            <div class="taqib-text" id="taqib-text-${prayer}">
+                <!-- محتوى التعقيب - مساحة كبيرة -->
+                <div class="taqib-content mb-4">
+                    <div class="card border-0 shadow-lg" style="min-height: 300px;">
+                        <div class="card-body p-4">
+                            <div class="taqib-text fs-5" id="taqib-text-${prayer}" style="line-height: 2; font-family: 'Traditional Arabic', serif;">
                                 ${formattedContent}
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- معلومات إضافية -->
-                <div class="taqib-footer mt-4">
+                <!-- أزرار التنقل والإجراءات -->
+                <div class="taqib-footer">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body py-2">
-                                    <small class="text-muted d-flex align-items-center">
-                                        <i class="bi bi-clock-history me-2"></i>
-                                        <span>وقت القراءة: ${this.calculateReadingTime(content)} دقيقة</span>
-                                    </small>
-                                </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-secondary" onclick="loadPreviousTaqib('${prayer}')">
+                                    <i class="bi bi-arrow-right me-2"></i> التعقيب السابق
+                                </button>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body py-2">
-                                    <small class="text-muted d-flex align-items-center">
-                                        <i class="bi bi-card-text me-2"></i>
-                                        <span>عدد الكلمات: ${this.countWords(content)} كلمة</span>
-                                    </small>
-                                </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-secondary" onclick="loadNextTaqib('${prayer}')">
+                                    التعقيب التالي <i class="bi bi-arrow-left ms-2"></i>
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- أزرار التنقل -->
-                    <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="loadPreviousTaqib('${prayer}')">
-                            <i class="bi bi-arrow-right me-1"></i> التعقيب السابق
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="loadNextTaqib('${prayer}')">
-                            التعقيب التالي <i class="bi bi-arrow-left ms-1"></i>
-                        </button>
                     </div>
                 </div>
             `;
@@ -279,28 +310,56 @@
             
             // تمييز الزر النشط
             this.highlightActiveButton(prayer);
+            
+            // التمرير إلى الأعلى
+            displayArea.scrollTop = 0;
         },
         
-        // تنسيق محتوى التعقيب
+        // تنسيق محتوى التعقيب - تحسين التنسيق
         formatTaqibContent(content) {
-            if (!content) return '<p class="text-muted">لا يوجد تعقيب متاح</p>';
+            if (!content) return '<p class="text-center text-muted">لا يوجد تعقيب متاح</p>';
             
             let formatted = content;
             
-            // استبدال الأسطر الجديدة بـ <br>
-            formatted = formatted.replace(/\n/g, '<br>');
+            // استبدال الأسطر الجديدة
+            formatted = formatted.replace(/\n{3,}/g, '\n\n');
+            formatted = formatted.replace(/\n/g, '<br><br>');
             
-            // تنسيق العناوين
-            formatted = formatted.replace(/اَللّـهُمَّ/gi, '<strong class="text-success">اَللّـهُمَّ</strong>');
-            formatted = formatted.replace(/سُبْحانَ اللهِ/gi, '<strong class="text-primary">سُبْحانَ اللهِ</strong>');
-            formatted = formatted.replace(/صَلَّى اللهُ عَلى مُحَمَّد/gi, '<strong class="text-danger">صَلَّى اللهُ عَلى مُحَمَّد</strong>');
+            // تنسيق العناوين والكلمات المهمة
+            const highlightWords = [
+                'اَللّـهُمَّ',
+                'سُبْحانَ اللهِ',
+                'صَلَّى اللهُ عَلى مُحَمَّد',
+                'تَعْقِيبُ',
+                'قُلْ'
+            ];
+            
+            highlightWords.forEach(word => {
+                const regex = new RegExp(`(${word})`, 'gi');
+                formatted = formatted.replace(regex, '<strong class="text-primary">$1</strong>');
+            });
             
             // إضافة فواصل بين المقاطع
-            formatted = formatted.replace(/(وقل أيضاً:|وتقول عشر مرّات:|ثمّ قل:)/g, '<hr class="my-3"><strong>$1</strong><br>');
+            const sectionMarkers = [
+                'وقل أيضاً',
+                'وتقول عشر مرّات',
+                'ثمّ قل',
+                'ثمّ قل مائة مرّة',
+                'ومائة مرّة'
+            ];
             
-            // إضافة أرقام للجمل المكررة
-            const countRegex = /(\d+) مرّات?:/g;
-            formatted = formatted.replace(countRegex, '<span class="badge bg-info">$1 مرّة</span><br>');
+            sectionMarkers.forEach(marker => {
+                const regex = new RegExp(`(${marker}[^<]+)`, 'gi');
+                formatted = formatted.replace(regex, 
+                    '<hr class="my-4"><div class="alert alert-light"><strong>$1</strong></div>');
+            });
+            
+            // تنسيق الأعداد والتكرار
+            formatted = formatted.replace(/(\d+)(\s*)(مِرَّة|مَرَّة|مرّات|مرّة)/gi, 
+                '<span class="badge bg-info text-dark fs-6 me-1">$1 $3</span>');
+            
+            // تحسين ظهور الآيات والأدعية
+            formatted = formatted.replace(/يَا[^<]+/gi, '<span class="text-success fw-bold">$&</span>');
             
             return formatted;
         },
@@ -308,7 +367,7 @@
         // حساب وقت القراءة
         calculateReadingTime(text) {
             const words = text.split(/\s+/).length;
-            const readingTime = Math.ceil(words / 200); // 200 كلمة في الدقيقة
+            const readingTime = Math.ceil(words / 150); // 150 كلمة في الدقيقة للعربية
             return readingTime || 1;
         },
         
@@ -356,14 +415,72 @@
         highlightActiveButton(prayer) {
             const buttons = document.querySelectorAll('.taqib-prayer-btn');
             buttons.forEach(button => {
-                button.classList.remove('active', 'btn-success');
+                button.classList.remove('active', 'btn-success', 'border-success', 'border-2');
                 button.classList.add('btn-outline-success');
                 
                 if (button.getAttribute('data-prayer') === prayer) {
                     button.classList.remove('btn-outline-success');
-                    button.classList.add('btn-success', 'active');
+                    button.classList.add('btn-success', 'active', 'border-success', 'border-2');
+                    // إضافة تأثير
+                    button.style.transform = 'scale(1.05)';
+                    button.style.transition = 'all 0.3s ease';
+                } else {
+                    button.style.transform = 'scale(1)';
                 }
             });
+        },
+        
+        // طباعة جميع التعقيبات
+        printAllTaqib() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl" lang="ar">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>تعقيبات الصلاة - مصباح المتهجد</title>
+                    <style>
+                        body { font-family: 'Traditional Arabic', serif; padding: 20px; }
+                        h1 { color: #198754; text-align: center; }
+                        .prayer-section { margin: 30px 0; border-bottom: 2px solid #ddd; padding-bottom: 20px; }
+                        .prayer-title { color: #0d6efd; font-size: 1.5rem; }
+                        .taqib-content { line-height: 2; font-size: 1.1rem; }
+                        @media print {
+                            .no-print { display: none; }
+                            body { font-size: 14pt; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>تعقيبات الصلاة من كتاب مصباح المتهجد</h1>
+                    <p class="text-center">طباعة بتاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+                    <hr>
+            `);
+            
+            // إضافة كل التعقيبات
+            Object.keys(this.prayerNames).forEach(prayer => {
+                printWindow.document.write(`
+                    <div class="prayer-section">
+                        <h2 class="prayer-title">${this.prayerNames[prayer]}</h2>
+                        <div class="taqib-content">${this.getDefaultTaqib(prayer).replace(/\n/g, '<br>')}</div>
+                    </div>
+                `);
+            });
+            
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        },
+        
+        // إغلاق النافذة
+        closeModal() {
+            const modalElement = document.getElementById('taqib-modal');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+            }
         },
         
         // تعقيبات افتراضية
@@ -502,6 +619,63 @@
         const currentIndex = prayers.indexOf(currentPrayer);
         const nextIndex = currentIndex < prayers.length - 1 ? currentIndex + 1 : 0;
         TaqibManager.loadTaqibForPrayer(prayers[nextIndex]);
+    };
+    
+    window.printCurrentTaqib = function(prayer) {
+        const prayerName = TaqibManager.prayerNames[prayer];
+        const taqibText = document.getElementById(`taqib-text-${prayer}`);
+        
+        if (taqibText) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl" lang="ar">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${prayerName} - تعقيب الصلاة</title>
+                    <style>
+                        body { 
+                            font-family: 'Traditional Arabic', 'Arial', sans-serif; 
+                            padding: 30px; 
+                            line-height: 2;
+                            font-size: 16pt;
+                        }
+                        h1 { 
+                            color: #198754; 
+                            text-align: center; 
+                            border-bottom: 2px solid #198754;
+                            padding-bottom: 10px;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            color: #666;
+                        }
+                        .content {
+                            text-align: justify;
+                            margin-top: 20px;
+                        }
+                        @media print {
+                            body { font-size: 14pt; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>${prayerName}</h1>
+                    <div class="header">
+                        <p>تعقيب الصلاة من كتاب مصباح المتهجد</p>
+                        <p>طباعة بتاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+                    </div>
+                    <hr>
+                    <div class="content">
+                        ${taqibText.innerHTML}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
     };
     
     // تهيئة عند تحميل DOM
