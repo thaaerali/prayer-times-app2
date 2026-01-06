@@ -1,0 +1,286 @@
+/* ============================================
+   تعقيب-الصلاة.سي إس إس
+   تصميم خاص لصفحة تعقيب الصلاة مع دعم الوضع الداكن
+   ============================================ */
+
+/* تصميم عام لصفحة تعقيب الصلاة */
+.taqib-container {
+    font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* تحسين عرض نص التعقيب في الوضع العادي */
+.taqib-text {
+    line-height: 2;
+    font-size: 1.1rem;
+    text-align: justify;
+    letter-spacing: 0.3px;
+}
+
+/* تحسين عرض نص التعقيب في الوضع الداكن */
+.dark-mode .taqib-text {
+    color: #e9ecef !important;
+    background-color: transparent !important;
+}
+
+/* تحسين كارد عرض التعقيب */
+.taqib-display-area .card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.dark-mode .taqib-display-area .card {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .taqib-display-area .card-body {
+    background-color: #2d3748 !important;
+    color: #e9ecef !important;
+}
+
+/* تحسين النصوص المميزة في الوضع الداكن */
+.dark-mode .taqib-text strong.text-primary {
+    color: #4cc9f0 !important;
+    font-weight: 600;
+}
+
+.dark-mode .taqib-text .text-success {
+    color: #52b788 !important;
+}
+
+/* تحسين البادجات في الوضع الداكن */
+.dark-mode .taqib-text .badge.bg-info {
+    background-color: #4361ee !important;
+    color: #ffffff !important;
+    border: 1px solid #4361ee;
+}
+
+/* تحسين النصوص المميزة */
+.taqib-text strong.text-primary {
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* تحسين عناصر التنبيه */
+.dark-mode .taqib-header .alert-success {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+    border-color: #28a745 !important;
+    color: #d4edda !important;
+}
+
+.dark-mode .taqib-container .alert-info {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+    border-color: #17a2b8 !important;
+    color: #d1ecf1 !important;
+}
+
+/* تحسين أزرار الصلوات */
+.taqib-prayer-btn {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.taqib-prayer-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .taqib-prayer-btn.btn-outline-success {
+    color: #52b788 !important;
+    border-color: #52b788 !important;
+}
+
+.dark-mode .taqib-prayer-btn.btn-outline-success:hover {
+    background-color: #52b788 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .taqib-prayer-btn.btn-success {
+    background-color: #52b788 !important;
+    border-color: #52b788 !important;
+    color: #ffffff !important;
+}
+
+/* تحسين منطقة العرض في الوضع الداكن */
+.dark-mode #taqib-display-area {
+    background-color: #1a202c !important;
+    border-color: #4a5568 !important;
+}
+
+/* تحسين الرؤوس والعناوين */
+.dark-mode .taqib-header h4.text-success {
+    color: #52b788 !important;
+}
+
+.dark-mode .text-success {
+    color: #52b788 !important;
+}
+
+/* تحسين النصوص الثانوية */
+.dark-mode .text-muted {
+    color: #a0aec0 !important;
+}
+
+/* تحسين أزرار الإجراءات */
+.dark-mode .btn-outline-success {
+    color: #52b788;
+    border-color: #52b788;
+}
+
+.dark-mode .btn-outline-success:hover {
+    background-color: #52b788;
+    color: #ffffff;
+}
+
+.dark-mode .btn-outline-primary {
+    color: #4299e1;
+    border-color: #4299e1;
+}
+
+.dark-mode .btn-outline-primary:hover {
+    background-color: #4299e1;
+    color: #ffffff;
+}
+
+.dark-mode .btn-outline-secondary {
+    color: #a0aec0;
+    border-color: #a0aec0;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+    background-color: #a0aec0;
+    color: #1a202c;
+}
+
+/* تحسين منطقة البودي */
+.dark-mode .taqib-container {
+    background-color: transparent !important;
+}
+
+/* تحسين الـ HR الفواصل */
+.dark-mode .taqib-text hr {
+    border-color: #4a5568 !important;
+}
+
+/* تحسين مناطق التنبيه في المحتوى */
+.dark-mode .taqib-text .alert-light {
+    background-color: #4a5568 !important;
+    border-color: #718096 !important;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode .taqib-text .alert-light strong {
+    color: #ffffff !important;
+}
+
+/* تحسين الأحرف الكبيرة والعناوين */
+.taqib-text {
+    font-size: 1.15rem;
+}
+
+@media (max-width: 768px) {
+    .taqib-text {
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+}
+
+/* تحسين طباعة التعقيب */
+@media print {
+    .taqib-text {
+        font-size: 14pt !important;
+        line-height: 1.8 !important;
+        color: #000000 !important;
+    }
+    
+    .dark-mode .taqib-text {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+}
+
+/* تأثيرات خاصة للقراءة */
+.taqib-text {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* تحسين عرض الأدعية والآيات */
+.taqib-text span.text-success.fw-bold {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px 0;
+}
+
+.dark-mode .taqib-text span.text-success.fw-bold {
+    background-color: rgba(82, 183, 136, 0.1);
+    border-left: 3px solid #52b788;
+}
+
+/* تحسين المسافات بين الأسطر */
+.taqib-text br + br {
+    content: "";
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* تحسين استجابة النصوص للشاشات الصغيرة */
+@media (max-width: 576px) {
+    .taqib-text {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    
+    .taqib-display-area .card-body {
+        padding: 1.25rem !important;
+    }
+}
+
+/* تحسين الإضاءة للنصوص المهمة */
+.taqib-text strong {
+    position: relative;
+}
+
+.taqib-text strong::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+}
+
+.dark-mode .taqib-text strong::after {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+/* تحسين التمرير */
+.taqib-display-area {
+    scroll-behavior: smooth;
+}
+
+/* إضافة تأثيرات عند التحديد */
+.taqib-text::selection {
+    background-color: rgba(25, 135, 84, 0.3);
+    color: inherit;
+}
+
+.dark-mode .taqib-text::selection {
+    background-color: rgba(82, 183, 136, 0.4);
+    color: #ffffff;
+}
+
+/* تحسين الخطوط للأدعية العربية */
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal-Regular.ttf') format('truetype');
+    font-display: swap;
+}
+
+.taqib-text {
+    font-family: 'Tajawal', 'Noto Sans Arabic', 'Segoe UI', sans-serif;
+}
