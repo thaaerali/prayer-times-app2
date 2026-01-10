@@ -1,4 +1,4 @@
-// ملف JavaScript المعدل للجدول الشهري مع زر طباعة
+// ملف JavaScript المعدل للجدول الشهري مع زر طباعة وتغيير طريقة الحساب
 (function() {
     'use strict';
     
@@ -16,12 +16,6 @@
         monthNames: [
             "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
             "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-        ],
-        
-        // أسماء الأشهر الهجرية (اختياري)
-        hijriMonthNames: [
-            "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة",
-            "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
         ],
         
         // أسماء الصلوات بالعربية
@@ -108,12 +102,25 @@
                     .btn-close,
                     button,
                     .alert,
-                    .text-muted:not(.print-text) {
+                    .text-muted:not(.print-text),
+                    .print-settings {
                         display: none !important;
                     }
                     
                     .monthly-timetable-container {
                         padding: 10px !important;
+                    }
+                    
+                    .print-quran-verse {
+                        display: block !important;
+                        text-align: center;
+                        font-size: 16px !important;
+                        color: #2c3e50 !important;
+                        font-weight: bold;
+                        margin: 15px 0 !important;
+                        padding: 10px !important;
+                        border-bottom: 2px solid #3498db !important;
+                        font-family: 'Traditional Arabic', 'Arial', sans-serif !important;
                     }
                     
                     .table {
@@ -150,6 +157,19 @@
                         padding-top: 10px;
                         border-top: 1px solid #ddd;
                     }
+                    
+                    .print-notice {
+                        display: block !important;
+                        text-align: center;
+                        font-size: 12px !important;
+                        color: #e74c3c !important;
+                        font-style: italic;
+                        margin-top: 15px !important;
+                        padding: 8px !important;
+                        background-color: #fff3cd !important;
+                        border: 1px solid #ffeaa7 !important;
+                        border-radius: 4px !important;
+                    }
                 }
                 
                 .print-header {
@@ -157,12 +177,13 @@
                     text-align: center;
                     padding: 15px 0;
                     border-bottom: 2px solid #333;
-                    margin-bottom: 20px;
+                    margin-bottom: 15px;
                 }
                 
                 .print-header h2 {
                     color: #2c3e50;
                     margin-bottom: 5px;
+                    font-size: 22px;
                 }
                 
                 .print-header .print-subtitle {
@@ -174,6 +195,38 @@
                     color: #e74c3c;
                     font-weight: bold;
                     margin-top: 5px;
+                    font-size: 12px;
+                }
+                
+                .print-quran-verse {
+                    display: none;
+                    direction: rtl;
+                    text-align: center;
+                    font-size: 18px;
+                    color: #2c3e50;
+                    font-weight: bold;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                    border-radius: 8px;
+                    border-right: 5px solid #3498db;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    font-family: 'Traditional Arabic', 'Arial', sans-serif;
+                }
+                
+                .print-notice {
+                    display: none;
+                    direction: rtl;
+                    text-align: center;
+                    font-size: 14px;
+                    color: #e74c3c;
+                    font-style: italic;
+                    margin-top: 20px;
+                    padding: 12px;
+                    background-color: #fff3cd;
+                    border: 2px solid #ffeaa7;
+                    border-radius: 6px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
                 }
                 
                 .print-footer {
@@ -262,6 +315,11 @@
                         </div>
                     </div>
                     
+                    <!-- الآية القرآنية للطباعة -->
+                    <div class="print-quran-verse">
+                        ﴿إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا﴾ [النساء: 103]
+                    </div>
+                    
                     <!-- رأس الجدول العادي -->
                     <div class="monthly-header text-center mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -335,6 +393,55 @@
                         </div>
                     </div>
                     
+                    <!-- إعدادات طريقة الحساب -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white py-2">
+                                    <i class="bi bi-calculator me-2"></i>إعدادات الحساب
+                                </div>
+                                <div class="card-body py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <label class="form-label mb-1"><small>طريقة الحساب:</small></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select id="calculation-method-monthly" class="form-select form-select-sm">
+                                                <option value="Hadi">تقويم الهادي</option>
+                                                <option value="MWL">رابطة العالم الإسلامي</option>
+                                                <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
+                                                <option value="Egypt">هيئة المساحة المصرية</option>
+                                                <option value="Makkah">أم القرى</option>
+                                                <option value="Karachi">جامعة العلوم الإسلامية كراتشي</option>
+                                                <option value="Tehran">جامعة طهران</option>
+                                                <option value="Jafari">الهيئة العامة للتقويم (إيران)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <small class="text-muted" id="method-description">
+                                                طريقة حساب أوقات الصلاة المستخدمة حالياً
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white py-2">
+                                    <i class="bi bi-printer me-2"></i>خيارات الطباعة
+                                </div>
+                                <div class="card-body py-3">
+                                    <button id="btn-print-options" class="btn btn-outline-success btn-sm w-100">
+                                        <i class="bi bi-printer me-1"></i>معاينة قبل الطباعة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- إعدادات إضافية للطباعة -->
                     <div class="row mb-3 print-settings d-none d-print-block">
                         <div class="col-12">
@@ -388,6 +495,12 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <!-- الملاحظة للطباعة -->
+                    <div class="print-notice">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        نرجو من المؤمنين الكرام الاحتياط بدقيقة أو دقيقتين عند الصلاة
                     </div>
                     
                     <!-- معلومات إضافية -->
@@ -461,6 +574,7 @@
             const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
             const calculationMethod = settings.calculationMethod || 'Hadi';
             const methodName = this.getMethodName(calculationMethod);
+            const methodDescription = this.getMethodDescription(calculationMethod);
             
             const methodSelect = document.getElementById('calculation-method-monthly');
             if (methodSelect) {
@@ -476,7 +590,45 @@
                 if (methodNameElement) {
                     methodNameElement.textContent = methodName;
                 }
+                
+                // تحديث وصف الطريقة
+                const methodDescElement = document.getElementById('method-description');
+                if (methodDescElement) {
+                    methodDescElement.textContent = methodDescription;
+                }
             }
+        },
+        
+        // الحصول على اسم طريقة الحساب
+        getMethodName: function(method) {
+            const methodNames = {
+                'Hadi': 'تقويم الهادي',
+                'MWL': 'رابطة العالم الإسلامي',
+                'ISNA': 'الجمعية الإسلامية لأمريكا الشمالية',
+                'Egypt': 'هيئة المساحة المصرية',
+                'Makkah': 'أم القرى',
+                'Karachi': 'جامعة العلوم الإسلامية كراتشي',
+                'Tehran': 'جامعة طهران',
+                'Jafari': 'الهيئة العامة للتقويم (إيران)'
+            };
+            
+            return methodNames[method] || method;
+        },
+        
+        // الحصول على وصف طريقة الحساب
+        getMethodDescription: function(method) {
+            const descriptions = {
+                'Hadi': 'تقويم الهادي يستخدم زاوية 18° للفجر والعشاء، وزاوية 4° للمغرب',
+                'MWL': 'رابطة العالم الإسلامي تستخدم زاوية 18° للفجر، وزاوية 17° للعشاء',
+                'ISNA': 'الجمعية الإسلامية لأمريكا الشمالية تستخدم زاوية 15° للفجر، وزاوية 15° للعشاء',
+                'Egypt': 'هيئة المساحة المصرية تستخدم زاوية 19.5° للفجر، وزاوية 17.5° للعشاء',
+                'Makkah': 'أم القرى تستخدم زاوية 18.5° للفجر، و90 دقيقة بعد المغرب للعشاء',
+                'Karachi': 'جامعة العلوم الإسلامية كراتشي تستخدم زاوية 18° للفجر، وزاوية 18° للعشاء',
+                'Tehran': 'جامعة طهران تستخدم زاوية 17.7° للفجر، وزاوية 14° للعشاء',
+                'Jafari': 'الهيئة العامة للتقويم تستخدم زاوية 16° للفجر، وزاوية 14° للعشاء، وزاوية 4° للمغرب'
+            };
+            
+            return descriptions[method] || 'طريقة حساب أوقات الصلاة';
         },
         
         // الحصول على حالة التوقيت الصيفي
@@ -498,6 +650,7 @@
                 const printBtn = document.getElementById('btn-print-timetable');
                 const printMobileBtn = document.getElementById('btn-print-mobile');
                 const closeBtn = document.getElementById('btn-close-timetable');
+                const printOptionsBtn = document.getElementById('btn-print-options');
                 const methodSelect = document.getElementById('calculation-method-monthly');
                 
                 if (prevBtn) {
@@ -520,6 +673,10 @@
                     printMobileBtn.addEventListener('click', () => this.printTimetable());
                 }
                 
+                if (printOptionsBtn) {
+                    printOptionsBtn.addEventListener('click', () => this.showPrintPreview());
+                }
+                
                 if (closeBtn) {
                     closeBtn.addEventListener('click', () => {
                         const modal = bootstrap.Modal.getInstance(document.getElementById('monthly-timetable-modal'));
@@ -528,7 +685,9 @@
                 }
                 
                 if (methodSelect) {
-                    methodSelect.addEventListener('change', (e) => this.changeCalculationMethod(e.target.value));
+                    methodSelect.addEventListener('change', (e) => {
+                        this.changeCalculationMethod(e.target.value);
+                    });
                 }
             }, 100);
         },
@@ -579,6 +738,151 @@
                     this.showPrintAlternative();
                 }
             }, 500);
+        },
+        
+        // معاينة قبل الطباعة
+        showPrintPreview: function() {
+            this.showNotification('جاري إعداد معاينة الطباعة...', 'info');
+            
+            // تحديث معلومات الطباعة
+            const methodSelect = document.getElementById('calculation-method-monthly');
+            if (methodSelect) {
+                const methodName = this.getMethodName(methodSelect.value);
+                const printMethodElement = document.getElementById('print-method-name');
+                if (printMethodElement) {
+                    printMethodElement.textContent = methodName;
+                }
+            }
+            
+            // إنشاء نافذة معاينة
+            const printContent = document.querySelector('#monthly-timetable-modal .modal-content').cloneNode(true);
+            
+            // إعداد النافذة المنبثقة للمعاينة
+            const previewWindow = window.open('', 'معاينة الطباعة', 'width=800,height=600,scrollbars=yes');
+            
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl" lang="ar">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>معاينة طباعة جدول أوقات الصلاة</title>
+                    <style>
+                        body {
+                            font-family: 'Arial', sans-serif;
+                            padding: 20px;
+                            background: #f5f5f5;
+                        }
+                        .preview-container {
+                            background: white;
+                            padding: 20px;
+                            border-radius: 10px;
+                            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        .preview-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 3px solid #2c3e50;
+                            padding-bottom: 15px;
+                        }
+                        .preview-header h2 {
+                            color: #2c3e50;
+                            margin-bottom: 10px;
+                        }
+                        .quran-verse {
+                            text-align: center;
+                            font-size: 18px;
+                            color: #2c3e50;
+                            font-weight: bold;
+                            margin: 20px 0;
+                            padding: 15px;
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border-radius: 8px;
+                            border-right: 5px solid #3498db;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 20px 0;
+                        }
+                        th, td {
+                            border: 1px solid #ddd;
+                            padding: 8px;
+                            text-align: center;
+                        }
+                        th {
+                            background-color: #3498db;
+                            color: white;
+                        }
+                        .notice {
+                            text-align: center;
+                            font-size: 14px;
+                            color: #e74c3c;
+                            font-style: italic;
+                            margin: 20px 0;
+                            padding: 10px;
+                            background-color: #fff3cd;
+                            border: 1px solid #ffeaa7;
+                            border-radius: 5px;
+                        }
+                        .print-actions {
+                            text-align: center;
+                            margin-top: 30px;
+                            padding-top: 20px;
+                            border-top: 1px solid #ddd;
+                        }
+                        .btn {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            margin: 0 10px;
+                        }
+                        .btn-print {
+                            background-color: #2ecc71;
+                            color: white;
+                        }
+                        .btn-close {
+                            background-color: #e74c3c;
+                            color: white;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <h2>معاينة طباعة جدول أوقات الصلاة</h2>
+                            <p>هذه معاينة لكيفية ظهور الجدول عند الطباعة</p>
+                        </div>
+                        
+                        <div class="quran-verse">
+                            ﴿إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا﴾ [النساء: 103]
+                        </div>
+                        
+                        ${printContent.innerHTML}
+                        
+                        <div class="notice">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            نرجو من المؤمنين الكرام الاحتياط بدقيقة أو دقيقتين عند الصلاة
+                        </div>
+                        
+                        <div class="print-actions">
+                            <button class="btn btn-print" onclick="window.print()">
+                                <i class="bi bi-printer"></i> طباعة الآن
+                            </button>
+                            <button class="btn btn-close" onclick="window.close()">
+                                <i class="bi bi-x-circle"></i> إغلاق المعاينة
+                            </button>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            previewWindow.document.close();
         },
         
         // بديل الطباعة: تنزيل كصورة أو PDF
@@ -637,9 +941,17 @@
                 
                 // تحديث عرض اسم الطريقة
                 const methodName = this.getMethodName(method);
+                const methodDescription = this.getMethodDescription(method);
+                
                 const methodNameElement = document.getElementById('current-method-name');
                 if (methodNameElement) {
                     methodNameElement.textContent = methodName;
+                }
+                
+                // تحديث وصف الطريقة
+                const methodDescElement = document.getElementById('method-description');
+                if (methodDescElement) {
+                    methodDescElement.textContent = methodDescription;
                 }
                 
                 // حفظ الإعدادات
@@ -652,22 +964,6 @@
                 
                 this.showNotification(`تم تغيير طريقة الحساب إلى ${methodName}`);
             }
-        },
-        
-        // الحصول على اسم طريقة الحساب
-        getMethodName: function(method) {
-            const methodNames = {
-                'Hadi': 'تقويم الهادي',
-                'MWL': 'رابطة العالم الإسلامي',
-                'ISNA': 'الجمعية الإسلامية لأمريكا الشمالية',
-                'Egypt': 'هيئة المساحة المصرية',
-                'Makkah': 'أم القرى',
-                'Karachi': 'جامعة العلوم الإسلامية كراتشي',
-                'Tehran': 'جامعة طهران',
-                'Jafari': 'الهيئة العامة للتقويم (إيران)'
-            };
-            
-            return methodNames[method] || method;
         },
         
         // تغيير الشهر
