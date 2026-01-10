@@ -102,13 +102,8 @@
             const contentDiv = document.getElementById('monthly-timetable-content');
             if (!contentDiv) return;
             
-            // احصل على إعدادات التطبيق
-            const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-            const currentLocation = window.currentLocation || {
-                latitude: 31.9539,
-                longitude: 44.3736,
-                city: 'النجف'
-            };
+            // احصل على الموقع الحالي من التطبيق الرئيسي
+            const currentLocation = this.getCurrentLocation();
             
             contentDiv.innerHTML = `
                 <div class="monthly-timetable-container p-3">
@@ -236,6 +231,35 @@
             
             // إعداد الأحداث للعناصر الجديدة
             this.setupModalEventListeners();
+        },
+        
+        // الحصول على الموقع الحالي
+        getCurrentLocation: function() {
+            // محاولة الحصول من التطبيق الرئيسي أولاً
+            if (window.currentLocation && window.currentLocation.latitude) {
+                console.log('📍 باستخدام الموقع الحالي من التطبيق:', window.currentLocation.city);
+                return window.currentLocation;
+            }
+            
+            // محاولة الحصول من localStorage
+            const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
+            
+            if (settings.latitude && settings.longitude) {
+                console.log('📍 باستخدام الموقع من localStorage:', settings.cityName || 'موقع محفوظ');
+                return {
+                    latitude: settings.latitude,
+                    longitude: settings.longitude,
+                    city: settings.cityName || 'موقع محفوظ'
+                };
+            }
+            
+            // القيم الافتراضية إذا لم يتم العثور على موقع
+            console.log('⚠️ لم يتم العثور على موقع، استخدام قيم افتراضية');
+            return {
+                latitude: 31.9539,
+                longitude: 44.3736,
+                city: 'النجف'
+            };
         },
         
         // تعيين طريقة الحساب من الإعدادات
@@ -377,13 +401,8 @@
                 </tr>
             `;
             
-            // احصل على إعدادات التطبيق الرئيسي
-            const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
-            const currentLocation = window.currentLocation || {
-                latitude: 31.9539,
-                longitude: 44.3736,
-                city: 'النجف'
-            };
+            // احصل على الموقع الحالي
+            const currentLocation = this.getCurrentLocation();
             
             // تحديث معلومات الموقع
             const locationInfo = document.getElementById('monthly-location-info');
@@ -450,7 +469,7 @@
             // عند الانتهاء، عرض الجدول الكامل
             setTimeout(() => {
                 tableBody.innerHTML = tableHTML;
-                console.log(`✅ تم حساب ${totalDays} يوم من أوقات الصلاة`);
+                console.log(`✅ تم حساب ${totalDays} يوم من أوقات الصلاة لموقع: ${location.city}`);
                 
                 // إضافة صف التذييل
                 const tfoot = document.createElement('tfoot');
@@ -459,7 +478,7 @@
                         <td colspan="10" class="text-center py-2">
                             <small class="text-muted">
                                 <i class="bi bi-check-circle text-success me-1"></i>
-                                تم حساب ${totalDays} يوم من أوقات الصلاة بدقة
+                                تم حساب ${totalDays} يوم من أوقات الصلاة بدقة لـ ${location.city}
                             </small>
                         </td>
                     </tr>
@@ -491,93 +510,93 @@
         },
         
         // حساب أوقات الصلاة باستخدام praytimes
-      calculatePrayerTimes: function(date, location) {
-    // إذا كانت مكتبة praytimes متاحة، استخدمها
-    if (this.prayTimes && typeof this.prayTimes.getTimes === 'function') {
-        try {
-            // الحصول على طريقة الحساب الحالية
-            const methodSelect = document.getElementById('calculation-method-monthly');
-            const currentMethod = methodSelect ? methodSelect.value : 'Hadi';
-            
-            // إعدادات تقويم الهادي مع الزاوية 4 للمغرب
-            if (currentMethod === 'Hadi') {
-                // حفظ الإعدادات الأصلية
-                const originalMethod = this.prayTimes.getMethod();
-                
-                // استخدام طريقة جعفري كأساس (لأنها تستخدم الزاوية 4 للمغرب)
-                this.prayTimes.setMethod('Jafari');
-                
-                // تعديل إعدادات تقويم الهادي
-                const hadiParams = {
-                    fajr: 18,   // تقويم الهادي يستخدم 18°
-                    isha: 18,     // تقويم الهادي يستخدم 18°
-                    maghrib: 4,   // الزاوية 4 للمغرب (مشترك مع الجعفري)
-                    asr: 'Standard', // المذهب الحنفي
-                    highLats: 'NightMiddle'
-                };
-                
-                // تطبيق إعدادات الهادي
-                this.prayTimes.adjust(hadiParams);
-                
-                // حساب الأوقات
-                const times = this.prayTimes.getTimes(
-                    date,
-                    [location.latitude, location.longitude],
-                    3, // توقيت العراق
-                    0, // الارتفاع
-                    0  // التوقيت الصيفي
-                );
-                
-                // استعادة الطريقة الأصلية
-                this.prayTimes.setMethod(originalMethod);
-                
-                // تطبيق تعديلات الوقت من الإعدادات
-                const adjustedTimes = this.applyTimeAdjustments(times);
-                
-                return {
-                    imsak: this.formatTime(adjustedTimes.imsak || times.imsak || '--:--'),
-                    fajr: this.formatTime(adjustedTimes.fajr || times.fajr || '--:--'),
-                    sunrise: this.formatTime(adjustedTimes.sunrise || times.sunrise || '--:--'),
-                    dhuhr: this.formatTime(adjustedTimes.dhuhr || times.dhuhr || '--:--'),
-                    asr: this.formatTime(adjustedTimes.asr || times.asr || '--:--'),
-                    sunset: this.formatTime(adjustedTimes.sunset || times.sunset || '--:--'),
-                    maghrib: this.formatTime(adjustedTimes.maghrib || times.maghrib || '--:--'), // سيتم حسابها بـ 4°
-                    isha: this.formatTime(adjustedTimes.isha || times.isha || '--:--'),
-                    midnight: this.formatTime(adjustedTimes.midnight || times.midnight || '--:--')
-                };
+        calculatePrayerTimes: function(date, location) {
+            // إذا كانت مكتبة praytimes متاحة، استخدمها
+            if (this.prayTimes && typeof this.prayTimes.getTimes === 'function') {
+                try {
+                    // الحصول على طريقة الحساب الحالية
+                    const methodSelect = document.getElementById('calculation-method-monthly');
+                    const currentMethod = methodSelect ? methodSelect.value : 'Hadi';
+                    
+                    // إعدادات تقويم الهادي مع الزاوية 4 للمغرب
+                    if (currentMethod === 'Hadi') {
+                        // حفظ الإعدادات الأصلية
+                        const originalMethod = this.prayTimes.getMethod();
+                        
+                        // استخدام طريقة جعفري كأساس (لأنها تستخدم الزاوية 4 للمغرب)
+                        this.prayTimes.setMethod('Jafari');
+                        
+                        // تعديل إعدادات تقويم الهادي
+                        const hadiParams = {
+                            fajr: 18,   // تقويم الهادي يستخدم 18°
+                            isha: 18,   // تقويم الهادي يستخدم 18°
+                            maghrib: 4, // الزاوية 4 للمغرب (مشترك مع الجعفري)
+                            asr: 'Standard', // المذهب الحنفي
+                            highLats: 'NightMiddle'
+                        };
+                        
+                        // تطبيق إعدادات الهادي
+                        this.prayTimes.adjust(hadiParams);
+                        
+                        // حساب الأوقات
+                        const times = this.prayTimes.getTimes(
+                            date,
+                            [location.latitude, location.longitude],
+                            3, // توقيت العراق
+                            0, // الارتفاع
+                            0  // التوقيت الصيفي
+                        );
+                        
+                        // استعادة الطريقة الأصلية
+                        this.prayTimes.setMethod(originalMethod);
+                        
+                        // تطبيق تعديلات الوقت من الإعدادات
+                        const adjustedTimes = this.applyTimeAdjustments(times);
+                        
+                        return {
+                            imsak: this.formatTime(adjustedTimes.imsak || times.imsak || '--:--'),
+                            fajr: this.formatTime(adjustedTimes.fajr || times.fajr || '--:--'),
+                            sunrise: this.formatTime(adjustedTimes.sunrise || times.sunrise || '--:--'),
+                            dhuhr: this.formatTime(adjustedTimes.dhuhr || times.dhuhr || '--:--'),
+                            asr: this.formatTime(adjustedTimes.asr || times.asr || '--:--'),
+                            sunset: this.formatTime(adjustedTimes.sunset || times.sunset || '--:--'),
+                            maghrib: this.formatTime(adjustedTimes.maghrib || times.maghrib || '--:--'), // سيتم حسابها بـ 4°
+                            isha: this.formatTime(adjustedTimes.isha || times.isha || '--:--'),
+                            midnight: this.formatTime(adjustedTimes.midnight || times.midnight || '--:--')
+                        };
+                    } else {
+                        // طرق حساب أخرى (بدون تغيير)
+                        const times = this.prayTimes.getTimes(
+                            date,
+                            [location.latitude, location.longitude],
+                            3,
+                            0,
+                            0
+                        );
+                        
+                        const adjustedTimes = this.applyTimeAdjustments(times);
+                        
+                        return {
+                            imsak: this.formatTime(adjustedTimes.imsak || times.imsak || '--:--'),
+                            fajr: this.formatTime(adjustedTimes.fajr || times.fajr || '--:--'),
+                            sunrise: this.formatTime(adjustedTimes.sunrise || times.sunrise || '--:--'),
+                            dhuhr: this.formatTime(adjustedTimes.dhuhr || times.dhuhr || '--:--'),
+                            asr: this.formatTime(adjustedTimes.asr || times.asr || '--:--'),
+                            sunset: this.formatTime(adjustedTimes.sunset || times.sunset || '--:--'),
+                            maghrib: this.formatTime(adjustedTimes.maghrib || times.maghrib || '--:--'),
+                            isha: this.formatTime(adjustedTimes.isha || times.isha || '--:--'),
+                            midnight: this.formatTime(adjustedTimes.midnight || times.midnight || '--:--')
+                        };
+                    }
+                } catch (error) {
+                    console.error('خطأ في حساب أوقات الصلاة باستخدام praytimes:', error);
+                    return this.calculateApproximateTimes(date, location);
+                }
             } else {
-                // طرق حساب أخرى (بدون تغيير)
-                const times = this.prayTimes.getTimes(
-                    date,
-                    [location.latitude, location.longitude],
-                    3,
-                    0,
-                    0
-                );
-                
-                const adjustedTimes = this.applyTimeAdjustments(times);
-                
-                return {
-                    imsak: this.formatTime(adjustedTimes.imsak || times.imsak || '--:--'),
-                    fajr: this.formatTime(adjustedTimes.fajr || times.fajr || '--:--'),
-                    sunrise: this.formatTime(adjustedTimes.sunrise || times.sunrise || '--:--'),
-                    dhuhr: this.formatTime(adjustedTimes.dhuhr || times.dhuhr || '--:--'),
-                    asr: this.formatTime(adjustedTimes.asr || times.asr || '--:--'),
-                    sunset: this.formatTime(adjustedTimes.sunset || times.sunset || '--:--'),
-                    maghrib: this.formatTime(adjustedTimes.maghrib || times.maghrib || '--:--'),
-                    isha: this.formatTime(adjustedTimes.isha || times.isha || '--:--'),
-                    midnight: this.formatTime(adjustedTimes.midnight || times.midnight || '--:--')
-                };
+                // استخدام حساب تقريبي
+                return this.calculateApproximateTimes(date, location);
             }
-        } catch (error) {
-            console.error('خطأ في حساب أوقات الصلاة باستخدام praytimes:', error);
-            return this.calculateApproximateTimes(date, location);
-        }
-    } else {
-        // استخدام حساب تقريبي
-        return this.calculateApproximateTimes(date, location);
-    }
-},
+        },
         
         // تطبيق تعديلات الوقت من الإعدادات
         applyTimeAdjustments: function(times) {
@@ -626,7 +645,7 @@
             const latFactor = Math.abs(location.latitude) / 90;
             const dayFactor = dayOfYear / 365;
             
-            // حسابات للنجف (خط العرض 32)
+            // حسابات مخصصة بناءً على الموقع
             const baseFajr = 5.0 + latFactor * 1.5 + Math.sin(dayFactor * Math.PI * 2) * 0.5;
             const baseSunrise = baseFajr + 1.2;
             const baseSunset = 18.5 - latFactor * 1.5 - Math.sin(dayFactor * Math.PI * 2) * 0.5;
@@ -724,5 +743,3 @@
         }, 1000);
     });
 })();
-
-
