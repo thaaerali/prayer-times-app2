@@ -1,4 +1,4 @@
-// ملف JavaScript المعدل للجدول الشهري مع حساب واقعي باستخدام praytimes.js
+// ملف JavaScript المعدل للجدول الشهري مع زر طباعة
 (function() {
     'use strict';
     
@@ -16,6 +16,12 @@
         monthNames: [
             "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
             "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+        ],
+        
+        // أسماء الأشهر الهجرية (اختياري)
+        hijriMonthNames: [
+            "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة",
+            "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
         ],
         
         // أسماء الصلوات بالعربية
@@ -39,6 +45,143 @@
             this.initPrayTimes();
             
             this.setupEventListeners();
+            
+            // إضافة أنماط الطباعة
+            this.addPrintStyles();
+        },
+        
+        // إضافة أنماط الطباعة
+        addPrintStyles: function() {
+            // إنشاء عنصر style لأنماط الطباعة
+            const style = document.createElement('style');
+            style.id = 'monthly-timetable-print-styles';
+            style.textContent = `
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    
+                    #monthly-timetable-modal .modal-content,
+                    #monthly-timetable-modal .modal-content * {
+                        visibility: visible;
+                    }
+                    
+                    #monthly-timetable-modal {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        min-height: 100vh;
+                        background: white !important;
+                        display: block !important;
+                        opacity: 1 !important;
+                        transform: none !important;
+                    }
+                    
+                    #monthly-timetable-modal .modal-dialog {
+                        max-width: 100% !important;
+                        width: 100% !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    
+                    #monthly-timetable-modal .modal-content {
+                        border: none !important;
+                        box-shadow: none !important;
+                        border-radius: 0 !important;
+                        min-height: 100vh;
+                    }
+                    
+                    #monthly-timetable-modal .modal-header,
+                    #monthly-timetable-modal .modal-footer {
+                        display: none !important;
+                    }
+                    
+                    #monthly-timetable-modal .print-header {
+                        display: block !important;
+                    }
+                    
+                    .month-controls,
+                    .btn-print,
+                    .btn-close,
+                    button,
+                    .alert,
+                    .text-muted:not(.print-text) {
+                        display: none !important;
+                    }
+                    
+                    .monthly-timetable-container {
+                        padding: 10px !important;
+                    }
+                    
+                    .table {
+                        font-size: 12px !important;
+                        border: 1px solid #000 !important;
+                    }
+                    
+                    .table th,
+                    .table td {
+                        border: 1px solid #000 !important;
+                        padding: 4px !important;
+                    }
+                    
+                    .table-success {
+                        background-color: #d4edda !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    
+                    .print-watermark {
+                        position: fixed;
+                        bottom: 10px;
+                        right: 10px;
+                        font-size: 10px;
+                        color: #666;
+                    }
+                    
+                    .print-footer {
+                        display: block !important;
+                        text-align: center;
+                        font-size: 10px;
+                        color: #666;
+                        margin-top: 20px;
+                        padding-top: 10px;
+                        border-top: 1px solid #ddd;
+                    }
+                }
+                
+                .print-header {
+                    display: none;
+                    text-align: center;
+                    padding: 15px 0;
+                    border-bottom: 2px solid #333;
+                    margin-bottom: 20px;
+                }
+                
+                .print-header h2 {
+                    color: #2c3e50;
+                    margin-bottom: 5px;
+                }
+                
+                .print-header .print-subtitle {
+                    color: #7f8c8d;
+                    font-size: 14px;
+                }
+                
+                .print-header .print-date {
+                    color: #e74c3c;
+                    font-weight: bold;
+                    margin-top: 5px;
+                }
+                
+                .print-footer {
+                    display: none;
+                }
+            `;
+            
+            document.head.appendChild(style);
         },
         
         // تهيئة مكتبة praytimes
@@ -97,7 +240,7 @@
             });
         },
         
-        // تحميل محتوى الجدول مع خيارات متقدمة
+        // تحميل محتوى الجدول مع زر الطباعة
         loadTimetableContent: function() {
             const contentDiv = document.getElementById('monthly-timetable-content');
             if (!contentDiv) return;
@@ -107,16 +250,33 @@
             
             contentDiv.innerHTML = `
                 <div class="monthly-timetable-container p-3">
-                    <!-- رأس الجدول -->
+                    <!-- رأس الجدول للطباعة -->
+                    <div class="print-header">
+                        <h2>جدول أوقات الصلاة الشهري</h2>
+                        <div class="print-subtitle">
+                            <span>${this.monthNames[this.currentMonth]} ${this.currentYear}</span> | 
+                            <span>${currentLocation.city}</span>
+                        </div>
+                        <div class="print-date">
+                            تم الإنشاء: ${new Date().toLocaleDateString('ar-EG')}
+                        </div>
+                    </div>
+                    
+                    <!-- رأس الجدول العادي -->
                     <div class="monthly-header text-center mb-4">
-                        <h4 class="text-primary mb-2">جدول أوقات الصلاة الشهري</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="text-primary mb-0">جدول أوقات الصلاة الشهري</h4>
+                            <button class="btn btn-outline-secondary btn-sm" id="btn-close-timetable">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
                         <div id="monthly-location-info" class="text-muted small">
                             <i class="bi bi-geo-alt"></i> الموقع: ${currentLocation.city}
                         </div>
                     </div>
                     
                     <!-- عناصر التحكم -->
-                    <div class="month-controls d-flex flex-wrap justify-content-center align-items-center gap-3 mb-4 p-3 bg-light rounded">
+                    <div class="month-controls d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-light rounded">
                         <div class="d-flex align-items-center gap-2">
                             <button id="prev-month-btn" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-chevron-right"></i> السابق
@@ -133,27 +293,15 @@
                             <button id="go-to-today-btn" class="btn btn-primary btn-sm">
                                 <i class="bi bi-calendar-check me-1"></i> هذا الشهر
                             </button>
-                        </div>
-                        
-                        <!-- طريقة الحساب -->
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="small text-muted">طريقة الحساب:</span>
-                            <select id="calculation-method-monthly" class="form-select form-select-sm" style="width: auto;">
-                                <option value="Hadi">تقويم الهادي</option>
-                                <option value="MWL">رابطة العالم الإسلامي</option>
-                                <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية</option>
-                                <option value="Egypt">هيئة المساحة المصرية</option>
-                                <option value="Makkah">أم القرى</option>
-                                <option value="Karachi">جامعة العلوم الإسلامية كراتشي</option>
-                                <option value="Tehran">جامعة طهران</option>
-                                <option value="Jafari">الهيئة العامة للتقويم (إيران)</option>
-                            </select>
+                            <button id="btn-print-timetable" class="btn btn-success btn-sm">
+                                <i class="bi bi-printer me-1"></i> طباعة الجدول
+                            </button>
                         </div>
                     </div>
                     
                     <!-- معلومات سريعة -->
                     <div class="row mb-4">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card border-0 bg-light">
                                 <div class="card-body text-center py-2">
                                     <small class="text-muted d-block">خط العرض</small>
@@ -161,7 +309,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card border-0 bg-light">
                                 <div class="card-body text-center py-2">
                                     <small class="text-muted d-block">خط الطول</small>
@@ -169,11 +317,43 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center py-2">
+                                    <small class="text-muted d-block">طريقة الحساب</small>
+                                    <span id="current-method-name" class="fw-bold">تقويم الهادي</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="card border-0 bg-light">
                                 <div class="card-body text-center py-2">
                                     <small class="text-muted d-block">التوقيت الصيفي</small>
                                     <span class="fw-bold">${this.getDstStatus()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- إعدادات إضافية للطباعة -->
+                    <div class="row mb-3 print-settings d-none d-print-block">
+                        <div class="col-12">
+                            <div class="card border-primary">
+                                <div class="card-body py-2">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block print-text">طريقة الحساب:</small>
+                                            <span class="fw-bold print-text" id="print-method-name">تقويم الهادي</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block print-text">التوقيت الصيفي:</small>
+                                            <span class="fw-bold print-text">${this.getDstStatus()}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block print-text">المصدر:</small>
+                                            <span class="fw-bold print-text">praytimes.js</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -222,6 +402,20 @@
                                 <strong>ملاحظة:</strong> هذه الأوقات دقيقة وتعتمد على الموقع الجغرافي وطريقة الحساب المختارة.
                             </small>
                         </div>
+                        
+                        <!-- زر الطباعة للهواتف -->
+                        <div class="d-block d-md-none mt-3">
+                            <button id="btn-print-mobile" class="btn btn-success btn-sm w-100">
+                                <i class="bi bi-printer me-1"></i> طباعة الجدول
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- تذييل الطباعة -->
+                    <div class="print-footer">
+                        <div>تطبيق مواقيت الصلاة - ${currentLocation.city}</div>
+                        <div>${new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        <div class="print-watermark">صفحة 1 من 1</div>
                     </div>
                 </div>
             `;
@@ -266,6 +460,7 @@
         setCalculationMethod: function() {
             const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
             const calculationMethod = settings.calculationMethod || 'Hadi';
+            const methodName = this.getMethodName(calculationMethod);
             
             const methodSelect = document.getElementById('calculation-method-monthly');
             if (methodSelect) {
@@ -274,6 +469,12 @@
                 // تحديث مكتبة praytimes إذا كانت متاحة
                 if (this.prayTimes && this.prayTimes.setMethod) {
                     this.prayTimes.setMethod(calculationMethod);
+                }
+                
+                // تحديث عرض اسم الطريقة
+                const methodNameElement = document.getElementById('current-method-name');
+                if (methodNameElement) {
+                    methodNameElement.textContent = methodName;
                 }
             }
         },
@@ -294,6 +495,9 @@
                 const prevBtn = document.getElementById('prev-month-btn');
                 const nextBtn = document.getElementById('next-month-btn');
                 const todayBtn = document.getElementById('go-to-today-btn');
+                const printBtn = document.getElementById('btn-print-timetable');
+                const printMobileBtn = document.getElementById('btn-print-mobile');
+                const closeBtn = document.getElementById('btn-close-timetable');
                 const methodSelect = document.getElementById('calculation-method-monthly');
                 
                 if (prevBtn) {
@@ -308,10 +512,121 @@
                     todayBtn.addEventListener('click', () => this.goToCurrentMonth());
                 }
                 
+                if (printBtn) {
+                    printBtn.addEventListener('click', () => this.printTimetable());
+                }
+                
+                if (printMobileBtn) {
+                    printMobileBtn.addEventListener('click', () => this.printTimetable());
+                }
+                
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('monthly-timetable-modal'));
+                        if (modal) modal.hide();
+                    });
+                }
+                
                 if (methodSelect) {
                     methodSelect.addEventListener('change', (e) => this.changeCalculationMethod(e.target.value));
                 }
             }, 100);
+        },
+        
+        // دالة الطباعة
+        printTimetable: function() {
+            console.log('🖨️ تجهيز الجدول للطباعة...');
+            
+            // تحديث اسم طريقة الحساب في قسم الطباعة
+            const methodSelect = document.getElementById('calculation-method-monthly');
+            if (methodSelect) {
+                const methodName = this.getMethodName(methodSelect.value);
+                const printMethodElement = document.getElementById('print-method-name');
+                if (printMethodElement) {
+                    printMethodElement.textContent = methodName;
+                }
+            }
+            
+            // إظهار رسالة التجهيز
+            this.showNotification('جاري تجهيز الجدول للطباعة...', 'info');
+            
+            // إخفاء عناصر غير ضرورية مؤقتاً
+            const modalContent = document.querySelector('#monthly-timetable-modal .modal-content');
+            if (modalContent) {
+                modalContent.classList.add('print-mode');
+            }
+            
+            // استخدام setTimeout لضمان تحديث DOM قبل الطباعة
+            setTimeout(() => {
+                try {
+                    // افتح نافذة الطباعة
+                    window.print();
+                    
+                    // إعادة العناصر المخفية بعد الطباعة
+                    setTimeout(() => {
+                        if (modalContent) {
+                            modalContent.classList.remove('print-mode');
+                        }
+                        
+                        this.showNotification('تم تجهيز الجدول للطباعة بنجاح', 'success');
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('خطأ في الطباعة:', error);
+                    this.showNotification('حدث خطأ أثناء محاولة الطباعة', 'error');
+                    
+                    // بديل: عرض زر التحميل كملف PDF
+                    this.showPrintAlternative();
+                }
+            }, 500);
+        },
+        
+        // بديل الطباعة: تنزيل كصورة أو PDF
+        showPrintAlternative: function() {
+            const modalContent = document.querySelector('#monthly-timetable-modal .modal-content');
+            if (!modalContent) return;
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <strong><i class="bi bi-exclamation-triangle me-2"></i>تنبيه!</strong>
+                <p class="mb-2">لم يتمكن المتصفح من فتح نافذة الطباعة. يمكنك:</p>
+                <div class="d-flex gap-2">
+                    <button id="screenshot-btn" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-camera me-1"></i> حفظ كصورة
+                    </button>
+                    <button id="pdf-btn" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-file-pdf me-1"></i> حفظ كـ PDF
+                    </button>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            modalContent.appendChild(alertDiv);
+            
+            // إضافة مستمعي الأحداث للأزرار الجديدة
+            setTimeout(() => {
+                const screenshotBtn = document.getElementById('screenshot-btn');
+                const pdfBtn = document.getElementById('pdf-btn');
+                
+                if (screenshotBtn) {
+                    screenshotBtn.addEventListener('click', () => this.saveAsImage());
+                }
+                
+                if (pdfBtn) {
+                    pdfBtn.addEventListener('click', () => this.saveAsPDF());
+                }
+            }, 100);
+        },
+        
+        // حفظ كصورة (بديل)
+        saveAsImage: function() {
+            this.showNotification('هذه الميزة قيد التطوير', 'info');
+        },
+        
+        // حفظ كـ PDF (بديل)
+        saveAsPDF: function() {
+            this.showNotification('هذه الميزة قيد التطوير', 'info');
         },
         
         // تغيير طريقة الحساب
@@ -319,6 +634,13 @@
             if (this.prayTimes && this.prayTimes.setMethod) {
                 this.prayTimes.setMethod(method);
                 console.log(`✅ تم تغيير طريقة الحساب إلى: ${method}`);
+                
+                // تحديث عرض اسم الطريقة
+                const methodName = this.getMethodName(method);
+                const methodNameElement = document.getElementById('current-method-name');
+                if (methodNameElement) {
+                    methodNameElement.textContent = methodName;
+                }
                 
                 // حفظ الإعدادات
                 const settings = JSON.parse(localStorage.getItem('prayerSettings')) || {};
@@ -328,7 +650,7 @@
                 // إعادة توليد الجدول
                 this.generateTable();
                 
-                this.showNotification(`تم تغيير طريقة الحساب إلى ${this.getMethodName(method)}`);
+                this.showNotification(`تم تغيير طريقة الحساب إلى ${methodName}`);
             }
         },
         
@@ -739,7 +1061,7 @@
             // جعل الكائن متاحاً عالمياً
             window.MonthlyTimetable = MonthlyTimetable;
             
-            console.log('✅ الجدول الشهري جاهز للاستخدام مع مكتبة PrayTimes');
+            console.log('✅ الجدول الشهري جاهز للاستخدام مع مكتبة PrayTimes وميزة الطباعة');
         }, 1000);
     });
 })();
